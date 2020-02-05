@@ -20,10 +20,12 @@ import com.enfec.sb.deviceInfoapi.model.DeviceInfoTable;
 public class DeviceInfoRepositoryImpl implements DeviceInfoRepository {
 	private static final Logger logger = LoggerFactory.getLogger(DeviceInfoRepositoryImpl.class);
 	
-	final String SELECT_DEVICE = "select ACCNT_ID,CHIP_ID,SERIAL_NUMBER,MAKE,MODEL,FIRMWARE,WIFI_SSID,WIFI_PWD from DEVICE_INFO where ACCNT_ID =?";
+	final String SELECT_DEVICE = "select Organizer_ID, Organizer_Name, Email_Address, PASSWORD, Other_Details from Organizers where Organizer_ID = ?; ";
 
-	final String REGISTER_DEVICE = "INSERT INTO DEVICE_INFO(ACCNT_ID,CHIP_ID,SERIAL_NUMBER,MAKE,MODEL,FIRMWARE,WIFI_SSID,WIFI_PWD) VALUES "
-			+ "(:accnt_id,:chip_id,:serial_number,:make,:firmware,:model,:wifi_ssid,:wifi_pwd)";
+//	final String REGISTER_DEVICE = "INSERT INTO DEVICE_INFO(ACCNT_ID,CHIP_ID,SERIAL_NUMBER,MAKE,MODEL,FIRMWARE,WIFI_SSID,WIFI_PWD) VALUES "
+//			+ "(:accnt_id,:chip_id,:serial_number,:make,:firmware,:model,:wifi_ssid,:wifi_pwd)";
+	final String REGISTER_DEVICE = "INSERT INTO Organizers(Organizer_ID, Organizer_Name, Email_Address, PASSWORD, Other_Details) VALUES "
+			+ "(:organizer_id,:organizer_name,:email_address,:password,:other_details)";
 	
 	final String UPDATE_DEVICE_INFO = "UPDATE DEVICE_INFO SET SERIAL_NUMBER = :serial_number ,MAKE=:make,MODEL=:model"
 			+ ",FIRMWARE=:firmware,WIFI_SSID=:wifi_ssid,WIFI_PWD=:wifi_pwd where ACCNT_ID = :accnt_id AND CHIP_ID =:chip_id" ;	
@@ -36,7 +38,7 @@ public class DeviceInfoRepositoryImpl implements DeviceInfoRepository {
 	JdbcTemplate jdbcTemplate;
 
 	@Override
-	public  List<DeviceInfoTable> getDeviceInfo(String accnt_id) {
+	public  List<DeviceInfoTable> getOrganizerInfo(int accnt_id) {
 		
 		return jdbcTemplate.query(SELECT_DEVICE,new Object[] { accnt_id }, new DeviceInfoRowmapper());
 	}
@@ -47,7 +49,6 @@ public class DeviceInfoRepositoryImpl implements DeviceInfoRepository {
 		Map<String, Object> param = deviceInfoMap(deviceInfoTable);
 		
 		SqlParameterSource pramSource = new MapSqlParameterSource(param);
-		logger.info("Register Device Info : {} ",pramSource);
 		affectedRow =namedParameterJdbcTemplate.update(REGISTER_DEVICE, pramSource);
 		
 		return affectedRow;
@@ -61,7 +62,6 @@ public class DeviceInfoRepositoryImpl implements DeviceInfoRepository {
 		Map<String, Object> param = deviceInfoMap(deviceInfoTable);
 		
 		SqlParameterSource pramSource = new MapSqlParameterSource(param);
-		logger.info("Updating Device Info : {} ",pramSource);
 		affectedRow =namedParameterJdbcTemplate.update(UPDATE_DEVICE_INFO, pramSource);
 		
 		return affectedRow;
@@ -71,20 +71,16 @@ public class DeviceInfoRepositoryImpl implements DeviceInfoRepository {
 	private Map<String, Object> deviceInfoMap(DeviceInfoTable deviceInfoTable) {
 		Map<String, Object>param = new HashMap<>();
 	
-			if (deviceInfoTable.getAccnt_id() != 0) {
-				param.put("accnt_id", deviceInfoTable.getAccnt_id());
+			if (deviceInfoTable.getOrganizer_id() != 0) {
+				param.put("organizer_id", deviceInfoTable.getOrganizer_id());
 			} else {
-				logger.error("Account id missing");
 				throw new NullPointerException("Accnt_id cannot be null");
 			}
 		
-		param.put("chip_id", deviceInfoTable.getChip_id().isEmpty() ? null:deviceInfoTable.getChip_id());
-		param.put("serial_number", deviceInfoTable.getSerial_number()==null ? null:deviceInfoTable.getSerial_number());
-		param.put("make", deviceInfoTable.getMake()==null ? null:deviceInfoTable.getMake());
-		param.put("firmware", deviceInfoTable.getFirmware()==null ? null:deviceInfoTable.getFirmware());
-		param.put("model", deviceInfoTable.getModel()==null ? null :deviceInfoTable.getModel());
-		param.put("wifi_ssid", deviceInfoTable.getWifi_ssid()==null? null :deviceInfoTable.getWifi_ssid());
-		param.put("wifi_pwd", deviceInfoTable.getWifi_pwd()==null? null : Base64.getEncoder().encode((deviceInfoTable.getWifi_pwd().getBytes())));
+		param.put("organizer_name", deviceInfoTable.getOrganizer_name().isEmpty() ? null:deviceInfoTable.getOrganizer_name());
+		param.put("email_address", deviceInfoTable.getEmail_address().isEmpty() ? null:deviceInfoTable.getEmail_address());
+		param.put("password", deviceInfoTable.getPassword().isEmpty() ? null:deviceInfoTable.getPassword());
+		param.put("other_details", deviceInfoTable.getOther_details().isEmpty() ? null:deviceInfoTable.getOther_details());
 		return param;
 	}
 

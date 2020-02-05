@@ -15,15 +15,11 @@ public class DeviceInfoRowmapper implements RowMapper<DeviceInfoTable> {
 	@Override
 	public DeviceInfoTable mapRow(ResultSet rs, int rowNum) throws SQLException {
 		DeviceInfoTable deviceInfoTable = new DeviceInfoTable();
-		deviceInfoTable.setAccnt_id(rs.getInt("ACCNT_ID"));
-		deviceInfoTable.setChip_id((rs.getString("CHIP_ID")));
-		deviceInfoTable.setFirmware((rs.getString("FIRMWARE")));
-		deviceInfoTable.setMake((rs.getString("MAKE")));
-		deviceInfoTable.setModel((rs.getString("MODEL")));
-		deviceInfoTable.setSerial_number((rs.getString("SERIAL_NUMBER")));
-		deviceInfoTable.setWifi_pwd(rs.getString("WIFI_PWD")==null ? null:new String((Base64.getDecoder().decode(rs.getString("WIFI_PWD")))));
-		deviceInfoTable.setWifi_ssid((rs.getString("WIFI_SSID")));
-		
+		deviceInfoTable.setOrganizer_id(rs.getInt("Organizer_ID"));
+		deviceInfoTable.setOrganizer_name((rs.getString("Organizer_Name")));
+		deviceInfoTable.setEmail_address((rs.getString("Email_Address")));
+		deviceInfoTable.setPassword((rs.getString("Password")));
+		deviceInfoTable.setOther_details((rs.getString("Other_Details")));
 		
 		return deviceInfoTable;
 	}

@@ -67,16 +67,16 @@ public class OrganizerRepositoryImpl implements OrganizerRepository{
 	private Map<String, Object> OrganizerMap(OrganizerTable organizerTable) {
 		Map<String, Object>param = new HashMap<>();
 	
-		if(organizerTable.getOrganizer_ID() != 0) {
-			param.put("Organizer_ID", organizerTable.getOrganizer_ID());
+		if(organizerTable.Organizer_ID != 0) {
+			param.put("Organizer_ID", organizerTable.Organizer_ID);
 		} else {
 			throw new NullPointerException("Organizer_ID cannot be null");
 		}
 		
-		param.put("Organizer_Name", organizerTable.getOrganizer_Name().isEmpty() ? null:organizerTable.getOrganizer_Name());
-		param.put("Email_Address", organizerTable.getEmail_Address().isEmpty() ? null:organizerTable.getEmail_Address());
-		param.put("Password", organizerTable.getPassword().isEmpty() ? null:organizerTable.getPassword());
-		param.put("Other_Details", organizerTable.getOther_Details().isEmpty() ? null:organizerTable.getOther_Details());
+		param.put("Organizer_Name", organizerTable.Organizer_Name.isEmpty() ? null:organizerTable.Organizer_Name);
+		param.put("Email_Address", organizerTable.Email_Address.isEmpty() ? null:organizerTable.Email_Address);
+		param.put("Password", organizerTable.Password.isEmpty() ? null:organizerTable.Password);
+		param.put("Other_Details", organizerTable.Other_Details.isEmpty() ? null:organizerTable.Other_Details);
 		return param;
 	}
 }

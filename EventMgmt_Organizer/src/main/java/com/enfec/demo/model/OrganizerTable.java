@@ -6,10 +6,10 @@ import lombok.Data;
 @Data
 @Component
 public class OrganizerTable {
-	int Organizer_ID;
-	private String Organizer_Name; 
-	private String Email_Address;
-	private String Password;
-	private String Other_Details;
+	public int Organizer_ID;
+	public String Organizer_Name; 
+	public String Email_Address;
+	public String Password;
+	public String Other_Details;
 	
 }

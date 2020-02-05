@@ -17,8 +17,8 @@ import com.enfec.sb.deviceInfoapi.model.OrganizerRowmapper;
 import com.enfec.sb.deviceInfoapi.model.OrganizerTable;
 
 @Component
-public class DeviceInfoRepositoryImpl implements DeviceInfoRepository {
-	private static final Logger logger = LoggerFactory.getLogger(DeviceInfoRepositoryImpl.class);
+public class OrganizerRepositoryImpl implements OrganizerRepository {
+	private static final Logger logger = LoggerFactory.getLogger(OrganizerRepositoryImpl.class);
 	
 	final String SELECT_DEVICE = "select Organizer_ID, Organizer_Name, Email_Address, PASSWORD, Other_Details from Organizers where Organizer_ID = ?; ";
 

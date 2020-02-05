@@ -34,11 +34,11 @@ public class OrganizerController {
 			}
 	}
 
-	@RequestMapping(value = "/registerorganizer", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+	@RequestMapping(value = "/register", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> registerOrganizer(
-			@RequestBody(required = true) OrganizerTable OrganizerTable) {
+			@RequestBody(required = true) OrganizerTable organizerTable) {
 			int affectedRow = OrganizerRepositoryImpl
-					.registerOrganizer(OrganizerTable);
+					.registerOrganizer(organizerTable);
 
 			if (affectedRow == 0) {
 				return new ResponseEntity<>(

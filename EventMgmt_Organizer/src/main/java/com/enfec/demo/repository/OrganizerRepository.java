@@ -4,7 +4,7 @@ import com.enfec.demo.model.OrganizerTable;
 
 public interface OrganizerRepository {
 	
-	public Object getOrganizerInfo(int organizer_id);
-	public int registerOrganizer(OrganizerTable deviceInfoTable);
-	public int updateOrganizer(OrganizerTable deviceInfoTable);
+	public Object getOrganizerInfo(int Organizer_ID);
+	public int registerOrganizer(OrganizerTable organizerTable);
+	public int updateOrganizer(OrganizerTable organizerTable);
 }

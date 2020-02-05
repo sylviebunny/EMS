@@ -18,15 +18,15 @@ import com.enfec.demo.model.OrganizerTable;
 
 @Component
 public class OrganizerRepositoryImpl implements OrganizerRepository{
-	private static final Logger logger = LoggerFactory.getLogger(OrganizerRepositoryImpl.class);
+//	private static final Logger logger = LoggerFactory.getLogger(OrganizerRepositoryImpl.class);
 	
-	final String SELECT_ORGANIZER = "select Organizer_ID,Organizer_Name,Email_Address,Password,Other_Details from Organizers where Organizer_ID =?";
+	final String SELECT_ORGANIZER = "select Organizer_ID,Organizer_Name,Email_Address,Password,Other_Details from Organizers where Organizer_ID = ?; ";
 
 	final String REGISTER_ORGANIZER = "INSERT INTO Organizers(Organizer_ID, Organizer_Name, Email_Address, Password, Other_Details) VALUES "
-			+ "(:organizer_id,:organizer_name,:email_address,:password,:other_details)";
+			+ "(:Organizer_ID,:Organizer_Name,:Email_Address,:Password,:Other_Details)";
 	
 	final String UPDATE_ORGANIZER_INFO = "UPDATE Organizers SET Email_Address = :Email_Address ,Password=:Password,Other_Details=:Other_Details"
-			+ "where ACCNT_ID = :accnt_id AND CHIP_ID =:chip_id" ;	
+			+ "where Organizer_ID = :Organizer_ID";	
 	
 	
 	@Autowired
@@ -41,9 +41,9 @@ public class OrganizerRepositoryImpl implements OrganizerRepository{
 	}
 	
 	@Override
-	public int registerOrganizer(OrganizerTable OrganizerTable) {
+	public int registerOrganizer(OrganizerTable organizerTable) {
 		int affectedRow;
-		Map<String, Object> param = OrganizerMap(OrganizerTable);
+		Map<String, Object> param = OrganizerMap(organizerTable);
 		
 		SqlParameterSource pramSource = new MapSqlParameterSource(param);
 		affectedRow =namedParameterJdbcTemplate.update(REGISTER_ORGANIZER, pramSource);
@@ -52,31 +52,31 @@ public class OrganizerRepositoryImpl implements OrganizerRepository{
 	}
 	
 	@Override
-	public int updateOrganizer(OrganizerTable OrganizerTable) {
+	public int updateOrganizer(OrganizerTable organizerTable) {
 		int affectedRow;
-		Map<String, Object> param = OrganizerMap(OrganizerTable);
+		Map<String, Object> param = OrganizerMap(organizerTable);
 		
 		SqlParameterSource pramSource = new MapSqlParameterSource(param);
-		logger.info("Updating Organizer Info : {} ",pramSource);
+//		logger.info("Updating Organizer Info : {} ",pramSource);
 		affectedRow =namedParameterJdbcTemplate.update(UPDATE_ORGANIZER_INFO, pramSource);
 		
 		return affectedRow;
 	}
 	
 	
-	private Map<String, Object> OrganizerMap(OrganizerTable OrganizerTable) {
+	private Map<String, Object> OrganizerMap(OrganizerTable organizerTable) {
 		Map<String, Object>param = new HashMap<>();
 	
-		if (OrganizerTable.getOrganizer_ID() != 0) {
-			param.put("Organizer_ID", OrganizerTable.getOrganizer_ID());
+		if(organizerTable.getOrganizer_ID() != 0) {
+			param.put("Organizer_ID", organizerTable.getOrganizer_ID());
 		} else {
 			throw new NullPointerException("Organizer_ID cannot be null");
 		}
 		
-		param.put("Organizer_Name", OrganizerTable.getOrganizer_Name().isEmpty() ? null:OrganizerTable.getOrganizer_Name());
-		param.put("Email_Address", OrganizerTable.getEmail_Address().isEmpty() ? null:OrganizerTable.getEmail_Address());
-		param.put("Password", OrganizerTable.getPassword().isEmpty() ? null:OrganizerTable.getPassword());
-		param.put("Other_Details", OrganizerTable.getOther_Details().isEmpty() ? null:OrganizerTable.getOther_Details());
+		param.put("Organizer_Name", organizerTable.getOrganizer_Name().isEmpty() ? null:organizerTable.getOrganizer_Name());
+		param.put("Email_Address", organizerTable.getEmail_Address().isEmpty() ? null:organizerTable.getEmail_Address());
+		param.put("Password", organizerTable.getPassword().isEmpty() ? null:organizerTable.getPassword());
+		param.put("Other_Details", organizerTable.getOther_Details().isEmpty() ? null:organizerTable.getOther_Details());
 		return param;
 	}
 }

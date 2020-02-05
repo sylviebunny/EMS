@@ -1,10 +1,10 @@
-package com.enfec.EMS;
+package com.enfec.sb.deviceInfoapi;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class EmsApplicationTests {
+class DeviceInfoApiApplicationTests {
 
 	@Test
 	void contextLoads() {

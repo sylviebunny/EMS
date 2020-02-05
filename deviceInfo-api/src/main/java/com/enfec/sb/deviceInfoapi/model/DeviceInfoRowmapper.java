@@ -7,14 +7,14 @@ import java.util.Base64;
 import org.springframework.jdbc.core.RowMapper;
 
 
-public class DeviceInfoRowmapper implements RowMapper<DeviceInfoTable> {
+public class DeviceInfoRowmapper implements RowMapper<OrganizerTable> {
 
 
 	
 	
 	@Override
-	public DeviceInfoTable mapRow(ResultSet rs, int rowNum) throws SQLException {
-		DeviceInfoTable deviceInfoTable = new DeviceInfoTable();
+	public OrganizerTable mapRow(ResultSet rs, int rowNum) throws SQLException {
+		OrganizerTable deviceInfoTable = new OrganizerTable();
 		deviceInfoTable.setOrganizer_id(rs.getInt("Organizer_ID"));
 		deviceInfoTable.setOrganizer_name((rs.getString("Organizer_Name")));
 		deviceInfoTable.setEmail_address((rs.getString("Email_Address")));

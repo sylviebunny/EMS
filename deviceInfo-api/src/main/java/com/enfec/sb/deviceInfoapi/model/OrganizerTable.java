@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Data
 @Component
-public class DeviceInfoTable {
+public class OrganizerTable {
 	
 	int organizer_id;
 	private String organizer_name; 

@@ -14,7 +14,7 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Component;
 
 import com.enfec.sb.deviceInfoapi.model.DeviceInfoRowmapper;
-import com.enfec.sb.deviceInfoapi.model.DeviceInfoTable;
+import com.enfec.sb.deviceInfoapi.model.OrganizerTable;
 
 @Component
 public class DeviceInfoRepositoryImpl implements DeviceInfoRepository {
@@ -38,13 +38,13 @@ public class DeviceInfoRepositoryImpl implements DeviceInfoRepository {
 	JdbcTemplate jdbcTemplate;
 
 	@Override
-	public  List<DeviceInfoTable> getOrganizerInfo(int accnt_id) {
+	public  List<OrganizerTable> getOrganizerInfo(int accnt_id) {
 		
 		return jdbcTemplate.query(SELECT_DEVICE,new Object[] { accnt_id }, new DeviceInfoRowmapper());
 	}
 
 	@Override
-	public int registerDevice(DeviceInfoTable deviceInfoTable) {
+	public int registerDevice(OrganizerTable deviceInfoTable) {
 		int affectedRow;
 		Map<String, Object> param = deviceInfoMap(deviceInfoTable);
 		
@@ -57,7 +57,7 @@ public class DeviceInfoRepositoryImpl implements DeviceInfoRepository {
 	}
 
 	@Override
-	public int updateDevice(DeviceInfoTable deviceInfoTable) {
+	public int updateDevice(OrganizerTable deviceInfoTable) {
 		int affectedRow;
 		Map<String, Object> param = deviceInfoMap(deviceInfoTable);
 		
@@ -68,7 +68,7 @@ public class DeviceInfoRepositoryImpl implements DeviceInfoRepository {
 
 	}
 	
-	private Map<String, Object> deviceInfoMap(DeviceInfoTable deviceInfoTable) {
+	private Map<String, Object> deviceInfoMap(OrganizerTable deviceInfoTable) {
 		Map<String, Object>param = new HashMap<>();
 	
 			if (deviceInfoTable.getOrganizer_id() != 0) {

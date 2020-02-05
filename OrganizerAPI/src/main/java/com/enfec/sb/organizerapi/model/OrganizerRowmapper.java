@@ -1,4 +1,4 @@
-package com.enfec.sb.deviceInfoapi.model;
+package com.enfec.sb.organizerapi.model;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

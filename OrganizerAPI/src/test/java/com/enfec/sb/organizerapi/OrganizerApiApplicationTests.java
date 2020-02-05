@@ -1,4 +1,4 @@
-package com.enfec.sb.deviceInfoapi;
+package com.enfec.sb.organizerapi;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -9,5 +9,6 @@ class OrganizerApiApplicationTests {
 	@Test
 	void contextLoads() {
 	}
+	
 
 }

@@ -1,4 +1,4 @@
-package com.enfec.sb.deviceInfoapi.repository;
+package com.enfec.sb.organizerapi.repository;
 
 import java.util.Base64;
 import java.util.HashMap;
@@ -13,8 +13,8 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Component;
 
-import com.enfec.sb.deviceInfoapi.model.OrganizerRowmapper;
-import com.enfec.sb.deviceInfoapi.model.OrganizerTable;
+import com.enfec.sb.organizerapi.model.OrganizerRowmapper;
+import com.enfec.sb.organizerapi.model.OrganizerTable;
 
 @Component
 public class OrganizerRepositoryImpl implements OrganizerRepository {

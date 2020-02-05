@@ -1,4 +1,4 @@
-package com.enfec.sb.deviceInfoapi;
+package com.enfec.sb.organizerapi;
 
 
 import org.springframework.boot.SpringApplication;

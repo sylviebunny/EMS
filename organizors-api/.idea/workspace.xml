@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="c4107815-998c-4ee7-91c3-e16e92abe463" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/enfec/sb/deviceInfoapi/repository/DeviceInfoRepositoryImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/enfec/sb/deviceInfoapi/repository/DeviceInfoRepositoryImpl.java" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="CodeStyleSettingsInfer">
+    <option name="done" value="true" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectCodeStyleSettingsMigration">
+    <option name="version" value="1" />
+  </component>
+  <component name="ProjectId" id="1V7CW9ZSO1BQzO7HMBKWNoGL9aN" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="aspect.path.notification.shown" value="true" />
+    <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
+    <property name="nodejs_npm_path_reset_for_default_project" value="true" />
+    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
+  </component>
+  <component name="RunManager">
+    <configuration name="DeviceInfoApiApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+      <module name="deviceInfo-api" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.enfec.sb.deviceInfoapi.DeviceInfoApiApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="ServiceViewManager">
+    <option name="viewStates">
+      <list>
+        <serviceView>
+          <treeState>
+            <expand />
+            <select />
+          </treeState>
+        </serviceView>
+      </list>
+    </option>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="c4107815-998c-4ee7-91c3-e16e92abe463" name="Default Changelist" comment="" />
+      <created>1576594775391</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1576594775391</updated>
+      <workItem from="1576594777552" duration="2492000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="328" y="106" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog" timestamp="1580402971973">
+      <screen x="0" y="23" width="1280" height="736" />
+    </state>
+    <state x="328" y="106" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog/0.23.1280.732@0.23.1280.732" timestamp="1578395159755" />
+    <state x="328" y="106" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog/0.23.1280.736@0.23.1280.736" timestamp="1580402971973" />
+    <state x="269" y="72" key="NewModule_or_Project.wizard" timestamp="1580787438002">
+      <screen x="0" y="23" width="1280" height="738" />
+    </state>
+    <state x="269" y="72" key="NewModule_or_Project.wizard/0.23.1280.736@0.23.1280.736" timestamp="1580735354624" />
+    <state x="269" y="72" key="NewModule_or_Project.wizard/0.23.1280.738@0.23.1280.738" timestamp="1580787438002" />
+    <state x="319" y="204" key="com.intellij.ide.util.TipDialog" timestamp="1576897141947">
+      <screen x="0" y="23" width="1280" height="730" />
+    </state>
+    <state x="319" y="204" key="com.intellij.ide.util.TipDialog/0.23.1280.730@0.23.1280.730" timestamp="1576897141947" />
+  </component>
+</project>

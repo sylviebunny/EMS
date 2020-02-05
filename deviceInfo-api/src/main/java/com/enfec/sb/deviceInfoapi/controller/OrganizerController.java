@@ -19,7 +19,7 @@ import com.enfec.sb.deviceInfoapi.repository.DeviceInfoRepositoryImpl;
 import com.google.gson.Gson;
 
 @RestController
-public class DeviceInfoController {
+public class OrganizerController {
 
 	@Autowired
 	DeviceInfoRepositoryImpl deviceInfoRepositoryImpl;

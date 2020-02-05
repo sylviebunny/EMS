@@ -15,14 +15,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.enfec.sb.deviceInfoapi.model.OrganizerTable;
-import com.enfec.sb.deviceInfoapi.repository.DeviceInfoRepositoryImpl;
+import com.enfec.sb.deviceInfoapi.repository.OrganizerRepositoryImpl;
 import com.google.gson.Gson;
 
 @RestController
 public class OrganizerController {
 
 	@Autowired
-	DeviceInfoRepositoryImpl deviceInfoRepositoryImpl;
+	OrganizerRepositoryImpl deviceInfoRepositoryImpl;
 
 	@RequestMapping(value = "/organizer/search/{Organizer_ID}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> getDeviceList(@PathVariable int Organizer_ID) {

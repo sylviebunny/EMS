@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.enfec.sb.deviceInfoapi.model.DeviceInfoTable;
+import com.enfec.sb.deviceInfoapi.model.OrganizerTable;
 import com.enfec.sb.deviceInfoapi.repository.DeviceInfoRepositoryImpl;
 import com.google.gson.Gson;
 
@@ -26,7 +26,7 @@ public class DeviceInfoController {
 
 	@RequestMapping(value = "/organizer/search/{Organizer_ID}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> getDeviceList(@PathVariable int Organizer_ID) {
-			List<DeviceInfoTable> deviceList = deviceInfoRepositoryImpl
+			List<OrganizerTable> deviceList = deviceInfoRepositoryImpl
 					.getOrganizerInfo(Organizer_ID);
 			if (deviceList.isEmpty()) {
 				return new ResponseEntity<>(
@@ -40,7 +40,7 @@ public class DeviceInfoController {
 
 	@RequestMapping(value = "/registerdevice", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> registerDevice(
-			@RequestBody(required = true) DeviceInfoTable deviceInfoTable) {
+			@RequestBody(required = true) OrganizerTable deviceInfoTable) {
 			int affectedRow = deviceInfoRepositoryImpl
 					.registerDevice(deviceInfoTable);
 
@@ -56,7 +56,7 @@ public class DeviceInfoController {
 
 	@RequestMapping(value = "/updatedevice", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> updateDevice(
-			@RequestBody(required = true) DeviceInfoTable deviceInfoTable) {
+			@RequestBody(required = true) OrganizerTable deviceInfoTable) {
 			int affectedRow = deviceInfoRepositoryImpl
 					.updateDevice(deviceInfoTable);
 

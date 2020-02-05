@@ -7,7 +7,7 @@ import java.util.Base64;
 import org.springframework.jdbc.core.RowMapper;
 
 
-public class DeviceInfoRowmapper implements RowMapper<OrganizerTable> {
+public class OrganizerRowmapper implements RowMapper<OrganizerTable> {
 
 
 	

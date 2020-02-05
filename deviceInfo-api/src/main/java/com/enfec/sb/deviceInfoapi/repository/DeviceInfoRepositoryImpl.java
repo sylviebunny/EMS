@@ -13,7 +13,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Component;
 
-import com.enfec.sb.deviceInfoapi.model.DeviceInfoRowmapper;
+import com.enfec.sb.deviceInfoapi.model.OrganizerRowmapper;
 import com.enfec.sb.deviceInfoapi.model.OrganizerTable;
 
 @Component
@@ -40,7 +40,7 @@ public class DeviceInfoRepositoryImpl implements DeviceInfoRepository {
 	@Override
 	public  List<OrganizerTable> getOrganizerInfo(int accnt_id) {
 		
-		return jdbcTemplate.query(SELECT_DEVICE,new Object[] { accnt_id }, new DeviceInfoRowmapper());
+		return jdbcTemplate.query(SELECT_DEVICE,new Object[] { accnt_id }, new OrganizerRowmapper());
 	}
 
 	@Override

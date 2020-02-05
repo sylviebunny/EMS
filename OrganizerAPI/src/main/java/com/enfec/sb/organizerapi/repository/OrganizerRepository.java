@@ -1,6 +1,6 @@
-package com.enfec.sb.deviceInfoapi.repository;
+package com.enfec.sb.organizerapi.repository;
 
-import com.enfec.sb.deviceInfoapi.model.OrganizerTable;
+import com.enfec.sb.organizerapi.model.OrganizerTable;
 
 public interface OrganizerRepository {
 

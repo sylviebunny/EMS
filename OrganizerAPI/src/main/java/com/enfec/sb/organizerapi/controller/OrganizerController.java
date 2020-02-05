@@ -1,4 +1,4 @@
-package com.enfec.sb.deviceInfoapi.controller;
+package com.enfec.sb.organizerapi.controller;
 
 import java.util.List;
 
@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.enfec.sb.deviceInfoapi.model.OrganizerTable;
-import com.enfec.sb.deviceInfoapi.repository.OrganizerRepositoryImpl;
+import com.enfec.sb.organizerapi.model.OrganizerTable;
+import com.enfec.sb.organizerapi.repository.OrganizerRepositoryImpl;
 import com.google.gson.Gson;
 
 @RestController

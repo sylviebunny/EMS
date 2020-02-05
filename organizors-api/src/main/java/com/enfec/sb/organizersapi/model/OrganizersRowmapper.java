@@ -18,6 +18,7 @@ public class OrganizersRowmapper implements RowMapper<OrganizersTable> {
 		organizersTable.setOrganizer_id(rs.getInt("Organizer_ID"));
 		organizersTable.setOrganizer_name((rs.getString("Organizer_Name")));
 		organizersTable.setEmail((rs.getString("Email_Address")));
+		//organizersTable.setPassword(rs.getString("Password"));
 		organizersTable.setPassword(rs.getString("Password")==null ? null:(rs.getString("Password")));
 		organizersTable.setDetails((rs.getString("Other_Details")));
 		

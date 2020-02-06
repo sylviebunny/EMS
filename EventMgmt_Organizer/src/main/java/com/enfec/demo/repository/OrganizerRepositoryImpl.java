@@ -20,13 +20,14 @@ import com.enfec.demo.model.OrganizerTable;
 public class OrganizerRepositoryImpl implements OrganizerRepository{
 //	private static final Logger logger = LoggerFactory.getLogger(OrganizerRepositoryImpl.class);
 	
-	final String SELECT_ORGANIZER = "select Organizer_ID,Organizer_Name,Email_Address,Password,Other_Details from Organizers where Organizer_ID = ?; ";
+	final String SELECT_ORGANIZER = "select Organizer_ID,Organizer_Name,Email_Address,Password,Other_Details FROM Organizers where Organizer_ID = ?; ";
 
 	final String REGISTER_ORGANIZER = "INSERT INTO Organizers(Organizer_ID, Organizer_Name, Email_Address, Password, Other_Details) VALUES "
 			+ "(:Organizer_ID,:Organizer_Name,:Email_Address,:Password,:Other_Details)";
 	
-	final String UPDATE_ORGANIZER_INFO = "UPDATE Organizers SET Email_Address = :Email_Address, Password = :Password, Other_Details = :Other_Details WHERE Organizer_ID = :Organizer_ID AND Organizer_Name = :Organizer_Name";	
+	final String UPDATE_ORGANIZER = "UPDATE Organizers SET Email_Address = :Email_Address, Password = :Password, Other_Details = :Other_Details WHERE Organizer_ID = :Organizer_ID AND Organizer_Name = :Organizer_Name";	
 	
+	final String DELETE_ORGANIZER = "DELETE FROM Organizers WHERE Organizer_ID = ?; ";
 	
 	@Autowired
 	NamedParameterJdbcTemplate namedParameterJdbcTemplate;
@@ -57,8 +58,14 @@ public class OrganizerRepositoryImpl implements OrganizerRepository{
 		
 		SqlParameterSource pramSource = new MapSqlParameterSource(param);
 //		logger.info("Updating Organizer Info : {} ",pramSource);
-		affectedRow =namedParameterJdbcTemplate.update(UPDATE_ORGANIZER_INFO, pramSource);
+		affectedRow =namedParameterJdbcTemplate.update(UPDATE_ORGANIZER, pramSource);
 		
+		return affectedRow;
+	}
+	
+	@Override
+	public int deleteOrganizer(int Organizer_ID) {
+		int affectedRow = jdbcTemplate.update(DELETE_ORGANIZER, Organizer_ID);
 		return affectedRow;
 	}
 	

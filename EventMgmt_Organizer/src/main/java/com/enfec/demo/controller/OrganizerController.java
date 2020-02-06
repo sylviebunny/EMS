@@ -22,8 +22,8 @@ public class OrganizerController {
 
 	@RequestMapping(value = "/organizer/search/{Organizer_ID}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> getOrganizerList(@PathVariable int Organizer_ID) {
-			List<OrganizerTable> organizerList = OrganizerRepositoryImpl
-					.getOrganizerInfo(Organizer_ID);
+			List<OrganizerTable> organizerList = OrganizerRepositoryImpl.getOrganizerInfo(Organizer_ID);
+			
 			if (organizerList.isEmpty()) {
 				return new ResponseEntity<>(
 						"{\"message\" : \"No device found\"}", HttpStatus.OK);
@@ -34,27 +34,22 @@ public class OrganizerController {
 			}
 	}
 
-	
 	@RequestMapping(value = "/organizer/register", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> registerOrganizer(@RequestBody(required = true) OrganizerTable organizerTable) {
-			int affectedRow = OrganizerRepositoryImpl
-					.registerOrganizer(organizerTable);
+			int affectedRow = OrganizerRepositoryImpl.registerOrganizer(organizerTable);
 
 			if (affectedRow == 0) {
 				return new ResponseEntity<>(
-						"{\"message\" : \"Organizer not registerd\"}",
-						HttpStatus.OK);
+						"{\"message\" : \"Organizer not registerd\"}", HttpStatus.OK);
 			} else {
 				return new ResponseEntity<>(
 						"{\"message\" : \"Organizer Registered\"}", HttpStatus.OK);
 			}
 	}
 
-	
 	@RequestMapping(value = "/organizer/update", method = RequestMethod.PUT, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> updateOrganizer(@RequestBody(required = true) OrganizerTable OrganizerTable) {
-			int affectedRow = OrganizerRepositoryImpl
-					.updateOrganizer(OrganizerTable);
+			int affectedRow = OrganizerRepositoryImpl.updateOrganizer(OrganizerTable);
 
 			if (affectedRow == 0) {
 				return new ResponseEntity<>(
@@ -65,4 +60,15 @@ public class OrganizerController {
 			}
 	}
 
+	@RequestMapping(value="/organizer/delete/{Organizer_ID}",method = RequestMethod.DELETE, produces = "application/json;charset=UTF-8")
+	public ResponseEntity<String> deleteOrganizer(@PathVariable("Organizer_ID") int id) {
+		int affectedRow = OrganizerRepositoryImpl.deleteOrganizer(id);
+		if(affectedRow > 0 )  {
+			return new ResponseEntity<>(
+					"{\"message\" : \"Organizer deleted\"}", HttpStatus.OK);
+		} else {
+			return new ResponseEntity<>(
+					"{\"message\" : \"Organizer is not able to delete\"}", HttpStatus.OK);
+		}
+	}
 }

@@ -34,17 +34,9 @@ public class OrganizerController {
 			}
 	}
 
-<<<<<<< Updated upstream
-	@RequestMapping(value = "/register", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
-	public ResponseEntity<String> registerOrganizer(
-			@RequestBody(required = true) OrganizerTable organizerTable) {
-			int affectedRow = OrganizerRepositoryImpl
-					.registerOrganizer(organizerTable);
-=======
 	@RequestMapping(value = "/organizer/register", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> registerOrganizer(@RequestBody(required = true) OrganizerTable organizerTable) {
 			int affectedRow = OrganizerRepositoryImpl.registerOrganizer(organizerTable);
->>>>>>> Stashed changes
 
 			if (affectedRow == 0) {
 				return new ResponseEntity<>(
@@ -55,17 +47,9 @@ public class OrganizerController {
 			}
 	}
 
-<<<<<<< Updated upstream
-	@RequestMapping(value = "/updateorganizer", method = RequestMethod.PUT, produces = "application/json;charset=UTF-8")
-	public ResponseEntity<String> updateOrganizer(
-			@RequestBody(required = true) OrganizerTable OrganizerTable) {
-			int affectedRow = OrganizerRepositoryImpl
-					.updateOrganizer(OrganizerTable);
-=======
 	@RequestMapping(value = "/organizer/update", method = RequestMethod.PUT, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> updateOrganizer(@RequestBody(required = true) OrganizerTable OrganizerTable) {
 			int affectedRow = OrganizerRepositoryImpl.updateOrganizer(OrganizerTable);
->>>>>>> Stashed changes
 
 			if (affectedRow == 0) {
 				return new ResponseEntity<>(

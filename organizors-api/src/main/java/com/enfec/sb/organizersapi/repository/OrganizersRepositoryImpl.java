@@ -23,9 +23,12 @@ public class OrganizersRepositoryImpl implements OrganizersRepository {
 
 	final String REGISTER_ORGANIZERS = "INSERT INTO Organizers(Organizer_ID, Organizer_Name, Email_Address, Password, Other_Details) VALUES "
 			+ "(:organizer_id,:organizer_name,:email,:password,:details)";
-		
-	final String UPDATE_ORGANIZERS = "UPDATE Organizers SET Organizer_Name =:organizer_name, Email_Address =:email, Password =:password, Other_Details=:details where Organizer_ID =:organizer_id" ;	
-	// for the SQL, after "=:", can not have a empty space 
+	
+	//final String UPDATE_ORGANIZERS = "UPDATE Organizers SET Password =:password, Other_Details=:details where Organizer_ID =:organizer_id AND Organizer_Name =:organizer_name" ;	
+	final String UPDATE_ORGANIZERS = "UPDATE Organizers SET Organizer_Name =:organizer_name, Email_Address = :email, Password =:password, Other_Details=:details where Organizer_ID =:organizer_id" ;
+	
+	final String DELETE_ORGANIZERS = "DELETE FROM Organizers WHERE Organizer_ID  =?";
+
 	
 	@Autowired
 	NamedParameterJdbcTemplate namedParameterJdbcTemplate;
@@ -61,6 +64,19 @@ public class OrganizersRepositoryImpl implements OrganizersRepository {
 		SqlParameterSource pramSource = new MapSqlParameterSource(param);
 		logger.info("Updating organizer : {} ",pramSource);
 		affectedRow =namedParameterJdbcTemplate.update(UPDATE_ORGANIZERS, pramSource);
+		
+		return affectedRow;
+
+	}
+	
+	@Override
+	public int deleteOrganizer(OrganizersTable organizersTable) {
+		int affectedRow;
+		Map<String, Object> param = organizersMap(organizersTable);
+		
+		SqlParameterSource pramSource = new MapSqlParameterSource(param);
+		logger.info("Deleting organizer : {} ",pramSource);
+		affectedRow =namedParameterJdbcTemplate.update(DELETE_ORGANIZERS, pramSource);
 		
 		return affectedRow;
 

@@ -9,4 +9,6 @@ public interface OrganizersRepository {
 	
 	public int updateOrganizer(OrganizersTable organizersTable);
 	
+	public int deleteOrganizer(OrganizersTable organizersTable);
+	
 }

@@ -2,8 +2,6 @@ package com.enfec.sb.organizersapi.model;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Base64;
-
 import org.springframework.jdbc.core.RowMapper;
 
 

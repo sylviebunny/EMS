@@ -22,27 +22,27 @@ import com.google.gson.Gson;
 public class OrganizerController {
 
 	@Autowired
-	OrganizerRepositoryImpl deviceInfoRepositoryImpl;
+	OrganizerRepositoryImpl organizerRepositoryImpl;
 
 	@RequestMapping(value = "/organizer/search/{Organizer_ID}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> getDeviceList(@PathVariable int Organizer_ID) {
-			List<OrganizerTable> deviceList = deviceInfoRepositoryImpl
+			List<OrganizerTable> deviceList = organizerRepositoryImpl
 					.getOrganizerInfo(Organizer_ID);
 			if (deviceList.isEmpty()) {
 				return new ResponseEntity<>(
 						"{\"message\" : \"No device found\"}", HttpStatus.OK);
 			} else {
 				return new ResponseEntity<>(
-						new Gson().toJson((deviceInfoRepositoryImpl
+						new Gson().toJson((organizerRepositoryImpl
 								.getOrganizerInfo(Organizer_ID))), HttpStatus.OK);
 			}
 	}
 
-	@RequestMapping(value = "/registerdevice", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+	@RequestMapping(value = "/organizer/create", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> registerDevice(
-			@RequestBody(required = true) OrganizerTable deviceInfoTable) {
-			int affectedRow = deviceInfoRepositoryImpl
-					.registerDevice(deviceInfoTable);
+			@RequestBody(required = true) OrganizerTable organizerTable) {
+			int affectedRow = organizerRepositoryImpl
+					.registerDevice(organizerTable);
 
 			if (affectedRow == 0) {
 				return new ResponseEntity<>(
@@ -54,11 +54,11 @@ public class OrganizerController {
 			}
 	}
 
-	@RequestMapping(value = "/updatedevice", method = RequestMethod.PUT, produces = "application/json;charset=UTF-8")
+	@RequestMapping(value = "/organizer/update", method = RequestMethod.PUT, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> updateDevice(
-			@RequestBody(required = true) OrganizerTable deviceInfoTable) {
-			int affectedRow = deviceInfoRepositoryImpl
-					.updateDevice(deviceInfoTable);
+			@RequestBody(required = true) OrganizerTable organizerTable) {
+			int affectedRow = organizerRepositoryImpl
+					.updateDevice(organizerTable);
 
 			if (affectedRow == 0) {
 				return new ResponseEntity<>(

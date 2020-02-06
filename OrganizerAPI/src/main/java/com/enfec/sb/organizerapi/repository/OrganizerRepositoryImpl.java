@@ -45,9 +45,9 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 	}
 
 	@Override
-	public int registerDevice(OrganizerTable deviceInfoTable) {
+	public int registerDevice(OrganizerTable organizerTable) {
 		int affectedRow;
-		Map<String, Object> param = deviceInfoMap(deviceInfoTable);
+		Map<String, Object> param = organizerMap(organizerTable);
 		
 		SqlParameterSource pramSource = new MapSqlParameterSource(param);
 		affectedRow =namedParameterJdbcTemplate.update(REGISTER_DEVICE, pramSource);
@@ -56,9 +56,9 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 	}
 
 	@Override
-	public int updateDevice(OrganizerTable deviceInfoTable) {
+	public int updateDevice(OrganizerTable organizerTable) {
 		int affectedRow;
-		Map<String, Object> param = deviceInfoMap(deviceInfoTable);
+		Map<String, Object> param = organizerMap(organizerTable);
 		
 		SqlParameterSource pramSource = new MapSqlParameterSource(param);
 		affectedRow =namedParameterJdbcTemplate.update(UPDATE_DEVICE_INFO, pramSource);
@@ -67,19 +67,19 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 
 	}
 	
-	private Map<String, Object> deviceInfoMap(OrganizerTable deviceInfoTable) {
+	private Map<String, Object> organizerMap(OrganizerTable organizerTable) {
 		Map<String, Object>param = new HashMap<>();
 	
-			if (deviceInfoTable.getOrganizer_id() != 0) {
-				param.put("organizer_id", deviceInfoTable.getOrganizer_id());
+			if (organizerTable.getOrganizer_id() != 0) {
+				param.put("organizer_id", organizerTable.getOrganizer_id());
 			} else {
 				throw new NullPointerException("Accnt_id cannot be null");
 			}
 		
-		param.put("organizer_name", deviceInfoTable.getOrganizer_name().isEmpty() ? null:deviceInfoTable.getOrganizer_name());
-		param.put("email_address", deviceInfoTable.getEmail_address().isEmpty() ? null:deviceInfoTable.getEmail_address());
-		param.put("password", deviceInfoTable.getPassword().isEmpty() ? null:deviceInfoTable.getPassword());
-		param.put("other_details", deviceInfoTable.getOther_details().isEmpty() ? null:deviceInfoTable.getOther_details());
+		param.put("organizer_name", organizerTable.getOrganizer_name().isEmpty() ? null:organizerTable.getOrganizer_name());
+		param.put("email_address", organizerTable.getEmail_address().isEmpty() ? null:organizerTable.getEmail_address());
+		param.put("password", organizerTable.getPassword().isEmpty() ? null:organizerTable.getPassword());
+		param.put("other_details", organizerTable.getOther_details().isEmpty() ? null:organizerTable.getOther_details());
 		return param;
 	}
 

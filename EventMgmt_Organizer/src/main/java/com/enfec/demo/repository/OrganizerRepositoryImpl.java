@@ -25,7 +25,7 @@ public class OrganizerRepositoryImpl implements OrganizerRepository{
 	final String REGISTER_ORGANIZER = "INSERT INTO Organizers(Organizer_ID, Organizer_Name, Email_Address, Password, Other_Details) VALUES "
 			+ "(:Organizer_ID,:Organizer_Name,:Email_Address,:Password,:Other_Details)";
 	
-	final String UPDATE_ORGANIZER_INFO = "UPDATE Organizers SET Password = :Password, Other_Details = :Other_Details WHERE Organizer_ID = :Organizer_ID AND Organizer_Name = :Organizer_Name";	
+	final String UPDATE_ORGANIZER_INFO = "UPDATE Organizers SET Email_Address = :Email_Address, Password = :Password, Other_Details = :Other_Details WHERE Organizer_ID = :Organizer_ID AND Organizer_Name = :Organizer_Name";	
 	
 	
 	@Autowired

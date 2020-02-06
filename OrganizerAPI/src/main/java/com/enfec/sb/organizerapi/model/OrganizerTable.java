@@ -8,7 +8,7 @@ import lombok.Data;
 @Component
 public class OrganizerTable {
 	
-	int organizer_id;
+	private int organizer_id;
 	private String organizer_name; 
 	private String email_address; 
 	private String password; 

@@ -25,8 +25,8 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 	final String REGISTER_ORGANIZER = "INSERT INTO Organizers(Organizer_ID, Organizer_Name, Email_Address, PASSWORD, Other_Details) VALUES "
 			+ "(:organizer_id,:organizer_name,:email_address,:password,:other_details)";
 	
-	final String UPDATE_ORGANIZER_INFO = "UPDATE Organizers SET Organizer_Name =:organizer_name, Email_Address= :email_address, PASSWORD =:password, Other_Details =:other_details WHERE Organizer_ID =:organizer_id"; 
-	
+	String UPDATE_ORGANIZER_INFO_PREFIX = "UPDATE Organizers SET "; 
+	String UPDATE_ORGANIZER_INFO_SUFFIX = " WHERE Organizer_ID = :organizer_id";
 	
 	@Autowired
 	NamedParameterJdbcTemplate namedParameterJdbcTemplate;
@@ -48,7 +48,7 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 		SqlParameterSource pramSource = new MapSqlParameterSource(param);
 		affectedRow =namedParameterJdbcTemplate.update(REGISTER_ORGANIZER, pramSource);
 		
-		return affectedRow;
+		return affectedRow; 
 	}
 
 	@Override
@@ -57,7 +57,18 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 		Map<String, Object> param = organizerMap(organizerTable);
 		
 		SqlParameterSource pramSource = new MapSqlParameterSource(param);
-		affectedRow =namedParameterJdbcTemplate.update(UPDATE_ORGANIZER_INFO, pramSource);
+		StringBuilder UPDATE_ORGANIZER_INFO = new StringBuilder();
+		for (String key : param.keySet()) {
+			if (param.get(key) != null && !key.equals("organizer_id"))
+			{
+				UPDATE_ORGANIZER_INFO.append(key + "=:" + key + ",");
+			}
+		}
+		// remove the last colon
+		UPDATE_ORGANIZER_INFO = UPDATE_ORGANIZER_INFO.deleteCharAt(UPDATE_ORGANIZER_INFO.length() - 1); 
+		
+		String UPDATE_ORGANIZER = UPDATE_ORGANIZER_INFO_PREFIX + UPDATE_ORGANIZER_INFO + UPDATE_ORGANIZER_INFO_SUFFIX;
+		affectedRow =namedParameterJdbcTemplate.update(UPDATE_ORGANIZER, pramSource);
 		
 		return affectedRow;
 
@@ -72,10 +83,10 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 				throw new NullPointerException("Organizer_ID cannot be null");
 			}
 		
-		param.put("organizer_name", organizerTable.getOrganizer_name().isEmpty() ? null:organizerTable.getOrganizer_name());
-		param.put("email_address", organizerTable.getEmail_address().isEmpty() ? null:organizerTable.getEmail_address());
-		param.put("password", organizerTable.getPassword().isEmpty() ? null:organizerTable.getPassword());
-		param.put("other_details", organizerTable.getOther_details().isEmpty() ? null:organizerTable.getOther_details());
+		param.put("organizer_name", organizerTable.getOrganizer_name() == null || organizerTable.getOrganizer_name().isEmpty() ? null:organizerTable.getOrganizer_name());
+		param.put("email_address", organizerTable.getEmail_address() == null || organizerTable.getEmail_address().isEmpty() ? null:organizerTable.getEmail_address());
+		param.put("password", organizerTable.getPassword() == null || organizerTable.getPassword().isEmpty() ? null:organizerTable.getPassword());
+		param.put("other_details", organizerTable.getOther_details() == null || organizerTable.getOther_details().isEmpty() ? null:organizerTable.getOther_details());
 		return param;
 	}
 

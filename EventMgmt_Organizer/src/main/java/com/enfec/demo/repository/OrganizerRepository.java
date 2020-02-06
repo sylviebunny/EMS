@@ -7,4 +7,5 @@ public interface OrganizerRepository {
 	public Object getOrganizerInfo(int Organizer_ID);
 	public int registerOrganizer(OrganizerTable organizerTable);
 	public int updateOrganizer(OrganizerTable organizerTable);
+	public int deleteOrganizer(int Organizer_ID);
 }

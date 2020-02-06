@@ -6,16 +6,17 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
-
 @Data
 @Getter
 @Setter
 @Component
-public class OrganizerTable {
-
-	public int Organizer_ID;
-	public String Organizer_Name; 
-	public String Email_Address;
-	public String Password;
+public class Address {
+	public int Address_ID; 
+	public String Street1;
+	public String Street2;
+	public String City;
+	public String State;
+	public int Zipcode;
 	public String Other_Details;
+	public int Organizer_ID;
 }

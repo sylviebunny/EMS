@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.enfec.demo.model.Address;
 import com.enfec.demo.model.OrganizerTable;
 import com.enfec.demo.repository.OrganizerRepositoryImpl;
 import com.google.gson.Gson;
@@ -47,6 +48,19 @@ public class OrganizerController {
 			}
 	}
 
+	@RequestMapping(value = "/organizer/addaddress", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+	public ResponseEntity<String> createAddress(@RequestBody(required = true) Address address) {
+			int affectedRow = OrganizerRepositoryImpl.createAddress(address);
+
+			if (affectedRow == 0) {
+				return new ResponseEntity<>(
+						"{\"message\" : \"Address not added\"}", HttpStatus.OK);
+			} else {
+				return new ResponseEntity<>(
+						"{\"message\" : \"Address added\"}", HttpStatus.OK);
+			}
+	}
+	
 	@RequestMapping(value = "/organizer/update", method = RequestMethod.PUT, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> updateOrganizer(@RequestBody(required = true) OrganizerTable OrganizerTable) {
 			int affectedRow = OrganizerRepositoryImpl.updateOrganizer(OrganizerTable);

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.enfec.sb.organizerapi.model.OrganizerContactTable;
 import com.enfec.sb.organizerapi.model.OrganizerTable;
 import com.enfec.sb.organizerapi.repository.OrganizerRepositoryImpl;
 import com.google.gson.Gson;
@@ -53,7 +54,25 @@ public class OrganizerController {
 						"{\"message\" : \"Organizer Registered\"}", HttpStatus.OK);
 			}
 	}
+	
+	// This method for creating contact information of organizer
+	@RequestMapping(value = "/organizer/contact/create", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+	public ResponseEntity<String> registerOrganizerInfo(
+			@RequestBody(required = true) OrganizerContactTable organizerContactTable) {
+			int affectedRow = organizerRepositoryImpl
+					.createOrganizerContact(organizerContactTable);
 
+			if (affectedRow == -1) {
+				return new ResponseEntity<>(
+						"{\"message\" : \"Address_ID or organizer_ID is not in Database\"}",
+						HttpStatus.OK);
+			} else {
+				return new ResponseEntity<>(
+						"{\"message\" : \"Organizer contact created\"}", HttpStatus.OK);
+			}
+	}
+	
+	// This method for updating information of organizer
 	@RequestMapping(value = "/organizer/update", method = RequestMethod.PUT, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> updateOrganizer(
 			@RequestBody(required = true) OrganizerTable organizerTable) {

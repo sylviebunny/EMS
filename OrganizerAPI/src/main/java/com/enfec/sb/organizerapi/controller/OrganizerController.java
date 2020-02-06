@@ -25,12 +25,12 @@ public class OrganizerController {
 	OrganizerRepositoryImpl organizerRepositoryImpl;
 
 	@RequestMapping(value = "/organizer/search/{Organizer_ID}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
-	public ResponseEntity<String> getDeviceList(@PathVariable int Organizer_ID) {
-			List<OrganizerTable> deviceList = organizerRepositoryImpl
+	public ResponseEntity<String> getOrganizerList(@PathVariable int Organizer_ID) {
+			List<OrganizerTable> organizerList = organizerRepositoryImpl
 					.getOrganizerInfo(Organizer_ID);
-			if (deviceList.isEmpty()) {
+			if (organizerList.isEmpty()) {
 				return new ResponseEntity<>(
-						"{\"message\" : \"No device found\"}", HttpStatus.OK);
+						"{\"message\" : \"No organizer found\"}", HttpStatus.OK);
 			} else {
 				return new ResponseEntity<>(
 						new Gson().toJson((organizerRepositoryImpl
@@ -39,33 +39,33 @@ public class OrganizerController {
 	}
 
 	@RequestMapping(value = "/organizer/create", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
-	public ResponseEntity<String> registerDevice(
+	public ResponseEntity<String> registerOrganizer(
 			@RequestBody(required = true) OrganizerTable organizerTable) {
 			int affectedRow = organizerRepositoryImpl
-					.registerDevice(organizerTable);
+					.registerOrganizer(organizerTable);
 
 			if (affectedRow == 0) {
 				return new ResponseEntity<>(
-						"{\"message\" : \"Device not registerd\"}",
+						"{\"message\" : \"Organizer not registerd\"}",
 						HttpStatus.OK);
 			} else {
 				return new ResponseEntity<>(
-						"{\"message\" : \"Device Registered\"}", HttpStatus.OK);
+						"{\"message\" : \"Organizer Registered\"}", HttpStatus.OK);
 			}
 	}
 
 	@RequestMapping(value = "/organizer/update", method = RequestMethod.PUT, produces = "application/json;charset=UTF-8")
-	public ResponseEntity<String> updateDevice(
+	public ResponseEntity<String> updateOrganizer(
 			@RequestBody(required = true) OrganizerTable organizerTable) {
 			int affectedRow = organizerRepositoryImpl
-					.updateDevice(organizerTable);
+					.updateOrganizer(organizerTable);
 
 			if (affectedRow == 0) {
 				return new ResponseEntity<>(
-						"{\"message\" : \"Device not found\"}", HttpStatus.OK);
+						"{\"message\" : \"Organizer not found\"}", HttpStatus.OK);
 			} else {
 				return new ResponseEntity<>(
-						"{\"message\" : \"Device updated\"}", HttpStatus.OK);
+						"{\"message\" : \"Organizer updated\"}", HttpStatus.OK);
 			}
 	}
 

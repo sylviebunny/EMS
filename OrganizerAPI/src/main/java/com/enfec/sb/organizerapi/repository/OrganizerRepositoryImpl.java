@@ -20,16 +20,12 @@ import com.enfec.sb.organizerapi.model.OrganizerTable;
 public class OrganizerRepositoryImpl implements OrganizerRepository {
 	private static final Logger logger = LoggerFactory.getLogger(OrganizerRepositoryImpl.class);
 	
-	final String SELECT_DEVICE = "select Organizer_ID, Organizer_Name, Email_Address, PASSWORD, Other_Details from Organizers where Organizer_ID = ?; ";
+	final String SELECT_ORGANIZER = "select Organizer_ID, Organizer_Name, Email_Address, PASSWORD, Other_Details from Organizers where Organizer_ID = ?; ";
 
-//	final String REGISTER_DEVICE = "INSERT INTO DEVICE_INFO(ACCNT_ID,CHIP_ID,SERIAL_NUMBER,MAKE,MODEL,FIRMWARE,WIFI_SSID,WIFI_PWD) VALUES "
-//			+ "(:accnt_id,:chip_id,:serial_number,:make,:firmware,:model,:wifi_ssid,:wifi_pwd)";
-	final String REGISTER_DEVICE = "INSERT INTO Organizers(Organizer_ID, Organizer_Name, Email_Address, PASSWORD, Other_Details) VALUES "
+	final String REGISTER_ORGANIZER = "INSERT INTO Organizers(Organizer_ID, Organizer_Name, Email_Address, PASSWORD, Other_Details) VALUES "
 			+ "(:organizer_id,:organizer_name,:email_address,:password,:other_details)";
 	
-//	final String UPDATE_DEVICE_INFO = "UPDATE DEVICE_INFO SET SERIAL_NUMBER = :serial_number ,MAKE=:make,MODEL=:model"
-//			+ ",FIRMWARE=:firmware,WIFI_SSID=:wifi_ssid,WIFI_PWD=:wifi_pwd where ACCNT_ID = :accnt_id AND CHIP_ID =:chip_id" ;	
-	final String UPDATE_DEVICE_INFO = "UPDATE Organizers SET Organizer_Name =:organizer_name, Email_Address= :email_address, PASSWORD =:password, Other_Details =:other_details WHERE Organizer_ID =:organizer_id"; 
+	final String UPDATE_ORGANIZER_INFO = "UPDATE Organizers SET Organizer_Name =:organizer_name, Email_Address= :email_address, PASSWORD =:password, Other_Details =:other_details WHERE Organizer_ID =:organizer_id"; 
 	
 	
 	@Autowired
@@ -41,27 +37,27 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 	@Override
 	public  List<OrganizerTable> getOrganizerInfo(int accnt_id) {
 		
-		return jdbcTemplate.query(SELECT_DEVICE,new Object[] { accnt_id }, new OrganizerRowmapper());
+		return jdbcTemplate.query(SELECT_ORGANIZER,new Object[] { accnt_id }, new OrganizerRowmapper());
 	}
 
 	@Override
-	public int registerDevice(OrganizerTable organizerTable) {
+	public int registerOrganizer(OrganizerTable organizerTable) {
 		int affectedRow;
 		Map<String, Object> param = organizerMap(organizerTable);
 		
 		SqlParameterSource pramSource = new MapSqlParameterSource(param);
-		affectedRow =namedParameterJdbcTemplate.update(REGISTER_DEVICE, pramSource);
+		affectedRow =namedParameterJdbcTemplate.update(REGISTER_ORGANIZER, pramSource);
 		
 		return affectedRow;
 	}
 
 	@Override
-	public int updateDevice(OrganizerTable organizerTable) {
+	public int updateOrganizer(OrganizerTable organizerTable) {
 		int affectedRow;
 		Map<String, Object> param = organizerMap(organizerTable);
 		
 		SqlParameterSource pramSource = new MapSqlParameterSource(param);
-		affectedRow =namedParameterJdbcTemplate.update(UPDATE_DEVICE_INFO, pramSource);
+		affectedRow =namedParameterJdbcTemplate.update(UPDATE_ORGANIZER_INFO, pramSource);
 		
 		return affectedRow;
 
@@ -73,7 +69,7 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 			if (organizerTable.getOrganizer_id() != 0) {
 				param.put("organizer_id", organizerTable.getOrganizer_id());
 			} else {
-				throw new NullPointerException("Accnt_id cannot be null");
+				throw new NullPointerException("Organizer_ID cannot be null");
 			}
 		
 		param.put("organizer_name", organizerTable.getOrganizer_name().isEmpty() ? null:organizerTable.getOrganizer_name());

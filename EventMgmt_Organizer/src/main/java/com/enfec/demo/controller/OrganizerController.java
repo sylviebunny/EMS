@@ -34,9 +34,9 @@ public class OrganizerController {
 			}
 	}
 
+	
 	@RequestMapping(value = "/organizer/register", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
-	public ResponseEntity<String> registerOrganizer(
-			@RequestBody(required = true) OrganizerTable organizerTable) {
+	public ResponseEntity<String> registerOrganizer(@RequestBody(required = true) OrganizerTable organizerTable) {
 			int affectedRow = OrganizerRepositoryImpl
 					.registerOrganizer(organizerTable);
 
@@ -50,9 +50,9 @@ public class OrganizerController {
 			}
 	}
 
+	
 	@RequestMapping(value = "/organizer/update", method = RequestMethod.PUT, produces = "application/json;charset=UTF-8")
-	public ResponseEntity<String> updateOrganizer(
-			@RequestBody(required = true) OrganizerTable OrganizerTable) {
+	public ResponseEntity<String> updateOrganizer(@RequestBody(required = true) OrganizerTable OrganizerTable) {
 			int affectedRow = OrganizerRepositoryImpl
 					.updateOrganizer(OrganizerTable);
 

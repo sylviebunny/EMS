@@ -53,7 +53,7 @@ public class OrganizersController {
 	}
 
 	@RequestMapping(value = "/registerdevice", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
-	public ResponseEntity<String> registerDevice(
+	public ResponseEntity<String> registerOrganizers(
 			@RequestBody(required = true) OrganizersTable organizorsTable) {
 
 		try {
@@ -87,9 +87,9 @@ public class OrganizersController {
 	}
 
 	@RequestMapping(value = "/updatedevice", method = RequestMethod.PUT, produces = "application/json;charset=UTF-8")
-	public ResponseEntity<String> updateDevice(
+	public ResponseEntity<String> updateOrganizers(
 			@RequestBody(required = true) OrganizersTable organizersTable) {
-
+		
 		try {
 			int affectedRow = organizersRepositoryImpl
 					.updateOrganizer(organizersTable);
@@ -117,6 +117,8 @@ public class OrganizersController {
 					"{\"message\" : \"Exception in registering device info\"}",
 					HttpStatus.INTERNAL_SERVER_ERROR);
 		}
+		
+		
 	}
 
 }

@@ -50,7 +50,7 @@ public class OrganizerController {
 			}
 	}
 
-	@RequestMapping(value = "/updateorganizer", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+	@RequestMapping(value = "/updateorganizer", method = RequestMethod.PUT, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> updateOrganizer(
 			@RequestBody(required = true) OrganizerTable OrganizerTable) {
 			int affectedRow = OrganizerRepositoryImpl

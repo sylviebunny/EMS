@@ -54,7 +54,7 @@ public class OrganizerController {
 			}
 	}
 
-	@RequestMapping(value = "/updatedevice", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+	@RequestMapping(value = "/updatedevice", method = RequestMethod.PUT, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> updateDevice(
 			@RequestBody(required = true) OrganizerTable deviceInfoTable) {
 			int affectedRow = deviceInfoRepositoryImpl

@@ -27,8 +27,9 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 	final String REGISTER_DEVICE = "INSERT INTO Organizers(Organizer_ID, Organizer_Name, Email_Address, PASSWORD, Other_Details) VALUES "
 			+ "(:organizer_id,:organizer_name,:email_address,:password,:other_details)";
 	
-	final String UPDATE_DEVICE_INFO = "UPDATE DEVICE_INFO SET SERIAL_NUMBER = :serial_number ,MAKE=:make,MODEL=:model"
-			+ ",FIRMWARE=:firmware,WIFI_SSID=:wifi_ssid,WIFI_PWD=:wifi_pwd where ACCNT_ID = :accnt_id AND CHIP_ID =:chip_id" ;	
+//	final String UPDATE_DEVICE_INFO = "UPDATE DEVICE_INFO SET SERIAL_NUMBER = :serial_number ,MAKE=:make,MODEL=:model"
+//			+ ",FIRMWARE=:firmware,WIFI_SSID=:wifi_ssid,WIFI_PWD=:wifi_pwd where ACCNT_ID = :accnt_id AND CHIP_ID =:chip_id" ;	
+	final String UPDATE_DEVICE_INFO = "UPDATE Organizers SET Organizer_Name =:organizer_name, Email_Address= :email_address, PASSWORD =:password, Other_Details =:other_details WHERE Organizer_ID =:organizer_id"; 
 	
 	
 	@Autowired
@@ -52,8 +53,6 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 		affectedRow =namedParameterJdbcTemplate.update(REGISTER_DEVICE, pramSource);
 		
 		return affectedRow;
-	
-		
 	}
 
 	@Override

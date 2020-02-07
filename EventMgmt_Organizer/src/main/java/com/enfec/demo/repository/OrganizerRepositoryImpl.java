@@ -36,6 +36,8 @@ public class OrganizerRepositoryImpl implements OrganizerRepository{
 	final String CREATE_ADDRESS = "INSERT INTO Address(Street1, Street2, City, State, Zipcode, Other_Details, Organizer_ID) VALUES " 
 			+ "(:Street1,:Street2,:City,:State,:Zipcode,:Other_Details,:Organizer_ID)";
 	
+	final String UPDATE_ADDRESS = "UPDATE Address SET Street1 = :Street1, Street2 = :Street2, City = :City, State = :State, Zipcode = :Zipcode, Other_Details = :Other_Details WHERE Organizer_ID = :Organizer_ID";
+	
 	@Autowired
 	NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 	
@@ -48,7 +50,7 @@ public class OrganizerRepositoryImpl implements OrganizerRepository{
 	}
 	
 	@Override
-	public int registerOrganizer(OrganizerTable organizerTable) {
+	public int createOrganizer(OrganizerTable organizerTable) {
 		int affectedRow;
 		Map<String, Object> param = OrganizerMap(organizerTable);
 		
@@ -80,6 +82,18 @@ public class OrganizerRepositoryImpl implements OrganizerRepository{
 		
 		return affectedRow;
 	}
+	
+	@Override
+	public int updateAddress(Address address) {
+		int affectedRow;
+		Map<String, Object> param = AddressMap(address);
+		
+		SqlParameterSource pramSource = new MapSqlParameterSource(param);
+		affectedRow =namedParameterJdbcTemplate.update(UPDATE_ADDRESS, pramSource);
+		
+		return affectedRow;
+	}
+	
 	
 	@Override
 	public int deleteOrganizer(int Organizer_ID) {

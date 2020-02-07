@@ -35,9 +35,9 @@ public class OrganizerController {
 			}
 	}
 
-	@RequestMapping(value = "/organizer/register", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
-	public ResponseEntity<String> registerOrganizer(@RequestBody(required = true) OrganizerTable organizerTable) {
-			int affectedRow = OrganizerRepositoryImpl.registerOrganizer(organizerTable);
+	@RequestMapping(value = "/organizer/create", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+	public ResponseEntity<String> createOrganizer(@RequestBody(required = true) OrganizerTable organizerTable) {
+			int affectedRow = OrganizerRepositoryImpl.createOrganizer(organizerTable);
 
 			if (affectedRow == 0) {
 				return new ResponseEntity<>(
@@ -48,7 +48,7 @@ public class OrganizerController {
 			}
 	}
 
-	@RequestMapping(value = "/organizer/addaddress", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+	@RequestMapping(value = "/organizer/address/create", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> createAddress(@RequestBody(required = true) Address address) {
 			int affectedRow = OrganizerRepositoryImpl.createAddress(address);
 
@@ -74,6 +74,20 @@ public class OrganizerController {
 			}
 	}
 
+	@RequestMapping(value = "/organizer/address/update", method = RequestMethod.PUT, produces = "application/json;charset=UTF-8")
+	public ResponseEntity<String> updateAddress(@RequestBody(required = true) Address address) {
+			int affectedRow = OrganizerRepositoryImpl.updateAddress(address);
+
+			if (affectedRow == 0) {
+				return new ResponseEntity<>(
+						"{\"message\" : \"Information not found\"}", HttpStatus.OK);
+			} else {
+				return new ResponseEntity<>(
+						"{\"message\" : \"Address updated\"}", HttpStatus.OK);
+			}
+	}
+	
+	
 	@RequestMapping(value="/organizer/delete/{Organizer_ID}",method = RequestMethod.DELETE, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> deleteOrganizer(@PathVariable("Organizer_ID") int id) {
 		int affectedRow = OrganizerRepositoryImpl.deleteOrganizer(id);

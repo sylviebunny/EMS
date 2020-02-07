@@ -7,6 +7,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -118,7 +119,7 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 			SqlParameterSource pramSource = new MapSqlParameterSource(param); 
 			affectedRow = namedParameterJdbcTemplate.update(CREATE_REGISTER_CONTACT_INFO, pramSource); 
 			return affectedRow; 
-		} catch (RuntimeException rt) {
+		} catch (DataIntegrityViolationException rt) {
 			return -1; 
 		} catch (Exception e) {
 			return Integer.MIN_VALUE; 

@@ -1,6 +1,7 @@
 package com.enfec.demo.repository;
 
 import java.sql.PreparedStatement;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -117,7 +118,7 @@ public class OrganizerRepositoryImpl implements OrganizerRepository{
 	public int updateOrganizer(OrganizerTable organizerTable) {
 		
 		int affectedRow;
-		Map<String, Object> param = OrganizerMap(organizerTable);
+		Map<String, Object> param = organizerMap(organizerTable);
 		
 		SqlParameterSource pramSource = new MapSqlParameterSource(param);
 		StringBuilder UPDATE_ORGANIZER_INFO = new StringBuilder();
@@ -213,18 +214,19 @@ public class OrganizerRepositoryImpl implements OrganizerRepository{
 		}
 	}
 	
-	/*
+	//For create, update with total info
 	private Map<String, Object> OrganizerMap(OrganizerTable organizerTable) {
 		Map<String, Object>param = new HashMap<>();
 
 		param.put("Organizer_Name", organizerTable.getOrganizer_Name().isEmpty() ? null:organizerTable.getOrganizer_Name());
 		param.put("Email_Address", organizerTable.getEmail_Address().isEmpty() ? null:organizerTable.getEmail_Address());
-		param.put("Password", organizerTable.getPassword().isEmpty() ? null:organizerTable.getPassword());
+		param.put("Password", organizerTable.getPassword().isEmpty() ? null:Base64.getEncoder().encode((organizerTable.getPassword().getBytes())));
 		param.put("Other_Details", organizerTable.getOther_Details().isEmpty() ? null:organizerTable.getOther_Details());
 		return param;
-	}*/
+	}
 	
-	private Map<String, Object> OrganizerMap(OrganizerTable organizerTable) {
+	//For update with partial part
+	private Map<String, Object> organizerMap(OrganizerTable organizerTable) {
 		// Mapping organizer's information query's variable to URL POST body
 		Map<String, Object>param = new HashMap<>();
 	
@@ -233,10 +235,9 @@ public class OrganizerRepositoryImpl implements OrganizerRepository{
 		} else {
 			throw new NullPointerException("Organizer_ID cannot be null");
 		}
-		
 		param.put("Organizer_Name", organizerTable.getOrganizer_Name() == null || organizerTable.getOrganizer_Name().isEmpty() ? null:organizerTable.getOrganizer_Name());
 		param.put("Email_Address", organizerTable.getEmail_Address() == null || organizerTable.getEmail_Address().isEmpty() ? null:organizerTable.getEmail_Address());
-		param.put("Password", organizerTable.getPassword() == null || organizerTable.getPassword().isEmpty() ? null:organizerTable.getPassword());
+		param.put("Password", organizerTable.getPassword() == null || organizerTable.getPassword().isEmpty() ? null:Base64.getEncoder().encode((organizerTable.getPassword().getBytes())));
 		param.put("Other_Details", organizerTable.getOther_Details() == null || organizerTable.getOther_Details().isEmpty() ? null:organizerTable.getOther_Details());
 		return param;
 	}

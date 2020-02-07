@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -53,7 +54,7 @@ public class OrganizersController {
 	}
 
 	@RequestMapping(value = "/registerorganizer", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
-	public ResponseEntity<String> registerDevice(
+	public ResponseEntity<String> registerOrganizers(
 			@RequestBody(required = true) OrganizersTable organizorsTable) {
 
 		try {
@@ -87,7 +88,7 @@ public class OrganizersController {
 	}
 
 	@RequestMapping(value = "/updateorganizer", method = RequestMethod.PUT, produces = "application/json;charset=UTF-8")
-	public ResponseEntity<String> updateDevice(
+	public ResponseEntity<String> updateOrganizers(
 			@RequestBody(required = true) OrganizersTable organizersTable) {
 
 		try {
@@ -117,6 +118,20 @@ public class OrganizersController {
 					"{\"message\" : \"Exception in registering organizer info\"}",
 					HttpStatus.INTERNAL_SERVER_ERROR);
 		}
+	}
+	
+	@RequestMapping(value = "/deleteorganizer/{organizer_id}", method = RequestMethod.DELETE, produces = "application/json;charset=UTF-8")
+	public ResponseEntity<String> deleteOrganizers(@PathVariable String organizer_id) {
+
+			int affectedRow = organizersRepositoryImpl.deleteOrganizer(organizer_id);
+			if (affectedRow==0) {
+				return new ResponseEntity<>(
+						"{\"message\" : \"Organizer not found\"}", HttpStatus.OK);
+			}else {
+			return new ResponseEntity<>(
+					"{\"message\" : \"Organizer deleted\"}", HttpStatus.OK);
+			}
+
 	}
 
 }

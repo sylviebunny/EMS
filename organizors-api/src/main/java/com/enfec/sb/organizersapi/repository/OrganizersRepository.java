@@ -8,5 +8,6 @@ public interface OrganizersRepository {
 	public int registerOrganizer(OrganizersTable organizersTable);
 	
 	public int updateOrganizer(OrganizersTable organizersTable);
+	public int deleteOrganizer(String organizer_id);
 	
 }

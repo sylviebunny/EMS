@@ -1,4 +1,4 @@
-package com.enfec.EMS;
+package com.enfec.EMS.CustomerAPI;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

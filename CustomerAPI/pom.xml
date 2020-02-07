@@ -8,7 +8,7 @@
 		<version>2.2.4.RELEASE</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.enfec.</groupId>
+	<groupId>com.enfec</groupId>
 	<artifactId>CustomerAPI</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>CustomerAPI</name>
@@ -26,6 +26,11 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
 		</dependency>
 
 		<dependency>

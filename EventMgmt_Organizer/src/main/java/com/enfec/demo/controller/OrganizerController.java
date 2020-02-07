@@ -35,6 +35,21 @@ public class OrganizerController {
 			}
 	}
 
+	@RequestMapping(value = "/organizer/address/search/{Organizer_ID}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
+	public ResponseEntity<String> getAddressList(@PathVariable int Organizer_ID) {
+			List<Address> addressList = OrganizerRepositoryImpl.getAddressInfo(Organizer_ID);
+			
+			if (addressList.isEmpty()) {
+				return new ResponseEntity<>(
+						"{\"message\" : \"No address found\"}", HttpStatus.OK);
+			} else {
+				return new ResponseEntity<>(
+						new Gson().toJson((OrganizerRepositoryImpl
+								.getAddressInfo(Organizer_ID))), HttpStatus.OK);
+			}
+	}
+	
+	
 	@RequestMapping(value = "/organizer/create", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> createOrganizer(@RequestBody(required = true) OrganizerTable organizerTable) {
 			int affectedRow = OrganizerRepositoryImpl.createOrganizer(organizerTable);

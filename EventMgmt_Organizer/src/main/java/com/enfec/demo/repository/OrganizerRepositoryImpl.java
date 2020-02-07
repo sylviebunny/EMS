@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
 import com.enfec.demo.model.Address;
+import com.enfec.demo.model.AddressRowmapper;
 import com.enfec.demo.model.OrganizerRowmapper;
 import com.enfec.demo.model.OrganizerTable;
 
@@ -23,19 +24,17 @@ public class OrganizerRepositoryImpl implements OrganizerRepository{
 //	private static final Logger logger = LoggerFactory.getLogger(OrganizerRepositoryImpl.class);
 	
 	final String SELECT_ORGANIZER = "select Organizer_ID,Organizer_Name,Email_Address,Password,Other_Details FROM Organizers where Organizer_ID = ?";
-
 	final String REGISTER_ORGANIZER = "INSERT INTO Organizers(Organizer_Name, Email_Address, Password, Other_Details) VALUES "
 			+ "(:Organizer_Name,:Email_Address,:Password,:Other_Details)";
-	
 	final String UPDATE_ORGANIZER = "UPDATE Organizers SET Email_Address = :Email_Address, Password = :Password, Other_Details = :Other_Details WHERE Organizer_ID = :Organizer_ID AND Organizer_Name = :Organizer_Name";	
 	
 	final String DELETE_ORGANIZER = "DELETE FROM Organizers WHERE Organizer_ID = ?";
 	final String DELETEfromADDRESS = "DELETE FROM Address WHERE Organizer_ID = ?";
 	final String DELETEfromCONTACTS = "DELETE FROM Contacts WHERE Organizer_ID = ?";
 	
+	final String SELECT_ADDRESS = "select Address_ID, Street1, Street2, City, State, Zipcode, Other_Details, Organizer_ID FROM Address where Organizer_ID = ?";
 	final String CREATE_ADDRESS = "INSERT INTO Address(Street1, Street2, City, State, Zipcode, Other_Details, Organizer_ID) VALUES " 
 			+ "(:Street1,:Street2,:City,:State,:Zipcode,:Other_Details,:Organizer_ID)";
-	
 	final String UPDATE_ADDRESS = "UPDATE Address SET Street1 = :Street1, Street2 = :Street2, City = :City, State = :State, Zipcode = :Zipcode, Other_Details = :Other_Details WHERE Organizer_ID = :Organizer_ID";
 	
 	@Autowired
@@ -46,7 +45,12 @@ public class OrganizerRepositoryImpl implements OrganizerRepository{
 	
 	@Override
 	public List<OrganizerTable> getOrganizerInfo(int Organizer_ID) {
-		return jdbcTemplate.query(SELECT_ORGANIZER,new Object[] { Organizer_ID }, new OrganizerRowmapper());
+		return jdbcTemplate.query(SELECT_ORGANIZER, new Object[] { Organizer_ID }, new OrganizerRowmapper());
+	}
+	
+	@Override
+	public List<Address> getAddressInfo(int Organizer_ID) {
+		return jdbcTemplate.query(SELECT_ADDRESS, new Object[] { Organizer_ID }, new AddressRowmapper());
 	}
 	
 	@Override

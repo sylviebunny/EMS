@@ -13,6 +13,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Component;
 
+import com.enfec.sb.organizerapi.model.OrganizerContactRowmapper;
 import com.enfec.sb.organizerapi.model.OrganizerContactTable;
 import com.enfec.sb.organizerapi.model.OrganizerRowmapper;
 import com.enfec.sb.organizerapi.model.OrganizerTable;
@@ -20,7 +21,7 @@ import com.enfec.sb.organizerapi.model.OrganizerTable;
 @Component
 public class OrganizerRepositoryImpl implements OrganizerRepository {
 	private static final Logger logger = LoggerFactory.getLogger(OrganizerRepositoryImpl.class);
-	
+
 	final String SELECT_ORGANIZER = "select Organizer_ID, Organizer_Name, Email_Address, PASSWORD, Other_Details from Organizers where Organizer_ID = ?; ";
 
 	final String REGISTER_ORGANIZER = "INSERT INTO Organizers(Organizer_ID, Organizer_Name, Email_Address, PASSWORD, Other_Details) VALUES "
@@ -29,8 +30,14 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 	String UPDATE_ORGANIZER_INFO_PREFIX = "UPDATE Organizers SET "; 
 	String UPDATE_ORGANIZER_INFO_SUFFIX = " WHERE Organizer_ID = :organizer_id";
 	
+	final String SELECT_ORGANIZER_CONTACT = "SELECT Contact_ID, Organizer_ID, Address_ID, Contact_Name, Telephone, Web_Site_Address from Contacts where Contacts.Organizer_ID = ?;";
+	
 	final String CREATE_REGISTER_CONTACT_INFO = "INSERT INTO Contacts(Organizer_ID, Address_ID, Contact_Name, Telephone, Web_Site_Address) VALUES"
 			+ "(:organizer_id, :address_id, :contact_name, :telephone, :web_site_address)"; 
+	
+	final String UPDATE_ORGANIZER_CONTACT_INFO = "UPDATE Contacts SET Contact_Name=:contact_name, Telephone=:telephone, "
+			+ "Web_Site_Address=:web_site_address WHERE Organizer_ID=:organizer_id AND Address_ID =:address_id";
+	
 	
 	@Autowired
 	NamedParameterJdbcTemplate namedParameterJdbcTemplate;
@@ -53,21 +60,6 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 		affectedRow = namedParameterJdbcTemplate.update(REGISTER_ORGANIZER, pramSource);
 		
 		return affectedRow; 
-	}
-	
-	@Override
-	public int createOrganizerContact(OrganizerContactTable organizerContactTable) {
-		// Insert contact information of organizer into organizer table
-		try {
-			int affectedRow; 
-			Map<String, Object> param = getOrganizerContactMap(organizerContactTable); 
-			
-			SqlParameterSource pramSource = new MapSqlParameterSource(param); 
-			affectedRow = namedParameterJdbcTemplate.update(CREATE_REGISTER_CONTACT_INFO, pramSource); 
-			return affectedRow; 
-		} catch (RuntimeException rt) {
-			return -1; 
-		}
 	}
 	
 	@Override
@@ -108,6 +100,44 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 		param.put("password", organizerTable.getPassword() == null || organizerTable.getPassword().isEmpty() ? null:organizerTable.getPassword());
 		param.put("other_details", organizerTable.getOther_details() == null || organizerTable.getOther_details().isEmpty() ? null:organizerTable.getOther_details());
 		return param;
+	}
+	
+	@Override
+	public  List<OrganizerContactTable> getOrganizerContactInfo(int organizer_id) {
+		
+		return jdbcTemplate.query(SELECT_ORGANIZER_CONTACT,new Object[] { organizer_id }, new OrganizerContactRowmapper());
+	}
+	
+	@Override
+	public int createOrganizerContact(OrganizerContactTable organizerContactTable) {
+		// Insert contact information of organizer into Contact table
+		try {
+			int affectedRow; 
+			Map<String, Object> param = getOrganizerContactMap(organizerContactTable); 
+			
+			SqlParameterSource pramSource = new MapSqlParameterSource(param); 
+			affectedRow = namedParameterJdbcTemplate.update(CREATE_REGISTER_CONTACT_INFO, pramSource); 
+			return affectedRow; 
+		} catch (RuntimeException rt) {
+			return -1; 
+		} catch (Exception e) {
+			return Integer.MIN_VALUE; 
+		}
+	}
+
+	@Override
+	public int updateOrganizerContact(OrganizerContactTable organizerContactTable) {
+		// Update contact information of organizer into contact table
+		try {
+			int affectedRow; 
+			Map<String, Object> param = getOrganizerContactMap(organizerContactTable); 
+			
+			SqlParameterSource pramSource = new MapSqlParameterSource(param); 
+			affectedRow = namedParameterJdbcTemplate.update(UPDATE_ORGANIZER_CONTACT_INFO, pramSource); 
+			return affectedRow; 
+		} catch (RuntimeException rt) {
+			return -1; 
+		}
 	}
 	
 	private Map<String, Object> getOrganizerContactMap(OrganizerContactTable organizerContactTable) {

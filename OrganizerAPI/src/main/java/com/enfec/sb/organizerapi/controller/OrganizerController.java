@@ -55,23 +55,6 @@ public class OrganizerController {
 			}
 	}
 	
-	// This method for creating contact information of organizer
-	@RequestMapping(value = "/organizer/contact/create", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
-	public ResponseEntity<String> registerOrganizerInfo(
-			@RequestBody(required = true) OrganizerContactTable organizerContactTable) {
-			int affectedRow = organizerRepositoryImpl
-					.createOrganizerContact(organizerContactTable);
-
-			if (affectedRow == -1) {
-				return new ResponseEntity<>(
-						"{\"message\" : \"Address_ID or organizer_ID is not in Database\"}",
-						HttpStatus.OK);
-			} else {
-				return new ResponseEntity<>(
-						"{\"message\" : \"Organizer contact created\"}", HttpStatus.OK);
-			}
-	}
-	
 	// This method for updating information of organizer
 	@RequestMapping(value = "/organizer/update", method = RequestMethod.PUT, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> updateOrganizer(
@@ -87,5 +70,58 @@ public class OrganizerController {
 						"{\"message\" : \"Organizer updated\"}", HttpStatus.OK);
 			}
 	}
+	
+	@RequestMapping(value = "/organizer/contact/search/{Organizer_ID}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
+	public ResponseEntity<String> getOrganizerContactList(@PathVariable int Organizer_ID) {
+			List<OrganizerContactTable> organizerContactList = organizerRepositoryImpl
+					.getOrganizerContactInfo(Organizer_ID);
+			if (organizerContactList.isEmpty()) {
+				return new ResponseEntity<>(
+						"{\"message\" : \"No organizer found\"}", HttpStatus.OK);
+			} else {
+				return new ResponseEntity<>(
+						new Gson().toJson((organizerRepositoryImpl
+								.getOrganizerContactInfo(Organizer_ID))), HttpStatus.OK);
+			}
+	}
+	
+	// This method for creating contact information of organizer
+	@RequestMapping(value = "/organizer/contact/create", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+	public ResponseEntity<String> registerOrganizerInfo(
+			@RequestBody(required = true) OrganizerContactTable organizerContactTable) {
+			int affectedRow = organizerRepositoryImpl
+					.createOrganizerContact(organizerContactTable);
 
+			if (affectedRow == -1) {
+				// Generate Runtime Exception 
+				return new ResponseEntity<>(
+						"{\"message\" : \"Address_ID or organizer_ID is not in Database\"}",
+						HttpStatus.OK);
+			} else if (affectedRow == Integer.MIN_VALUE) {
+				return new ResponseEntity<>(
+						"{\"message\" : \"Error that has not been defined\"}", 
+						HttpStatus.BAD_REQUEST);
+			} else {
+				return new ResponseEntity<>(
+						"{\"message\" : \"Organizer contact created\"}", HttpStatus.OK);
+			}
+	}
+	
+	// This method for creating contact information of organizer
+	@RequestMapping(value = "/organizer/contact/update", method = RequestMethod.PUT, produces = "application/json;charset=UTF-8")
+	public ResponseEntity<String> updateOrganizerInfo(
+			@RequestBody(required = true) OrganizerContactTable organizerContactTable) {
+			int affectedRow = organizerRepositoryImpl
+					.updateOrganizerContact(organizerContactTable);
+
+			if (affectedRow == 0) {
+				// Generate Runtime Exception 
+				return new ResponseEntity<>(
+						"{\"message\" : \"Address_ID or organizer_ID is not in Database\"}",
+						HttpStatus.OK);
+			} else {
+				return new ResponseEntity<>(
+						"{\"message\" : \"Organizer contact successfully updated\"}", HttpStatus.OK);
+			}
+	}
 }

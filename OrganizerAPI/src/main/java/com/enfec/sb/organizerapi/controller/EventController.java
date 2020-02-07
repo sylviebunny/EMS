@@ -14,20 +14,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.enfec.sb.organizerapi.model.OrganizerContactTable;
-import com.enfec.sb.organizerapi.model.OrganizerTable;
-import com.enfec.sb.organizerapi.repository.OrganizerRepositoryImpl;
+import com.enfec.sb.organizerapi.model.EventTable;
+import com.enfec.sb.organizerapi.repository.EventRepositoryImpl;
 import com.google.gson.Gson;
 
 @RestController
-public class OrganizerController {
+public class EventController {
 
 	@Autowired
-	OrganizerRepositoryImpl organizerRepositoryImpl;
+	EventRepositoryImpl organizerRepositoryImpl;
 
 	@RequestMapping(value = "/organizer/search/{Organizer_ID}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> getOrganizerList(@PathVariable int Organizer_ID) {
-			List<OrganizerTable> organizerList = organizerRepositoryImpl
+			List<EventTable> organizerList = organizerRepositoryImpl
 					.getOrganizerInfo(Organizer_ID);
 			if (organizerList.isEmpty()) {
 				return new ResponseEntity<>(
@@ -41,7 +40,7 @@ public class OrganizerController {
 
 	@RequestMapping(value = "/organizer/create", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> registerOrganizer(
-			@RequestBody(required = true) OrganizerTable organizerTable) {
+			@RequestBody(required = true) EventTable organizerTable) {
 			int affectedRow = organizerRepositoryImpl
 					.registerOrganizer(organizerTable);
 
@@ -55,27 +54,10 @@ public class OrganizerController {
 			}
 	}
 	
-	// This method for creating contact information of organizer
-	@RequestMapping(value = "/organizer/contact/create", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
-	public ResponseEntity<String> registerOrganizerInfo(
-			@RequestBody(required = true) OrganizerContactTable organizerContactTable) {
-			int affectedRow = organizerRepositoryImpl
-					.createOrganizerContact(organizerContactTable);
-
-			if (affectedRow == -1) {
-				return new ResponseEntity<>(
-						"{\"message\" : \"Address_ID or organizer_ID is not in Database\"}",
-						HttpStatus.OK);
-			} else {
-				return new ResponseEntity<>(
-						"{\"message\" : \"Organizer contact created\"}", HttpStatus.OK);
-			}
-	}
-	
 	// This method for updating information of organizer
 	@RequestMapping(value = "/organizer/update", method = RequestMethod.PUT, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> updateOrganizer(
-			@RequestBody(required = true) OrganizerTable organizerTable) {
+			@RequestBody(required = true) EventTable organizerTable) {
 			int affectedRow = organizerRepositoryImpl
 					.updateOrganizer(organizerTable);
 
@@ -87,5 +69,5 @@ public class OrganizerController {
 						"{\"message\" : \"Organizer updated\"}", HttpStatus.OK);
 			}
 	}
-
+	
 }

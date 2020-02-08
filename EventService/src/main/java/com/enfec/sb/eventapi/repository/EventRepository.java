@@ -4,8 +4,10 @@ import com.enfec.sb.eventapi.model.EventTable;
 
 public interface EventRepository {
 	
-	public Object getOrganizerInfo(int organizer_id);
-	public int registerOrganizer(EventTable organizerTable);
-	public int updateOrganizer(EventTable organizerTable);
+	public Object getEventInfoByID(int organizer_id);
+	public Object getEventInfoByName(String event_name);
+	
+	public int createEvent(EventTable organizerTable);
+	public int updateEvent(EventTable organizerTable);
 	
 }

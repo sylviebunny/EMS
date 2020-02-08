@@ -7,4 +7,4 @@ Update Organizer service and improve all CRUD APIs with connecting Organizer tab
 
 Separate services creations to Organizer, Event, Room, Seat, Customer, Organizer_Order, Customer_Order, Refund
 
-Heidi: Start setting up Event service. 
+Heidi: For eventService, already implemented searchEventByEventID/searchEventByEventName/createEvent/updateEvent. 

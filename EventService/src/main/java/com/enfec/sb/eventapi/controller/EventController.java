@@ -22,51 +22,68 @@ import com.google.gson.Gson;
 public class EventController {
 
 	@Autowired
-	EventRepositoryImpl organizerRepositoryImpl;
-
-	@RequestMapping(value = "/organizer/search/{Organizer_ID}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
-	public ResponseEntity<String> getOrganizerList(@PathVariable int Organizer_ID) {
-			List<EventTable> organizerList = organizerRepositoryImpl
-					.getOrganizerInfo(Organizer_ID);
-			if (organizerList.isEmpty()) {
+	EventRepositoryImpl eventRepositoryImpl;
+	
+	// Search event by event ID
+	@RequestMapping(value = "/event/search/event_id/{Event_ID}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
+	public ResponseEntity<String> getEventListByID(@PathVariable int Event_ID) {
+			List<EventTable> eventList = eventRepositoryImpl
+					.getEventInfoByID(Event_ID);
+			if (eventList.isEmpty()) {
 				return new ResponseEntity<>(
-						"{\"message\" : \"No organizer found\"}", HttpStatus.OK);
+						"{\"message\" : \"No event found\"}", HttpStatus.OK);
 			} else {
 				return new ResponseEntity<>(
-						new Gson().toJson((organizerRepositoryImpl
-								.getOrganizerInfo(Organizer_ID))), HttpStatus.OK);
-			}
-	}
-
-	@RequestMapping(value = "/organizer/create", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
-	public ResponseEntity<String> registerOrganizer(
-			@RequestBody(required = true) EventTable organizerTable) {
-			int affectedRow = organizerRepositoryImpl
-					.registerOrganizer(organizerTable);
-
-			if (affectedRow == 0) {
-				return new ResponseEntity<>(
-						"{\"message\" : \"Organizer not registerd\"}",
-						HttpStatus.OK);
-			} else {
-				return new ResponseEntity<>(
-						"{\"message\" : \"Organizer Registered\"}", HttpStatus.OK);
+						new Gson().toJson((eventRepositoryImpl
+								.getEventInfoByID(Event_ID))), HttpStatus.OK);
 			}
 	}
 	
-	// This method for updating information of organizer
-	@RequestMapping(value = "/organizer/update", method = RequestMethod.PUT, produces = "application/json;charset=UTF-8")
-	public ResponseEntity<String> updateOrganizer(
-			@RequestBody(required = true) EventTable organizerTable) {
-			int affectedRow = organizerRepositoryImpl
-					.updateOrganizer(organizerTable);
+	// Search event by event name 
+	@RequestMapping(value = "/event/search/event_name/{Event_Name}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
+	public ResponseEntity<String> getEventListByID(@PathVariable String Event_Name) {
+			List<EventTable> eventList = eventRepositoryImpl
+					.getEventInfoByName(Event_Name);
+			if (eventList.isEmpty()) {
+				return new ResponseEntity<>(
+						"{\"message\" : \"No event found\"}", HttpStatus.OK);
+			} else {
+				return new ResponseEntity<>(
+						new Gson().toJson((eventRepositoryImpl
+								.getEventInfoByName(Event_Name))), HttpStatus.OK);
+			}
+	}
+	
+	// Create event
+	@RequestMapping(value = "/event/create", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+	public ResponseEntity<String> registerEvent(
+			@RequestBody(required = true) EventTable eventTable) {
+			int affectedRow = eventRepositoryImpl
+					.createEvent(eventTable);
 
 			if (affectedRow == 0) {
 				return new ResponseEntity<>(
-						"{\"message\" : \"Organizer not found\"}", HttpStatus.OK);
+						"{\"message\" : \"Event not registerd\"}",
+						HttpStatus.OK);
 			} else {
 				return new ResponseEntity<>(
-						"{\"message\" : \"Organizer updated\"}", HttpStatus.OK);
+						"{\"message\" : \"Event Registered\"}", HttpStatus.OK);
+			}
+	}
+	
+	// Update event
+	@RequestMapping(value = "/event/update", method = RequestMethod.PUT, produces = "application/json;charset=UTF-8")
+	public ResponseEntity<String> updateEvent(
+			@RequestBody(required = true) EventTable eventTable) {
+			int affectedRow = eventRepositoryImpl
+					.updateEvent(eventTable);
+
+			if (affectedRow == 0) {
+				return new ResponseEntity<>(
+						"{\"message\" : \"Event not found\"}", HttpStatus.OK);
+			} else {
+				return new ResponseEntity<>(
+						"{\"message\" : \"Event updated\"}", HttpStatus.OK);
 			}
 	}
 	

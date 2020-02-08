@@ -30,7 +30,7 @@ public class EventRepositoryImpl implements EventRepository {
 			+ "(:event_status_code, :event_type_code, :free_or_commercial_code, :organizer_id, "
 			+ ":venue_id, :event_name, :event_start_date, :event_end_date, :number_of_participants, :derived_days_duration, :event_cost, :discount, :comments)";
 	
-	String UPDATE_EVENT_INFO_PREFIX = "UPDATE Organizers SET "; 
+	String UPDATE_EVENT_INFO_PREFIX = "UPDATE Events SET "; 
 	String UPDATE_EVENT_INFO_SUFFIX = " WHERE Organizer_ID = :organizer_id";
 	
 	@Autowired
@@ -53,6 +53,7 @@ public class EventRepositoryImpl implements EventRepository {
 
 	@Override
 	public int createEvent (EventTable eventTable) {
+		// Create an event
 		int affectedRow;
 		Map<String, Object> param = eventMap(eventTable);
 		

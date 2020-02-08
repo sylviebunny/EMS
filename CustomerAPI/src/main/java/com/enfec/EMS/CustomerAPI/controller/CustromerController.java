@@ -60,11 +60,58 @@ public class CustromerController {
 		
 		}catch(DataIntegrityViolationException dataIntegrityViolationException){
 			logger.error("Invalid Customer id:{}", customerTable.getId());
-			return new ResponseEntity<String>("{\"message\": \"Invalid Customer id\"}", HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<String>(
+					"{\"message\": \"Invalid Customer id\"}", 
+					HttpStatus.BAD_REQUEST);
 		}catch(Exception exception){
 			logger.error("Exceprtion in regestering Customer:{}", exception.getMessage());
-			return new ResponseEntity<String>("{\"message\": \"Exception in regestering Customer info\"}", HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<String>(
+					"{\"message\": \"Exception in regestering Customer info\"}", 
+					HttpStatus.INTERNAL_SERVER_ERROR);
 		}
+	}
+	
+	@RequestMapping(value = "/Customer/Update", method = RequestMethod.PUT, produces = "applications/json; charset=UTF-8")
+	public ResponseEntity<String>CustomerUpdate(
+			@RequestBody(required = true) CustomerTable customerTable){
+		try {
+			int affectedRow = customerRepositoryImpl.updateCustomer(customerTable);
+			if(affectedRow == 0) {
+				logger.info("Customer not updated customer_name: {}", customerTable.getName());
+				return new ResponseEntity<String>(
+						"{\"message\" : \"Customer not updated\"}",
+						HttpStatus.OK);
+			}else {
+				logger.info("Custoer updated customer_name: {}", customerTable.getName());
+				return new ResponseEntity<String>(
+						"{\"message\": \"Customer updated\"}", HttpStatus.OK);
+			}
+		
+		}catch(DataIntegrityViolationException dataIntegrityViolationException){
+			logger.error("Invalid Customer id:{}", customerTable.getId());
+			return new ResponseEntity<String>(
+					"{\"message\": \"Invalid Customer id\"}", HttpStatus.BAD_REQUEST);
+		}catch(Exception exception){
+			logger.error("Exceprtion in updating Customer:{}", exception.getMessage());
+			return new ResponseEntity<String>(
+					"{\"message\": \"Exception in updating Customer info\"}", 
+					HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	@RequestMapping(value = "/Customer/Delete/{id}", method = RequestMethod.DELETE, produces = "application/json;charset=UTF-8")
+	public ResponseEntity<String> deleteCustomer(
+			@PathVariable String id) {
+
+			int affectedRow = customerRepositoryImpl.deleteCustomer(id);
+			if (affectedRow==0) {
+				return new ResponseEntity<>(
+						"{\"message\" : \"Customer not found\"}", HttpStatus.OK);
+			}else {
+			return new ResponseEntity<>(
+					"{\"message\" : \"Customer deleted\"}", HttpStatus.OK);
+			}
+
 	}
 	
 }

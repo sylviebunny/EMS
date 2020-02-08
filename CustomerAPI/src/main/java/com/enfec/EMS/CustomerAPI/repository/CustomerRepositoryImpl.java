@@ -13,7 +13,6 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Component;
-
 import com.enfec.EMS.CustomerAPI.model.CustomerRowmapper;
 import com.enfec.EMS.CustomerAPI.model.CustomerTable;
 
@@ -24,10 +23,15 @@ import org.slf4j.LoggerFactory;
 public class CustomerRepositoryImpl implements CustomerRepository {
 	private static final Logger logger = LoggerFactory.getLogger(CustomerRepositoryImpl.class);
 	
-	final String SELECT_CUSTOMER = "SELECT Customer_ID, User_Name, Email_Address, CPassword, Phone FROM Customers WHERE CUSTOMER_ID =?";
+	final String SELECT_CUSTOMER = "SELECT Customer_ID, User_Name, Email_Address, CPassword, Phone FROM Customers WHERE Customer_ID =?";
 	
 	final String REGISTER_CUSTOMER = "INSERT INTO Customers(User_Name, Email_Address, CPassword, Phone) VALUES"
 			+ "(:name, :email, :psw, :phone)";
+	
+	final String UPDATE_CUSTOMER = "UPDATE Customers SET User_name =:name, Email_Address =:email, CPassword =:psw, Phone =:phone WHERE Customer_ID =:id";
+	
+	final String DELETE_CUSTOMER = "DELETE FROM Customers WHERE Customer_ID =?";
+
 	
 	@Autowired
 	NamedParameterJdbcTemplate namedParameterJdbcTemplate;
@@ -46,8 +50,9 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 		}
 		*/
 		
+		cstmMap.put("id", customerTable.getId());
 		cstmMap.put("name", customerTable.getName() == null ? null: customerTable.getName());
-		cstmMap.put("email", customerTable.getName());
+		cstmMap.put("email", customerTable.getEmail());
 		cstmMap.put("psw", customerTable.getPsw() == null ? null:Base64.getEncoder().encode((customerTable.getPsw().getBytes())));
 		cstmMap.put("phone", customerTable.getPhone());
 		
@@ -70,5 +75,30 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 		return affectedRow;
 		
 	}
+	
+	
+	
+	@Override
+	public int updateCustomer(CustomerTable customerTable) {
+		int affectedRow;
+		Map<String, Object>cstmMap = CustomerMap(customerTable);
+		SqlParameterSource parameterSource = new MapSqlParameterSource(cstmMap);
+		logger.info("Update customer info:{}", parameterSource);
+		affectedRow = namedParameterJdbcTemplate.update(UPDATE_CUSTOMER, parameterSource);
+		
+		return affectedRow;
+		
+	}
+	
+	
+	@Override
+	public int deleteCustomer(String id) {
+		int affectedRow = jdbcTemplate.update(DELETE_CUSTOMER, id);
+		return affectedRow;
+
+	}
+	
+	
+	
 
 }

@@ -1,4 +1,4 @@
-package com.enfec.sb.organizerapi.repository;
+package com.enfec.sb.eventapi.repository;
 
 import java.util.Base64;
 import java.util.HashMap;
@@ -14,8 +14,8 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Component;
 
-import com.enfec.sb.organizerapi.model.EventRowmapper;
-import com.enfec.sb.organizerapi.model.EventTable;
+import com.enfec.sb.eventapi.model.EventRowmapper;
+import com.enfec.sb.eventapi.model.EventTable;
 
 @Component
 public class EventRepositoryImpl implements EventRepository {

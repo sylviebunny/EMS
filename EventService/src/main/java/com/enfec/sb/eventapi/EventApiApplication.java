@@ -1,4 +1,4 @@
-package com.enfec.sb.organizerapi;
+package com.enfec.sb.eventapi;
 
 
 import org.springframework.boot.SpringApplication;

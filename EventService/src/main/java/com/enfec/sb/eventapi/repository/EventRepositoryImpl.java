@@ -31,7 +31,7 @@ public class EventRepositoryImpl implements EventRepository {
 			+ ":venue_id, :event_name, :event_start_date, :event_end_date, :number_of_participants, :derived_days_duration, :event_cost, :discount, :comments)";
 	
 	String UPDATE_EVENT_INFO_PREFIX = "UPDATE Events SET "; 
-	String UPDATE_EVENT_INFO_SUFFIX = " WHERE Organizer_ID = :organizer_id";
+	String UPDATE_EVENT_INFO_SUFFIX = " WHERE Event_ID = :event_id AND Organizer_ID =:organizer_id";
 	
 	@Autowired
 	NamedParameterJdbcTemplate namedParameterJdbcTemplate;
@@ -55,7 +55,7 @@ public class EventRepositoryImpl implements EventRepository {
 	public int createEvent (EventTable eventTable) {
 		// Create an event
 		int affectedRow;
-		Map<String, Object> param = eventMap(eventTable);
+		Map<String, Object> param = eventMap(eventTable, Integer.MIN_VALUE);
 		
 		SqlParameterSource pramSource = new MapSqlParameterSource(param);
 		affectedRow = namedParameterJdbcTemplate.update(REGISTER_EVENT, pramSource);
@@ -65,30 +65,38 @@ public class EventRepositoryImpl implements EventRepository {
 	
 	@Override
 	public int updateEvent(EventTable eventTable) {
+		// Update an event by matching event_id and organizer_id
 		int affectedRow;
-		Map<String, Object> param = eventMap(eventTable);
+		Map<String, Object> param = eventMap(eventTable, eventTable.getEvent_id());
 		
 		SqlParameterSource pramSource = new MapSqlParameterSource(param);
-		StringBuilder UPDATE_ORGANIZER_INFO = new StringBuilder();
+		
+		// Decide which part we need to update
+		StringBuilder UPDATE_EVENT_INFO = new StringBuilder();
 		for (String key : param.keySet()) {
-			if (param.get(key) != null && !key.equals("organizer_id"))
+			if (param.get(key) != null && !key.equals("organizer_id") && !key.equals("event_id"))
 			{
-				UPDATE_ORGANIZER_INFO.append(key + "=:" + key + ",");
+				UPDATE_EVENT_INFO.append(key + "=:" + key + ",");
 			}
 		}
-		// remove the last colon
-		UPDATE_ORGANIZER_INFO = UPDATE_ORGANIZER_INFO.deleteCharAt(UPDATE_ORGANIZER_INFO.length() - 1); 
+		// remove the last comma
+		UPDATE_EVENT_INFO = UPDATE_EVENT_INFO.deleteCharAt(UPDATE_EVENT_INFO.length() - 1); 
 		
-		String UPDATE_ORGANIZER = UPDATE_EVENT_INFO_PREFIX + UPDATE_ORGANIZER_INFO + UPDATE_EVENT_INFO_SUFFIX;
-		affectedRow =namedParameterJdbcTemplate.update(UPDATE_ORGANIZER, pramSource);
+		String UPDATE_EVENT = UPDATE_EVENT_INFO_PREFIX + UPDATE_EVENT_INFO + UPDATE_EVENT_INFO_SUFFIX;
+		affectedRow =namedParameterJdbcTemplate.update(UPDATE_EVENT, pramSource);
 		
 		return affectedRow;
 
 	}
 	
-	private Map<String, Object> eventMap(EventTable eventTable) {
+	private Map<String, Object> eventMap(EventTable eventTable, int event_id) {
 		// Mapping event's information query's variable to URL POST body
 		Map<String, Object>param = new HashMap<>();
+		
+		if (event_id != Integer.MIN_VALUE) {
+			// Means we need to update event 
+			param.put("event_id", event_id); 
+		}
 		
 		param.put("event_status_code", eventTable.getEvent_status_code() == null || eventTable.getEvent_status_code().isEmpty() ? 
 				null : eventTable.getEvent_status_code());

@@ -1,5 +1,6 @@
 package com.enfec.sb.organizersapi.repository;
 
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -87,8 +88,8 @@ public class OrganizersRepositoryImpl implements OrganizersRepository {
 		param.put("organizer_name", organizersTable.getOrganizer_name() == null ? null:organizersTable.getOrganizer_name());
 		param.put("email", organizersTable.getEmail()==null ? null:organizersTable.getEmail());
 		param.put("details", organizersTable.getDetails()==null ? null:organizersTable.getDetails());
-		param.put("password", organizersTable.getPassword().isEmpty() ? null : organizersTable.getPassword());
-		//param.put("password", organizersTable.getPassword()==null? null : Base64.getEncoder().encode((organizersTable.getPassword().getBytes())));// encode password
+		//param.put("password", organizersTable.getPassword().isEmpty() ? null : organizersTable.getPassword());
+		param.put("password", organizersTable.getPassword()==null? null : Base64.getEncoder().encode((organizersTable.getPassword().getBytes())));// encode password
 		
 		return param;
 	}

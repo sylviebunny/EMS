@@ -6,9 +6,11 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,15 +31,40 @@ public class CustromerController {
 	CustomerRepositoryImpl customerRepositoryImpl;
 	
 	@RequestMapping(value = "/customers/{id}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
-	public ResponseEntity<String>getCustomerList(@PathVariable String id) {
+	public ResponseEntity<String>getCustomerList(@PathVariable String id) { 
 			List<CustomerTable> customerList = customerRepositoryImpl.getCustomer(id);
 			if (customerList.isEmpty()) {
 				logger.info("No organizer found for: {} ", id);
 				return new ResponseEntity<>(
 						"{\"message\" : \"No organizer found\"}", HttpStatus.OK);
 			
-		}
+			}
 			return new ResponseEntity<>(
 					new Gson().toJson((customerRepositoryImpl.getCustomer(id))), HttpStatus.OK);
 		}
+	
+	@RequestMapping(value = "/Customer/Register", method = RequestMethod.POST, produces = "applications/json; charset=UTF-8")
+	public ResponseEntity<String>customerRegister(
+			@RequestBody(required = true) CustomerTable customerTable){
+		try {
+			int affectedRow = customerRepositoryImpl.registerCustomer(customerTable);
+			if(affectedRow == 0) {
+				logger.info("Customer not registered customer_name: {}", customerTable.getName());
+				return new ResponseEntity<String>(
+						"{\"message\" : \"Customer not registered\"}",
+						HttpStatus.OK);
+			}else {
+				logger.info("Custoer registered customer_name: {}", customerTable.getName());
+				return new ResponseEntity<String>("{\"message\": \"Customer registered\"}", HttpStatus.OK);
+			}
+		
+		}catch(DataIntegrityViolationException dataIntegrityViolationException){
+			logger.error("Invalid Customer id:{}", customerTable.getId());
+			return new ResponseEntity<String>("{\"message\": \"Invalid Customer id\"}", HttpStatus.BAD_REQUEST);
+		}catch(Exception exception){
+			logger.error("Exceprtion in regestering Customer:{}", exception.getMessage());
+			return new ResponseEntity<String>("{\"message\": \"Exception in regestering Customer info\"}", HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
 }

@@ -25,11 +25,13 @@ public class EventRepositoryImpl implements EventRepository {
 
 	final String SELECT_EVENT_BY_ID = "SELECT * FROM Events WHERE Event_ID=?;";
 
-	final String REGISTER_ORGANIZER = "INSERT INTO Organizers(Organizer_ID, Organizer_Name, Email_Address, PASSWORD, Other_Details) VALUES "
-			+ "(:organizer_id, :organizer_name,:email_address,:password,:other_details)";
+	final String REGISTER_EVENT = "INSERT INTO Events(Event_Status_Code, Event_Type_Code, Free_or_Commercial_Code, Organizer_ID, Venue_ID, "
+			+ "Event_Name, Event_Start_Date, Event_End_Date, Number_of_Participants, Derived_Days_Duration, Event_Cost, Discount, Comments) VALUES "
+			+ "(:event_status_code, :event_type_code, :free_or_commercial_code, :organizer_id, "
+			+ ":venue_id, :event_name, :event_start_date, :event_end_date, :number_of_participants, :derived_days_duration, :event_cost, :discount, :comments)";
 	
-	String UPDATE_ORGANIZER_INFO_PREFIX = "UPDATE Organizers SET "; 
-	String UPDATE_ORGANIZER_INFO_SUFFIX = " WHERE Organizer_ID = :organizer_id";
+	String UPDATE_EVENT_INFO_PREFIX = "UPDATE Organizers SET "; 
+	String UPDATE_EVENT_INFO_SUFFIX = " WHERE Organizer_ID = :organizer_id";
 	
 	@Autowired
 	NamedParameterJdbcTemplate namedParameterJdbcTemplate;
@@ -55,7 +57,7 @@ public class EventRepositoryImpl implements EventRepository {
 		Map<String, Object> param = eventMap(eventTable);
 		
 		SqlParameterSource pramSource = new MapSqlParameterSource(param);
-		affectedRow = namedParameterJdbcTemplate.update(REGISTER_ORGANIZER, pramSource);
+		affectedRow = namedParameterJdbcTemplate.update(REGISTER_EVENT, pramSource);
 		
 		return affectedRow; 
 	}
@@ -76,7 +78,7 @@ public class EventRepositoryImpl implements EventRepository {
 		// remove the last colon
 		UPDATE_ORGANIZER_INFO = UPDATE_ORGANIZER_INFO.deleteCharAt(UPDATE_ORGANIZER_INFO.length() - 1); 
 		
-		String UPDATE_ORGANIZER = UPDATE_ORGANIZER_INFO_PREFIX + UPDATE_ORGANIZER_INFO + UPDATE_ORGANIZER_INFO_SUFFIX;
+		String UPDATE_ORGANIZER = UPDATE_EVENT_INFO_PREFIX + UPDATE_ORGANIZER_INFO + UPDATE_EVENT_INFO_SUFFIX;
 		affectedRow =namedParameterJdbcTemplate.update(UPDATE_ORGANIZER, pramSource);
 		
 		return affectedRow;
@@ -87,8 +89,8 @@ public class EventRepositoryImpl implements EventRepository {
 		// Mapping event's information query's variable to URL POST body
 		Map<String, Object>param = new HashMap<>();
 		
-		param.put("event_status_code", eventTable.getComments() == null || eventTable.getComments().isEmpty() ? 
-				null : eventTable.getComments());
+		param.put("event_status_code", eventTable.getEvent_status_code() == null || eventTable.getEvent_status_code().isEmpty() ? 
+				null : eventTable.getEvent_status_code());
 		
 		param.put("event_type_code", eventTable.getEvent_type_code() == null || eventTable.getEvent_type_code().isEmpty() ? 
 				null : eventTable.getEvent_type_code());

@@ -1,6 +1,6 @@
-package com.enfec.sb.organizerapi.repository;
+package com.enfec.sb.eventapi.repository;
 
-import com.enfec.sb.organizerapi.model.EventTable;
+import com.enfec.sb.eventapi.model.EventTable;
 
 public interface EventRepository {
 	

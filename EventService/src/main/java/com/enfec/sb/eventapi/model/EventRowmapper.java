@@ -1,4 +1,4 @@
-package com.enfec.sb.organizerapi.model;
+package com.enfec.sb.eventapi.model;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

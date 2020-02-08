@@ -1,4 +1,4 @@
-package com.enfec.sb.organizerapi.controller;
+package com.enfec.sb.eventapi.controller;
 
 import java.util.List;
 
@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.enfec.sb.organizerapi.model.EventTable;
-import com.enfec.sb.organizerapi.repository.EventRepositoryImpl;
+import com.enfec.sb.eventapi.model.EventTable;
+import com.enfec.sb.eventapi.repository.EventRepositoryImpl;
 import com.google.gson.Gson;
 
 @RestController

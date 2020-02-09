@@ -47,7 +47,8 @@ public class RoomController {
 								.getRoomInfo(Room_ID))), HttpStatus.OK);
 			}
 	}
-/*
+
+	//The foreign key information must exist first in the db
 	@RequestMapping(value = "/room/update", method = RequestMethod.PUT, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> updateRoom(@RequestBody(required = true) Room room) {
 			int affectedRow = RoomRepositoryImpl.updateRoom(room);
@@ -60,7 +61,7 @@ public class RoomController {
 						"{\"message\" : \"Room updated\"}", HttpStatus.OK);
 			}
 	}
-*/
+
 	@RequestMapping(value="/room/delete/{Room_ID}",method = RequestMethod.DELETE, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> deleteRoom(@PathVariable("Room_ID") int id) {
 		int affectedRow = RoomRepositoryImpl.deleteRoom(id);

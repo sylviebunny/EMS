@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.enfec.sb.eventapi.model.EventTable;
@@ -25,10 +26,14 @@ public class EventController {
 	@Autowired
 	EventRepositoryImpl eventRepositoryImpl;
 	
-	// Search event by event ID
-	@RequestMapping(value = "/event/search/event_id/{Event_ID}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
-	public ResponseEntity<String> getEventListByID(@PathVariable int Event_ID) {
-			List<EventTable> eventList = eventRepositoryImpl.getEventInfoByID(Event_ID);
+	// Search event by options
+	@RequestMapping(value = "/event/search", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
+	public ResponseEntity<String> getEventList (
+				@RequestParam(name = "event_id", required = false) Integer Id, 
+				@RequestParam(name = "event_name", required = false) String name, 
+				@RequestParam(name = "event_type_code", required = false) String code
+			) {
+			List<EventTable> eventList = eventRepositoryImpl.getEventInfo(name);
 			
 			if (eventList.isEmpty()) {
 				return new ResponseEntity<>(
@@ -36,22 +41,7 @@ public class EventController {
 			} else {
 				return new ResponseEntity<>(
 						new Gson().toJson((eventRepositoryImpl
-								.getEventInfoByID(Event_ID))), HttpStatus.OK);
-			}
-	}
-	
-	// Search event by event name 
-	@RequestMapping(value = "/event/search/event_name/{Event_Name}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
-	public ResponseEntity<String> getEventListByID(@PathVariable String Event_Name) {
-			List<EventTable> eventList = eventRepositoryImpl.getEventInfoByName(Event_Name);
-			
-			if (eventList.isEmpty()) {
-				return new ResponseEntity<>(
-						"{\"message\" : \"No event found\"}", HttpStatus.OK);
-			} else {
-				return new ResponseEntity<>(
-						new Gson().toJson((eventRepositoryImpl
-								.getEventInfoByName(Event_Name))), HttpStatus.OK);
+								.getEventInfo(name))), HttpStatus.OK);
 			}
 	}
 	

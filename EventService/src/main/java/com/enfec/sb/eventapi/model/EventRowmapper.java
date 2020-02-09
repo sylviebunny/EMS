@@ -7,7 +7,7 @@ import java.util.Base64;
 import org.springframework.jdbc.core.RowMapper;
 
 
-public class EventRowmapperByID implements RowMapper<EventTable> {
+public class EventRowmapper implements RowMapper<EventTable> {
 
 
 	

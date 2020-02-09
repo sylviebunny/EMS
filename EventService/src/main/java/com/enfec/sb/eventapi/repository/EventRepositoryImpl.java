@@ -21,8 +21,6 @@ import com.enfec.sb.eventapi.model.EventTable;
 public class EventRepositoryImpl implements EventRepository {
 	private static final Logger logger = LoggerFactory.getLogger(EventRepositoryImpl.class);
 
-	private static final String SELECT_EVENT_BY_NAME = "SELECT * FROM Events WHERE Event_Name =?";
-
 	final String REGISTER_EVENT = "INSERT INTO Events(Event_Status_Code, Event_Type_Code, Free_or_Commercial_Code, Organizer_ID, Venue_ID, "
 			+ "Event_Name, Event_Start_Date, Event_End_Date, Number_of_Participants, Derived_Days_Duration, Event_Cost, Discount, Comments) VALUES "
 			+ "(:event_status_code, :event_type_code, :free_or_commercial_code, :organizer_id, "
@@ -35,6 +33,8 @@ public class EventRepositoryImpl implements EventRepository {
 
 	private static final String SELECT_EVENT_BY_ID = "SELECT * FROM Events WHERE Event_ID =?";
 	
+	private static final String SELECT_EVENT_PREFIX = "SELECT * FROM Events WHERE ";
+	
 	@Autowired
 	NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 	
@@ -42,9 +42,27 @@ public class EventRepositoryImpl implements EventRepository {
 	JdbcTemplate jdbcTemplate;
 	
 	@Override
-	public List<EventTable> getEventInfo(String event_name) {
-		// Implementation for GET event by EVENT_NAME
-		return jdbcTemplate.query(SELECT_EVENT_BY_NAME, new EventRowmapper(), event_name);
+	public List<EventTable> getEventInfo(
+			Integer event_id, String event_name, String event_type_code, Boolean free_or_commercial_code, Integer organizer_id, Integer venue_id) {
+		// Implementation for GET event by options
+		// event_id, event_name, type_code, free_or_commercial, organizer_id, venue_id
+		StringBuilder PARAMETER = new StringBuilder(); 
+		if (event_id != null) { 
+			PARAMETER.append("Event_ID=? AND"); }; 
+		if (event_name != null) { 
+			PARAMETER.append("Event_Name=? AND"); };
+		if (event_type_code != null) { 
+			PARAMETER.append("Free_or_Commercial_Code=? AND"); };
+		if (organizer_id != null) {
+			PARAMETER.append("Organizer_ID=? AND"); };
+		if (venue_id != null) {
+			PARAMETER.append("Venue_ID=? AND"); };
+		
+		// Remove the last AND
+		PARAMETER.delete(PARAMETER.length() - 3, PARAMETER.length()); 
+		
+		final String SELECT_EVENT = SELECT_EVENT_PREFIX + PARAMETER.toString(); 
+		return jdbcTemplate.query(SELECT_EVENT, new EventRowmapper(), event_name);
 	}
 	
 	private List<EventTable> getEventInfoByID(int event_id) {

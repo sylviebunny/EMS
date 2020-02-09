@@ -14,7 +14,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Component;
 
-import com.enfec.sb.eventapi.model.EventRowmapperByID;
+import com.enfec.sb.eventapi.model.EventRowmapper;
 import com.enfec.sb.eventapi.model.EventTable;
 
 @Component
@@ -22,8 +22,6 @@ public class EventRepositoryImpl implements EventRepository {
 	private static final Logger logger = LoggerFactory.getLogger(EventRepositoryImpl.class);
 
 	private static final String SELECT_EVENT_BY_NAME = "SELECT * FROM Events WHERE Event_Name =?";
-
-	final String SELECT_EVENT_BY_ID = "SELECT * FROM Events WHERE Event_ID=?;";
 
 	final String REGISTER_EVENT = "INSERT INTO Events(Event_Status_Code, Event_Type_Code, Free_or_Commercial_Code, Organizer_ID, Venue_ID, "
 			+ "Event_Name, Event_Start_Date, Event_End_Date, Number_of_Participants, Derived_Days_Duration, Event_Cost, Discount, Comments) VALUES "
@@ -34,26 +32,26 @@ public class EventRepositoryImpl implements EventRepository {
 	String UPDATE_EVENT_INFO_SUFFIX = " WHERE Event_ID = :event_id AND Organizer_ID =:organizer_id";
 	
 	private static final String DELETE_EVENT = "DELETE FROM Events WHERE Event_ID =?";
+
+	private static final String SELECT_EVENT_BY_ID = "SELECT * FROM Events WHERE Event_ID =?";
 	
 	@Autowired
 	NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 	
 	@Autowired
 	JdbcTemplate jdbcTemplate;
-
-	@Override
-	public  List<EventTable> getEventInfoByID(int event_id) {
-		// Implementation for GET event by ID
-		EventRowmapperByID e = new EventRowmapperByID(); 
-		return jdbcTemplate.query(SELECT_EVENT_BY_ID, new Object[] {event_id}, e);
-	}
 	
 	@Override
-	public List<EventTable> getEventInfoByName(String event_name) {
+	public List<EventTable> getEventInfo(String event_name) {
 		// Implementation for GET event by EVENT_NAME
-		return jdbcTemplate.query(SELECT_EVENT_BY_NAME, new EventRowmapperByID(), event_name);
+		return jdbcTemplate.query(SELECT_EVENT_BY_NAME, new EventRowmapper(), event_name);
 	}
-
+	
+	private List<EventTable> getEventInfoByID(int event_id) {
+		// Implementation for GET event by EVENT_ID
+		return jdbcTemplate.query(SELECT_EVENT_BY_ID, new Object[] {event_id}, new EventRowmapper());
+	}
+	
 	@Override
 	public int createEvent (EventTable eventTable) {
 		// Create an event
@@ -105,7 +103,7 @@ public class EventRepositoryImpl implements EventRepository {
 			return affectedRow; 
 		}
 	}
-	
+
 	private Map<String, Object> eventMap(EventTable eventTable, int event_id) {
 		// Mapping event's information query's variable to URL POST body
 		Map<String, Object>param = new HashMap<>();

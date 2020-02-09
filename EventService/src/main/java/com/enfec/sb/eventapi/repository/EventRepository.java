@@ -10,4 +10,6 @@ public interface EventRepository {
 	public int createEvent(EventTable organizerTable);
 	public int updateEvent(EventTable organizerTable);
 	
+	public int deleteEvent(int event_id); 
+	
 }

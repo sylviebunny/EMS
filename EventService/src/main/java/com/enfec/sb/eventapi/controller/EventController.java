@@ -1,6 +1,7 @@
 package com.enfec.sb.eventapi.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,8 +28,8 @@ public class EventController {
 	// Search event by event ID
 	@RequestMapping(value = "/event/search/event_id/{Event_ID}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> getEventListByID(@PathVariable int Event_ID) {
-			List<EventTable> eventList = eventRepositoryImpl
-					.getEventInfoByID(Event_ID);
+			List<EventTable> eventList = eventRepositoryImpl.getEventInfoByID(Event_ID);
+			
 			if (eventList.isEmpty()) {
 				return new ResponseEntity<>(
 						"{\"message\" : \"No event found\"}", HttpStatus.OK);
@@ -42,8 +43,8 @@ public class EventController {
 	// Search event by event name 
 	@RequestMapping(value = "/event/search/event_name/{Event_Name}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> getEventListByID(@PathVariable String Event_Name) {
-			List<EventTable> eventList = eventRepositoryImpl
-					.getEventInfoByName(Event_Name);
+			List<EventTable> eventList = eventRepositoryImpl.getEventInfoByName(Event_Name);
+			
 			if (eventList.isEmpty()) {
 				return new ResponseEntity<>(
 						"{\"message\" : \"No event found\"}", HttpStatus.OK);
@@ -58,8 +59,7 @@ public class EventController {
 	@RequestMapping(value = "/event/create", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> registerEvent(
 			@RequestBody(required = true) EventTable eventTable) {
-			int affectedRow = eventRepositoryImpl
-					.createEvent(eventTable);
+			int affectedRow = eventRepositoryImpl.createEvent(eventTable);
 
 			if (affectedRow == 0) {
 				return new ResponseEntity<>(
@@ -67,7 +67,7 @@ public class EventController {
 						HttpStatus.OK);
 			} else {
 				return new ResponseEntity<>(
-						"{\"message\" : \"Event Registered\"}", HttpStatus.OK);
+						"{\"message\" : \"Event successfully registered\"}", HttpStatus.OK);
 			}
 	}
 	
@@ -75,16 +75,29 @@ public class EventController {
 	@RequestMapping(value = "/event/update", method = RequestMethod.PUT, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> updateEvent(
 			@RequestBody(required = true) EventTable eventTable) {
-			int affectedRow = eventRepositoryImpl
-					.updateEvent(eventTable);
+			int affectedRow = eventRepositoryImpl.updateEvent(eventTable);
 
 			if (affectedRow == 0) {
 				return new ResponseEntity<>(
 						"{\"message\" : \"Event not found\"}", HttpStatus.OK);
 			} else {
 				return new ResponseEntity<>(
-						"{\"message\" : \"Event updated\"}", HttpStatus.OK);
+						"{\"message\" : \"Event successfully updated\"}", HttpStatus.OK);
 			}
 	}
 	
+	// Delete event
+	@RequestMapping(value = "/event/delete/{Event_ID}", method = RequestMethod.DELETE) 
+	public ResponseEntity<String> deleteEvent(@PathVariable int Event_ID){
+		int affectedRow = eventRepositoryImpl.deleteEvent(Event_ID); 
+		
+		if (affectedRow == Integer.MIN_VALUE) {
+			// Didn't find this event by event_id 
+			return new ResponseEntity<> (
+					"{\"message\" : \"Event not found\"}", HttpStatus.OK);  
+		} else {
+			return new ResponseEntity<> (
+					"{\"message\" : \"Event successfully deleted\"}", HttpStatus.OK); 
+		}
+	}
 }

@@ -33,6 +33,8 @@ public class EventRepositoryImpl implements EventRepository {
 	String UPDATE_EVENT_INFO_PREFIX = "UPDATE Events SET "; 
 	String UPDATE_EVENT_INFO_SUFFIX = " WHERE Event_ID = :event_id AND Organizer_ID =:organizer_id";
 	
+	private static final String DELETE_EVENT = "DELETE FROM Events WHERE Event_ID =?";
+	
 	@Autowired
 	NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 	
@@ -46,6 +48,7 @@ public class EventRepositoryImpl implements EventRepository {
 		return jdbcTemplate.query(SELECT_EVENT_BY_ID, new Object[] {event_id}, e);
 	}
 	
+	@Override
 	public List<EventTable> getEventInfoByName(String event_name) {
 		// Implementation for GET event by EVENT_NAME
 		return jdbcTemplate.query(SELECT_EVENT_BY_NAME, new EventRowmapperByID(), event_name);
@@ -87,6 +90,20 @@ public class EventRepositoryImpl implements EventRepository {
 		
 		return affectedRow;
 
+	}
+	
+	@Override
+	public int deleteEvent(int event_id) {
+		// Delete an event by event_id
+		List<EventTable> et = getEventInfoByID(event_id); 
+		
+		if (et == null) {
+			// Didn't find this event; 
+			return Integer.MIN_VALUE; 
+		} else {
+			int affectedRow = jdbcTemplate.update(DELETE_EVENT, event_id);
+			return affectedRow; 
+		}
 	}
 	
 	private Map<String, Object> eventMap(EventTable eventTable, int event_id) {

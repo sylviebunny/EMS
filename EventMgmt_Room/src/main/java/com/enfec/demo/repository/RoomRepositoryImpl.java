@@ -122,7 +122,6 @@ public class RoomRepositoryImpl implements RoomRepository{
 		return affectedRow;
 	}
 	
-	
 	@Override
 	public int deleteRoom(int Room_ID) {
 		String DELETE_ROOM = "DELETE FROM Rooms WHERE Room_ID = ?";

@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -44,7 +45,8 @@ public class RoomRepositoryImpl implements RoomRepository{
 	              }, keyHolder);
 	    Number key = keyHolder.getKey();
 	    //key is primary key
-	    int count1 = jdbcTemplate.update(CREATE_ROOM1,key.longValue(),room.getEvent_ID(),room.getBooking_Status_Code(),room.getOccupancy(),room.getCommercial_or_Free(),room.getOccupancy_Date_From(),room.getOccupancy_Date_To());
+	    int count1 = jdbcTemplate.update(CREATE_ROOM1,key.longValue(),room.getEvent_ID(),room.getBooking_Status_Code(),
+	    		room.getOccupancy(),room.getCommercial_or_Free(),room.getOccupancy_Date_From(),room.getOccupancy_Date_To());
 	    return count;
 	}
 	
@@ -52,19 +54,24 @@ public class RoomRepositoryImpl implements RoomRepository{
 	@Override
 	public Room getRoomInfo(int Room_ID) {
 		String SELECT_ROOM = "select * from Rooms r join Space_Requests s on r.Room_ID = s.Room_ID where r.Room_ID = ?";
-		Room room = jdbcTemplate.queryForObject(SELECT_ROOM, (rs,count) -> new Room(rs.getInt("Room_ID"),
-				rs.getInt("Venue_ID"),
-				rs.getString("Room_Name"),
-				rs.getInt("Room_Capability"),
-				rs.getDouble("Rate_for_Day"),
-				rs.getString("Other_Details"),
-				rs.getInt("Space_Request_ID"),
-				rs.getInt("Event_ID"),
-				rs.getString("Booking_Status_Code"),
-				rs.getByte("Occupancy"),
-				rs.getByte("Commercial_or_Free"),
-				rs.getTimestamp("Occupancy_Date_From"),
-				rs.getTimestamp("Occupancy_Date_To")),Room_ID);
+		Room room;
+		try {
+			room = jdbcTemplate.queryForObject(SELECT_ROOM, (rs,count) -> new Room(rs.getInt("Room_ID"),
+					rs.getInt("Venue_ID"),
+					rs.getString("Room_Name"),
+					rs.getInt("Room_Capability"),
+					rs.getDouble("Rate_for_Day"),
+					rs.getString("Other_Details"),
+					rs.getInt("Space_Request_ID"),
+					rs.getInt("Event_ID"),
+					rs.getString("Booking_Status_Code"),
+					rs.getByte("Occupancy"),
+					rs.getByte("Commercial_or_Free"),
+					rs.getTimestamp("Occupancy_Date_From"),
+					rs.getTimestamp("Occupancy_Date_To")),Room_ID);
+		} catch (EmptyResultDataAccessException e) {
+			return null;
+		}
 		return room;
 	}
 	

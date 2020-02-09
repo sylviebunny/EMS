@@ -9,6 +9,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -138,7 +139,7 @@ public class OrganizerRepositoryImpl implements OrganizerRepository{
 	@Override
 	public List<Address> getAddressInfo(int Organizer_ID) {
 		String SELECT_ADDRESS = "select Address_ID, Street1, Street2, City, State, Zipcode, Other_Details, Organizer_ID FROM Address where Organizer_ID = ?";
-		return jdbcTemplate.query(SELECT_ADDRESS, new Object[] { Organizer_ID }, new AddressRowmapper());
+		return jdbcTemplate.query(SELECT_ADDRESS, new Object[] { Organizer_ID }, new BeanPropertyRowMapper<Address>(Address.class));
 	}
 
 	@Override

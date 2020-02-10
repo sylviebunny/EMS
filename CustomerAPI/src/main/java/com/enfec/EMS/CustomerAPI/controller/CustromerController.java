@@ -30,7 +30,7 @@ public class CustromerController {
 	@Autowired
 	CustomerRepositoryImpl customerRepositoryImpl;
 	
-	@RequestMapping(value = "/customers/{id}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
+	@RequestMapping(value = "/Customers/{id}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String>getCustomerList(@PathVariable String id) { 
 			List<CustomerTable> customerList = customerRepositoryImpl.getCustomer(id);
 			if (customerList.isEmpty()) {

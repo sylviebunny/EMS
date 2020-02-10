@@ -66,16 +66,17 @@ public class SeatRepositoryImpl implements SeatRepository{
 //	Update with partial info
 	@Override
 	public int updateSeat(Seat seat) {
-		String UPDATE_SEAT_INFO_PREFIX = "UPDATE Seats SET "; 
+		String UPDATE_SEAT_INFO_PREFIX = "UPDATE `Seats` SET "; 
 		String UPDATE_SEAT_INFO_SUFFIX = " WHERE Seat_ID = :Seat_ID";
 		int affectedRow;
 		Map<String, Object> param = seatMap(seat);
-		
+//		UPDATE `evntmgmt_usa`.`Seats` SET `Category_ID` = '1' WHERE (`Seat_ID` = '2');
 		SqlParameterSource pramSource = new MapSqlParameterSource(param);
 		StringBuilder UPDATE_SEAT_INFO = new StringBuilder();
 		for (String key : param.keySet()) {
 			if(param.get(key) != null && !key.equals("Seat_ID")) {
-				UPDATE_SEAT_INFO.append(key + "=:" + key + ",");
+				UPDATE_SEAT_INFO.append("`");
+				UPDATE_SEAT_INFO.append(key + "`" +" = :" + key + ",");
 			}
 		}
 		UPDATE_SEAT_INFO = UPDATE_SEAT_INFO.deleteCharAt(UPDATE_SEAT_INFO.length() - 1); 

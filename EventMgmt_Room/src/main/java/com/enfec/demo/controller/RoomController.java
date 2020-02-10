@@ -20,7 +20,7 @@ public class RoomController {
 	@Autowired
 	RoomRepositoryImpl RoomRepositoryImpl;
 
-	//For "Organizers" table
+
 	@RequestMapping(value = "/room/create", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> createRoom(@RequestBody(required = true) Room room) {
 			int affectedRow = RoomRepositoryImpl.createRoom(room);

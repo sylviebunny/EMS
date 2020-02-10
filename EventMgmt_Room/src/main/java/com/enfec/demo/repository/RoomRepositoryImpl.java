@@ -1,6 +1,11 @@
 package com.enfec.demo.repository;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.Base64;
 import java.util.HashMap;
@@ -30,6 +35,8 @@ public class RoomRepositoryImpl implements RoomRepository{
 	
 	@Override
 	public int createRoom(Room room) {
+//		Create: "Mon, 10 Feb 2020 10:30:00 PST"
+//		Get: "Feb 10, 2020 10:25:00 AM"
 		String CREATE_ROOM = "INSERT INTO Rooms(Venue_ID,Room_Name,Room_Capability,Rate_for_Day,Other_Details) VALUES(?,?,?,?,?)";
 		String CREATE_ROOM1 = "INSERT INTO Space_Requests(Room_ID,Event_ID,Booking_Status_Code,Occupancy,Commercial_or_Free,Occupancy_Date_From,Occupancy_Date_To) VALUES(?,?,?,?,?,?,?)";
 		
@@ -46,11 +53,13 @@ public class RoomRepositoryImpl implements RoomRepository{
 	              }, keyHolder);
 	    Number key = keyHolder.getKey();
 	    //key is primary key
-	    int count1 = jdbcTemplate.update(CREATE_ROOM1,key.longValue(),room.getEvent_ID(),room.getBooking_Status_Code(),
+
+//	    jdbcTemplate.execute(TIME_ZONE);
+	    int count1 = jdbcTemplate.update(CREATE_ROOM1, key.longValue(),room.getEvent_ID(),room.getBooking_Status_Code(),
 	    		room.isOccupancy(),room.isCommercial_or_Free(),room.getOccupancy_Date_From(),room.getOccupancy_Date_To());
 	    return count;
 	}
-	
+//	2020-02-07T16:00:00.000-0800
 	
 	@Override
 	public Room getRoomInfo(int Room_ID) {

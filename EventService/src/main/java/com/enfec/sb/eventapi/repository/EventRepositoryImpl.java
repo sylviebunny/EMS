@@ -1,5 +1,6 @@
 package com.enfec.sb.eventapi.repository;
 
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
@@ -33,7 +34,7 @@ public class EventRepositoryImpl implements EventRepository {
 
 	private static final String SELECT_EVENT_BY_ID = "SELECT * FROM Events WHERE Event_ID =?";
 	
-	private static final String SELECT_EVENT_PREFIX = "SELECT * FROM Events WHERE ";
+	private static final String SELECT_EVENT_PREFIX = "SELECT * FROM Events WHERE";
 	
 	@Autowired
 	NamedParameterJdbcTemplate namedParameterJdbcTemplate;
@@ -46,23 +47,36 @@ public class EventRepositoryImpl implements EventRepository {
 			Integer event_id, String event_name, String event_type_code, Boolean free_or_commercial_code, Integer organizer_id, Integer venue_id) {
 		// Implementation for GET event by options
 		// event_id, event_name, type_code, free_or_commercial, organizer_id, venue_id
+		
+		List<Object> parameter = new ArrayList<>(); 
 		StringBuilder PARAMETER = new StringBuilder(); 
 		if (event_id != null) { 
-			PARAMETER.append("Event_ID=? AND"); }; 
+			PARAMETER.append(" Event_ID=? AND");  
+			parameter.add(event_id); };
 		if (event_name != null) { 
-			PARAMETER.append("Event_Name=? AND"); };
+			PARAMETER.append(" Event_Name=? AND");
+			parameter.add(event_name); };
 		if (event_type_code != null) { 
-			PARAMETER.append("Free_or_Commercial_Code=? AND"); };
+			PARAMETER.append(" Free_or_Commercial_Code=? AND"); 
+			parameter.add(free_or_commercial_code); };
 		if (organizer_id != null) {
-			PARAMETER.append("Organizer_ID=? AND"); };
+			PARAMETER.append(" Organizer_ID=? AND"); 
+			parameter.add(organizer_id); }; 
 		if (venue_id != null) {
-			PARAMETER.append("Venue_ID=? AND"); };
+			PARAMETER.append(" Venue_ID=? AND"); 
+			parameter.add(venue_id); };
 		
 		// Remove the last AND
 		PARAMETER.delete(PARAMETER.length() - 3, PARAMETER.length()); 
 		
+		// Convert List to Array
+		Object[] param = new Object[parameter.size()]; 
+		for (int i = 0; i < parameter.size(); i++) {
+			param[i] = parameter.get(i); 
+		}
+		
 		final String SELECT_EVENT = SELECT_EVENT_PREFIX + PARAMETER.toString(); 
-		return jdbcTemplate.query(SELECT_EVENT, new EventRowmapper(), event_name);
+		return jdbcTemplate.query(SELECT_EVENT, param, new EventRowmapper());
 	}
 	
 	private List<EventTable> getEventInfoByID(int event_id) {

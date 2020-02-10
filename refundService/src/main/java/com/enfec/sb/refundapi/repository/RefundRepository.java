@@ -6,13 +6,9 @@ import com.enfec.sb.refundapi.model.OOrderRefundTable;
 
 public interface RefundRepository {
 	
-	public Object getEventInfo(Integer event_id, String event_name, String type_code, Boolean free_or_commercial,
-			Integer organizer_id, Integer venue_id); 
-	
-	public int createEvent(OOrderRefundTable organizerTable);
-	public int updateEvent(OOrderRefundTable organizerTable);
-	
-	public int deleteEvent(int event_id);
+	public int createOrganizerRefund(OOrderRefundTable organizerTable);
+	public int deleteOrganizerRefund(int refund_id);
+	public Object getOrganizerRefund(int refund_id);
 
 
 	

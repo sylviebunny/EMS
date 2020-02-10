@@ -21,7 +21,6 @@ public class OOrderRefundTable {
 	private int oorder_id; 
 	private String description; 
 	
-	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
 	private Timestamp refund_created_time;
 	
 	private String refund_status; 

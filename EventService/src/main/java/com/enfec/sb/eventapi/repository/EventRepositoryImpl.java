@@ -136,11 +136,11 @@ public class EventRepositoryImpl implements EventRepository {
 		}
 	}
 
-	private Map<String, Object> eventMap(EventTable eventTable, int event_id) {
+	private Map<String, Object> eventMap(EventTable eventTable, Integer event_id) {
 		// Mapping event's information query's variable to URL POST body
 		Map<String, Object>param = new HashMap<>();
 		
-		if (event_id != Integer.MIN_VALUE) {
+		if (event_id != null && event_id != Integer.MIN_VALUE) {
 			// Means we need to update event 
 			param.put("event_id", event_id); 
 		}

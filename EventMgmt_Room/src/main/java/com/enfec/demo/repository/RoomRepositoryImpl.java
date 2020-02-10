@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -46,7 +47,7 @@ public class RoomRepositoryImpl implements RoomRepository{
 	    Number key = keyHolder.getKey();
 	    //key is primary key
 	    int count1 = jdbcTemplate.update(CREATE_ROOM1,key.longValue(),room.getEvent_ID(),room.getBooking_Status_Code(),
-	    		room.getOccupancy(),room.getCommercial_or_Free(),room.getOccupancy_Date_From(),room.getOccupancy_Date_To());
+	    		room.isOccupancy(),room.isCommercial_or_Free(),room.getOccupancy_Date_From(),room.getOccupancy_Date_To());
 	    return count;
 	}
 	
@@ -56,6 +57,7 @@ public class RoomRepositoryImpl implements RoomRepository{
 		String SELECT_ROOM = "select * from Rooms r join Space_Requests s on r.Room_ID = s.Room_ID where r.Room_ID = ?";
 		Room room;
 		try {
+			/*
 			room = jdbcTemplate.queryForObject(SELECT_ROOM, (rs,count) -> new Room(rs.getInt("Room_ID"),
 					rs.getInt("Venue_ID"),
 					rs.getString("Room_Name"),
@@ -68,7 +70,9 @@ public class RoomRepositoryImpl implements RoomRepository{
 					rs.getByte("Occupancy"),
 					rs.getByte("Commercial_or_Free"),
 					rs.getTimestamp("Occupancy_Date_From"),
-					rs.getTimestamp("Occupancy_Date_To")),Room_ID);
+					rs.getTimestamp("Occupancy_Date_To")),Room_ID);*/
+			room = jdbcTemplate.queryForObject(SELECT_ROOM, new Object[] { Room_ID }, 
+					new BeanPropertyRowMapper<Room>(Room.class));
 		} catch (EmptyResultDataAccessException e) {
 			return null;
 		}
@@ -122,6 +126,7 @@ public class RoomRepositoryImpl implements RoomRepository{
 		return affectedRow;
 	}
 	
+	
 	@Override
 	public int deleteRoom(int Room_ID) {
 		String DELETE_ROOM = "DELETE FROM Rooms WHERE Room_ID = ?";
@@ -165,8 +170,8 @@ public class RoomRepositoryImpl implements RoomRepository{
 		param.put("Space_Request_ID", room.getSpace_Request_ID() != 0 ? room.getSpace_Request_ID() : null);
 		param.put("Event_ID", room.getEvent_ID() != 0 ? room.getEvent_ID() : null); 
 		param.put("Booking_Status_Code", room.getBooking_Status_Code() == null || room.getBooking_Status_Code().isEmpty() ? null:room.getBooking_Status_Code());
-		param.put("Occupancy", room.getOccupancy() != 0 ? room.getOccupancy() : null);
-		param.put("Commercial_or_Free", room.getCommercial_or_Free() != 0 ? room.getCommercial_or_Free() : null);
+		param.put("Occupancy", room.isOccupancy() ? room.isOccupancy() : false);
+		param.put("Commercial_or_Free", room.isCommercial_or_Free() ? room.isCommercial_or_Free() : false);
 		param.put("Occupancy_Date_From", room.getOccupancy_Date_From() == null ? null:room.getOccupancy_Date_From());
 		param.put("Occupancy_Date_To", room.getOccupancy_Date_To() == null ? null:room.getOccupancy_Date_To());
 		return param;

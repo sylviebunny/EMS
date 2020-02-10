@@ -27,8 +27,8 @@ public class Room {
 	public int Space_Request_ID; 
 	public int Event_ID;
 	public String Booking_Status_Code; 
-	public byte Occupancy; 
-	public byte Commercial_or_Free; 
+	public boolean Occupancy; 
+	public boolean Commercial_or_Free; 
 	public Timestamp Occupancy_Date_From;
 	public Timestamp Occupancy_Date_To;
 }

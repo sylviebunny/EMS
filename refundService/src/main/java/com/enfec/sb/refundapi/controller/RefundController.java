@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.enfec.sb.refundapi.model.RefundTable;
+import com.enfec.sb.refundapi.model.OOrderRefundTable;
 import com.enfec.sb.refundapi.repository.RefundRepositoryImpl;
 import com.google.gson.Gson;
 
@@ -46,7 +46,7 @@ public class RefundController {
 						"{\"message\" : \"Invalid id\"}", HttpStatus.BAD_REQUEST); 
 			}
 			
-			List<RefundTable> eventList = eventRepositoryImpl.getEventInfo(event_id, event_name, type_code, free_or_commercial, organizer_id, venue_id);
+			List<OOrderRefundTable> eventList = eventRepositoryImpl.getEventInfo(event_id, event_name, type_code, free_or_commercial, organizer_id, venue_id);
 			
 			if (eventList.isEmpty()) {
 				return new ResponseEntity<>(
@@ -61,7 +61,7 @@ public class RefundController {
 	// Create event
 	@RequestMapping(value = "/event/create", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> registerEvent(
-			@RequestBody(required = true) RefundTable eventTable) {
+			@RequestBody(required = true) OOrderRefundTable eventTable) {
 			int affectedRow = eventRepositoryImpl.createEvent(eventTable);
 
 			if (affectedRow == 0) {
@@ -77,7 +77,7 @@ public class RefundController {
 	// Update event
 	@RequestMapping(value = "/event/update", method = RequestMethod.PUT, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> updateEvent(
-			@RequestBody(required = true) RefundTable eventTable) {
+			@RequestBody(required = true) OOrderRefundTable eventTable) {
 			int affectedRow = eventRepositoryImpl.updateEvent(eventTable);
 
 			if (affectedRow == 0) {

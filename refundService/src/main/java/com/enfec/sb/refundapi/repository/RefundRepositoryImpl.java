@@ -15,8 +15,8 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Component;
 
-import com.enfec.sb.refundapi.model.RefundRowmapper;
-import com.enfec.sb.refundapi.model.RefundTable;
+import com.enfec.sb.refundapi.model.OOrderRefundRowmapper;
+import com.enfec.sb.refundapi.model.OOrderRefundTable;
 
 @Component
 public class RefundRepositoryImpl implements RefundRepository {
@@ -43,7 +43,7 @@ public class RefundRepositoryImpl implements RefundRepository {
 	JdbcTemplate jdbcTemplate;
 	
 	@Override
-	public List<RefundTable> getEventInfo(
+	public List<OOrderRefundTable> getEventInfo(
 			Integer event_id, String event_name, String event_type_code, Boolean free_or_commercial_code, Integer organizer_id, Integer venue_id) {
 		// Implementation for GET event by options
 		// event_id, event_name, type_code, free_or_commercial, organizer_id, venue_id
@@ -76,16 +76,16 @@ public class RefundRepositoryImpl implements RefundRepository {
 		}
 		
 		final String SELECT_EVENT = SELECT_EVENT_PREFIX + PARAMETER.toString(); 
-		return jdbcTemplate.query(SELECT_EVENT, param, new RefundRowmapper());
+		return jdbcTemplate.query(SELECT_EVENT, param, new OOrderRefundRowmapper());
 	}
 	
-	private List<RefundTable> getEventInfoByID(int event_id) {
+	private List<OOrderRefundTable> getEventInfoByID(int event_id) {
 		// Implementation for GET event by EVENT_ID
-		return jdbcTemplate.query(SELECT_EVENT_BY_ID, new Object[] {event_id}, new RefundRowmapper());
+		return jdbcTemplate.query(SELECT_EVENT_BY_ID, new Object[] {event_id}, new OOrderRefundRowmapper());
 	}
 	
 	@Override
-	public int createEvent (RefundTable eventTable) {
+	public int createEvent (OOrderRefundTable eventTable) {
 		// Create an event
 		int affectedRow;
 		Map<String, Object> param = eventMap(eventTable, Integer.MIN_VALUE);
@@ -97,7 +97,7 @@ public class RefundRepositoryImpl implements RefundRepository {
 	}
 	
 	@Override
-	public int updateEvent(RefundTable eventTable) {
+	public int updateEvent(OOrderRefundTable eventTable) {
 		// Update an event by matching event_id and organizer_id
 		int affectedRow;
 		Map<String, Object> param = eventMap(eventTable, eventTable.getEvent_id());
@@ -125,7 +125,7 @@ public class RefundRepositoryImpl implements RefundRepository {
 	@Override
 	public int deleteEvent(int event_id) {
 		// Delete an event by event_id
-		List<RefundTable> et = getEventInfoByID(event_id); 
+		List<OOrderRefundTable> et = getEventInfoByID(event_id); 
 		
 		if (et == null) {
 			// Didn't find this event; 
@@ -136,7 +136,7 @@ public class RefundRepositoryImpl implements RefundRepository {
 		}
 	}
 
-	private Map<String, Object> eventMap(RefundTable eventTable, Integer event_id) {
+	private Map<String, Object> eventMap(OOrderRefundTable eventTable, Integer event_id) {
 		// Mapping event's information query's variable to URL POST body
 		Map<String, Object>param = new HashMap<>();
 		

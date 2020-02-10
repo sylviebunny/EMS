@@ -59,7 +59,7 @@ public class SeatController {
 			}
 	}
 
-	/*
+	
 	@RequestMapping(value="/seat/delete/{Seat_ID}",method = RequestMethod.DELETE, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> deleteSeat(@PathVariable("Seat_ID") int id) {
 		int affectedRow = SeatRepositoryImpl.deleteSeat(id);
@@ -70,5 +70,5 @@ public class SeatController {
 			return new ResponseEntity<>(
 					"{\"message\" : \"Seat is not able to delete\"}", HttpStatus.OK);
 		}
-	}*/
+	}
 }

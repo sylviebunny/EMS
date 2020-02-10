@@ -85,7 +85,13 @@ public class SeatRepositoryImpl implements SeatRepository{
 		affectedRow =namedParameterJdbcTemplate.update(UPDATE_SEAT, pramSource);
 		return affectedRow;
 	}	
-//	public int deleteSeat(int Seat_ID);
+	
+	@Override
+	public int deleteSeat(int Seat_ID) {
+		String DELETE_SEAT = "DELETE FROM Seats WHERE Seat_ID = ?";
+		int affectedRow = jdbcTemplate.update(DELETE_SEAT, Seat_ID);
+		return affectedRow;
+	}
 	
 	
 	/*

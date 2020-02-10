@@ -16,7 +16,7 @@ public class OOrderRefundRowmapper implements RowMapper<OOrderRefundTable> {
 	public OOrderRefundTable mapRow(ResultSet rs, int rowNum) throws SQLException {
 		
 		OOrderRefundTable oot = new OOrderRefundTable();
-		  
+		
 		oot.setRefund_id(rs.getInt("Refund_ID"));
 		oot.setOorder_id(rs.getInt("OOrder_ID"));
 		oot.setDescription(rs.getString("Description"));

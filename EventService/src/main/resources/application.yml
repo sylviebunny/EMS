@@ -2,7 +2,7 @@
 #This YML file is commonly used for configuration files and in applications where data is being stored or transmitted. 
 
 
-spring.datasource.url: jdbc:mysql://seralock-db.cwhxcgdndstk.us-east-2.rds.amazonaws.com:3306/evntmgmt_usa
+spring.datasource.url: jdbc:mysql://seralock-db.cwhxcgdndstk.us-east-2.rds.amazonaws.com:3306/evntmgmt_usa?serverTimezone=UTC
 spring.datasource.username: evntmgmt-usa
 spring.datasource.password: Dbdev@Enfec15
 spring.datasource.driver-class-name: com.mysql.cj.jdbc.Driver

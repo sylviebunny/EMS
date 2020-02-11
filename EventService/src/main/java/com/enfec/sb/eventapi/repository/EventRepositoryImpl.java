@@ -22,10 +22,10 @@ import com.enfec.sb.eventapi.model.EventTable;
 public class EventRepositoryImpl implements EventRepository {
 	private static final Logger logger = LoggerFactory.getLogger(EventRepositoryImpl.class);
 
-	final String REGISTER_EVENT = "INSERT INTO Events(Event_Status_Code, Event_Type_Code, Free_or_Commercial_Code, Organizer_ID, Venue_ID, "
-			+ "Event_Name, Event_Start_Date, Event_End_Date, Number_of_Participants, Derived_Days_Duration, Event_Cost, Discount, Comments) VALUES "
-			+ "(:event_status_code, :event_type_code, :free_or_commercial_code, :organizer_id, "
-			+ ":venue_id, :event_name, :event_start_date, :event_end_date, :number_of_participants, :derived_days_duration, :event_cost, :discount, :comments)";
+	final String REGISTER_EVENT = "INSERT INTO Events(Event_Status_Code, Event_Type_Code, Commercial_Type, Organizer_ID, Venue_ID, "
+			+ "Event_Name, Event_Start_Time, Event_End_Time, Number_of_Participants, Derived_Days_Duration, Event_Cost, Discount, Comments) VALUES "
+			+ "(:event_status_code, :event_type_code, :commercial_type, :organizer_id, "
+			+ ":venue_id, :event_name, :event_start_time, :event_end_time, :number_of_participants, :derived_days_duration, :event_cost, :discount, :comments)";
 	
 	String UPDATE_EVENT_INFO_PREFIX = "UPDATE Events SET "; 
 	String UPDATE_EVENT_INFO_SUFFIX = " WHERE Event_ID = :event_id AND Organizer_ID =:organizer_id";
@@ -57,7 +57,7 @@ public class EventRepositoryImpl implements EventRepository {
 			PARAMETER.append(" Event_Name=? AND");
 			parameter.add(event_name); };
 		if (event_type_code != null) { 
-			PARAMETER.append(" Free_or_Commercial_Code=? AND"); 
+			PARAMETER.append(" Commercial_Type=? AND"); 
 			parameter.add(free_or_commercial_code); };
 		if (organizer_id != null) {
 			PARAMETER.append(" Organizer_ID=? AND"); 
@@ -151,8 +151,8 @@ public class EventRepositoryImpl implements EventRepository {
 		param.put("event_type_code", eventTable.getEvent_type_code() == null || eventTable.getEvent_type_code().isEmpty() ? 
 				null : eventTable.getEvent_type_code());
 		
-		param.put("free_or_commercial_code", eventTable.getFree_or_commercial_code() == null ? 
-				null : eventTable.getFree_or_commercial_code());
+		param.put("commercial_type", eventTable.getCommercial_type() == null ? 
+				null : eventTable.getCommercial_type());
 		
 		param.put("organizer_id", eventTable.getOrganizer_id());		// Cannot be null
 		
@@ -161,11 +161,11 @@ public class EventRepositoryImpl implements EventRepository {
 		param.put("event_name", eventTable.getEvent_name() == null || eventTable.getEvent_name().isEmpty() ? 
 				null : eventTable.getEvent_name());
 		
-		param.put("event_start_date", eventTable.getEvent_start_date() == null ? 
-				null : eventTable.getEvent_start_date());
+		param.put("event_start_time", eventTable.getEvent_start_time() == null ? 
+				null : eventTable.getEvent_start_time());
 		
-		param.put("event_end_date", eventTable.getEvent_end_date() == null ? 
-				null : eventTable.getEvent_end_date());
+		param.put("event_end_time", eventTable.getEvent_end_time() == null ? 
+				null : eventTable.getEvent_end_time());
 		
 		param.put("number_of_participants", eventTable.getNumber_of_participants() == null ? 
 				null : eventTable.getNumber_of_participants());

@@ -20,16 +20,14 @@ public class EventTable {
 	private int event_id; 
 	private String event_status_code; 
 	private String event_type_code; 
-	private Boolean free_or_commercial_code; 			// 0: free; 1: commercial
+	private String commercial_type; 			// Profitable/Non-profitable/Free...
 	
 	private int organizer_id; 
 	private int venue_id;
 	private String event_name; 
 	
-	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
-	private Timestamp event_start_date;
-	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
-	private Timestamp event_end_date; 
+	private Timestamp event_start_time;
+	private Timestamp event_end_time; 
 	
 	private Integer number_of_participants; 
 	private String derived_days_duration; 

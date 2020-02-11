@@ -33,7 +33,7 @@ public class RefundRepositoryImpl implements RefundRepository {
 			+ "VALUES(:oorder_id, :description, :refund_updated_time, :refund_status)";
 
 	private static final String UPDATE_ORGANIZER_REFUND = "UPDATE evntmgmt_usa.Refund SET Refund.Refund_Status = :refund_status, "
-			+ "Refund.Description = :description, Refund_Updated_Time = :refund_update_time WHERE Refund.Refund_ID = :refund_id;";
+			+ "Refund.Description = :description, Refund_Updated_Time = :refund_updated_time WHERE Refund.Refund_ID = :refund_id;";
 
 	private static final String SELECT_ORGANIZER_REFUND_BY_OORDER_ID = "SELECT * FROM Refund WHERE OOrder_ID =?";
 	

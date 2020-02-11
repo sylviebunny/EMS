@@ -44,7 +44,7 @@ public class EventRepositoryImpl implements EventRepository {
 	
 	@Override
 	public List<EventTable> getEventInfo(
-			Integer event_id, String event_name, String event_type_code, Boolean free_or_commercial_code, Integer organizer_id, Integer venue_id) {
+			Integer event_id, String event_name, String event_type_code, String commercial_type, Integer organizer_id, Integer venue_id) {
 		// Implementation for GET event by options
 		// event_id, event_name, type_code, free_or_commercial, organizer_id, venue_id
 		
@@ -58,7 +58,7 @@ public class EventRepositoryImpl implements EventRepository {
 			parameter.add(event_name); };
 		if (event_type_code != null) { 
 			PARAMETER.append(" Commercial_Type=? AND"); 
-			parameter.add(free_or_commercial_code); };
+			parameter.add(commercial_type); };
 		if (organizer_id != null) {
 			PARAMETER.append(" Organizer_ID=? AND"); 
 			parameter.add(organizer_id); }; 

@@ -32,6 +32,19 @@ public class EventRowmapper implements RowMapper<EventTable> {
 		et.setDiscount(rs.getDouble("Discount"));
 		et.setComments(rs.getString("Comments"));
 		
+		// Venue and Address Information
+		et.setVenue_name(rs.getString("Venue_Name"));
+		et.setOther_details(rs.getString("Other_Details"));
+		et.setStreet1(rs.getString("Street1"));
+		et.setStreet2(rs.getString("Street2"));
+		et.setCity(rs.getString("City"));
+		et.setState(rs.getString("State"));
+		et.setZipcode(rs.getInt("Zipcode"));
+		
+		et.setEvent_type_description(rs.getString("Event_Type_Description"));
+		et.setEvent_status_description(rs.getString("Event_status_description"));
+		et.setOrganizer_name(rs.getString("Organizer_Name"));
+		
 		return et;
 	}
 	

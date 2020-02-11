@@ -35,12 +35,16 @@ public class EventRepositoryImpl implements EventRepository {
 	private static final String SELECT_EVENT_BY_ID = "SELECT * FROM Events WHERE Event_ID =?";
 	
 	private static final String SELECT_EVENT_PREFIX = "SELECT * FROM Events WHERE";
+
+	private static final String GET_ALL_EVENT = "SELECT Event_ID, Events.Event_Status_Code, Events.Event_Type_Code, Commercial_Type, Events.Organizer_ID, Events.Venue_ID, Event_Name, Event_Start_Time, Event_End_Time, Number_of_Participants, Derived_Days_Duration, Event_Cost, Discount, Comments, Venue_Name, Venues.Other_Details, Street1, Street2, City, State, Zipcode, Event_Status_Description, Event_Type_Description, Organizer_Name\n" + 
+			"FROM Events, Venues, Venue_Address, Ref_Event_Status, Ref_Event_Types, Organizers\n" + 
+			"WHERE Events.Venue_ID = Venues.Venue_ID AND Events.Venue_ID = Venue_Address.Venue_ID AND Events.Event_Status_Code = Ref_Event_Status.Event_Status_Code AND Events.Event_Type_Code = Ref_Event_Types.Event_Type_Code AND Organizers.Organizer_ID = Events.Organizer_ID; ";
 	
 	@Autowired
 	NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 	
 	@Autowired
-	JdbcTemplate jdbcTemplate;
+	JdbcTemplate jdbcTemplate; 
 	
 	@Override
 	public List<EventTable> getEventInfo(
@@ -77,6 +81,28 @@ public class EventRepositoryImpl implements EventRepository {
 		
 		final String SELECT_EVENT = SELECT_EVENT_PREFIX + PARAMETER.toString(); 
 		return jdbcTemplate.query(SELECT_EVENT, param, new EventRowmapper());
+	}
+	
+	public List<EventTable> getAllEvents() {
+		// Get All EventDefault information
+		return jdbcTemplate.query(GET_ALL_EVENT, new EventRowmapper()); 
+	}
+	
+	public List<Map> getAllInfo (List<EventTable> eventList){
+		List<Map> allEvent = new ArrayList<>(); 
+		Map<String, Object> oneEntity = new HashMap<>();
+		for (int i = 0; i < eventList.size(); i++) {
+			// oneEntity is an allEvent entity including all information. 
+			oneEntity = eventMap(eventList.get(i), eventList.get(i).getEvent_id()); 
+			int currVenueID = eventList.get(i).getVenue_id(); 
+			oneEntity = getVenueAndAddressInfo(oneEntity, currVenueID); 
+			allEvent.add(oneEntity);
+		}
+		return allEvent; 
+	}
+	
+	private Map<String, Object> getVenueAndAddressInfo(Map<String, Object> oneEntity, int currVenueID) {
+		return oneEntity; 
 	}
 	
 	private List<EventTable> getEventInfoByID(int event_id) {
@@ -135,7 +161,7 @@ public class EventRepositoryImpl implements EventRepository {
 			return affectedRow; 
 		}
 	}
-
+	
 	private Map<String, Object> eventMap(EventTable eventTable, Integer event_id) {
 		// Mapping event's information query's variable to URL POST body
 		Map<String, Object>param = new HashMap<>();
@@ -155,8 +181,6 @@ public class EventRepositoryImpl implements EventRepository {
 				null : eventTable.getCommercial_type());
 		
 		param.put("organizer_id", eventTable.getOrganizer_id());		// Cannot be null
-		
-		param.put("venue_id", eventTable.getVenue_id());			// Cannot be null 
 		
 		param.put("event_name", eventTable.getEvent_name() == null || eventTable.getEvent_name().isEmpty() ? 
 				null : eventTable.getEvent_name());
@@ -182,6 +206,38 @@ public class EventRepositoryImpl implements EventRepository {
 		param.put("comments", eventTable.getComments() == null || eventTable.getComments().isEmpty() ? 
 				null :eventTable.getComments());
 				
+		param.put("venue_id", eventTable.getVenue_id());			// Cannot be null 
+		
+		param.put("venue_name", eventTable.getVenue_name() == null || eventTable.getVenue_name().isEmpty() ? 
+				null :eventTable.getVenue_name());
+		
+		param.put("other_details", eventTable.getOther_details() == null || eventTable.getOther_details().isEmpty() ? 
+				null :eventTable.getOther_details());
+		
+		param.put("street1", eventTable.getStreet1() == null || eventTable.getStreet1().isEmpty() ? 
+				null :eventTable.getStreet1());
+		
+		param.put("street2", eventTable.getStreet2() == null || eventTable.getStreet2().isEmpty() ? 
+				null :eventTable.getStreet2());
+		
+		param.put("city", eventTable.getCity() == null || eventTable.getCity().isEmpty() ? 
+				null :eventTable.getCity());
+		
+		param.put("state", eventTable.getState() == null || eventTable.getState().isEmpty() ? 
+				null :eventTable.getState());
+		
+		param.put("zipcode", eventTable.getZipcode() == null ? 
+				null :eventTable.getZipcode());
+		
+		param.put("event_type_description", eventTable.getEvent_type_description() == null || eventTable.getEvent_type_description().isEmpty() ? 
+				null :eventTable.getEvent_type_description());
+		
+		param.put("event_status_description", eventTable.getEvent_status_description() == null || eventTable.getEvent_status_description().isEmpty() ? 
+				null :eventTable.getEvent_status_description());
+		
+		param.put("organizer_name", eventTable.getOrganizer_name() == null || eventTable.getOrganizer_name().isEmpty() ? 
+				null :eventTable.getOrganizer_name());
+		
 		return param;
 	}
 	

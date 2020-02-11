@@ -37,7 +37,10 @@ public class EventController {
 				@RequestParam(name = "organizer_id", required = false) Integer organizer_id, 
 				@RequestParam(name = "venue_id", required = false) Integer venue_id
 			) {
-		
+
+			// Get all events information from database into a List<Map>
+			List<EventTable> getAllEvent = eventRepositoryImpl.getAllEvents(); 
+			
 			// Precheck if each parameter is valid 
 			if ((event_id != null && event_id <= 0) || 
 				(organizer_id != null && organizer_id <= 0) || 
@@ -46,15 +49,16 @@ public class EventController {
 						"{\"message\" : \"Invalid id\"}", HttpStatus.BAD_REQUEST); 
 			}
 			
-			List<EventTable> eventList = eventRepositoryImpl.getEventInfo(event_id, event_name, type_code, commercial_type, organizer_id, venue_id);
 			
-			if (eventList.isEmpty()) {
+			List<Map> allEventDefault = eventRepositoryImpl.getAllInfo(getAllEvent);
+//			List<EventTable> eventList = eventRepositoryImpl.getEventInfo(event_id, event_name, type_code, commercial_type, organizer_id, venue_id);
+			
+			if (allEventDefault.isEmpty()) {
 				return new ResponseEntity<>(
 						"{\"message\" : \"No event found\"}", HttpStatus.OK);
 			} else {
 				return new ResponseEntity<>(
-						new Gson().toJson((eventRepositoryImpl
-								.getEventInfo(event_id, event_name, type_code, commercial_type, organizer_id, venue_id))), HttpStatus.OK);
+						new Gson().toJson(allEventDefault), HttpStatus.OK);
 			}
 	}
 	

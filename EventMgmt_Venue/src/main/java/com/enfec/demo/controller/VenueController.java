@@ -47,7 +47,7 @@ public class VenueController {
 								.getVenueInfo(Venue_ID))), HttpStatus.OK);
 			}
 	}
-/*
+
 	//The foreign key information must exist first in the db
 	@RequestMapping(value = "/venue/update", method = RequestMethod.PUT, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> updateRoom(@RequestBody(required = true) Venue venue) {
@@ -62,6 +62,7 @@ public class VenueController {
 			}
 	}
 
+	/*
 	@RequestMapping(value="/venue/delete/{Venue_ID}",method = RequestMethod.DELETE, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> deleteVenue(@PathVariable("Venue_ID") int id) {
 		int affectedRow = VenueRepositoryImpl.deleteVenue(id);

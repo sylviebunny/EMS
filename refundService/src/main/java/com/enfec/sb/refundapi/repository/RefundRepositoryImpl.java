@@ -31,6 +31,9 @@ public class RefundRepositoryImpl implements RefundRepository {
 
 	private static final String CREATE_ORGANIZER_REFUND = "INSERT INTO Refund (OOrder_ID, Description, Refund_Created_Time, Refund_Status)"
 			+ "VALUES(:oorder_id, :description, :refund_created_time, :refund_status)";
+
+	private static final String UPDATE_ORGANIZER_REFUND = "UPDATE evntmgmt_usa.Refund SET Refund.Refund_Status = :refund_status, "
+			+ "Refund.Description = :description, Refund_Created_Time = :refund_created_time WHERE Refund.Refund_ID = :refund_id;";
 	
 	@Autowired
 	NamedParameterJdbcTemplate namedParameterJdbcTemplate;
@@ -45,15 +48,31 @@ public class RefundRepositoryImpl implements RefundRepository {
 	}
 	
 	@Override
-	public int createOrganizerRefund (OOrderRefundTable eventTable) {
+	public int createOrganizerRefund (OOrderRefundTable organizerRefundTable) {
 		// Create an organizer refund
 		int affectedRow;
-		Map<String, Object> param = getOrganizerRefundMap(eventTable, Integer.MIN_VALUE);
+		Map<String, Object> param = getOrganizerRefundMap(organizerRefundTable, Integer.MIN_VALUE);
 		
 		SqlParameterSource pramSource = new MapSqlParameterSource(param);
 		affectedRow = namedParameterJdbcTemplate.update(CREATE_ORGANIZER_REFUND, pramSource);
 		
 		return affectedRow; 
+	}
+	
+	@Override
+	public int updateOrganizerRefund(OOrderRefundTable organizerRefundTable) {
+		/*
+		 *  Update an organizer refund by assigning specific organizer_refund_id and 
+		 *  providing status and description
+		 */
+		int affectedRow;
+		Map<String, Object> param = getOrganizerRefundMap(organizerRefundTable, organizerRefundTable.getRefund_id());
+		
+		SqlParameterSource pramSource = new MapSqlParameterSource(param);
+		affectedRow = namedParameterJdbcTemplate.update(UPDATE_ORGANIZER_REFUND, pramSource);
+		
+		return affectedRow; 
+		
 	}
 	
 	@Override

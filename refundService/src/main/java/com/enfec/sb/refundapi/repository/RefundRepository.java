@@ -9,6 +9,7 @@ public interface RefundRepository {
 	public int createOrganizerRefund(OOrderRefundTable organizerTable);
 	public int deleteOrganizerRefund(int refund_id);
 	public Object getOrganizerRefund(int refund_id);
+	public int updateOrganizerRefund(OOrderRefundTable organizerRefundTable);
 
 
 	

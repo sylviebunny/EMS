@@ -29,11 +29,13 @@ public class RefundRepositoryImpl implements RefundRepository {
 
 	private static final String SELECT_ORGANIZER_REFUND = "SELECT * FROM Refund WHERE Refund_ID =?";
 
-	private static final String CREATE_ORGANIZER_REFUND = "INSERT INTO Refund (OOrder_ID, Description, Refund_Created_Time, Refund_Status)"
-			+ "VALUES(:oorder_id, :description, :refund_created_time, :refund_status)";
+	private static final String CREATE_ORGANIZER_REFUND = "INSERT INTO Refund (OOrder_ID, Description, Refund_Updated_Time, Refund_Status)"
+			+ "VALUES(:oorder_id, :description, :refund_updated_time, :refund_status)";
 
 	private static final String UPDATE_ORGANIZER_REFUND = "UPDATE evntmgmt_usa.Refund SET Refund.Refund_Status = :refund_status, "
-			+ "Refund.Description = :description, Refund_Created_Time = :refund_created_time WHERE Refund.Refund_ID = :refund_id;";
+			+ "Refund.Description = :description, Refund_Updated_Time = :refund_update_time WHERE Refund.Refund_ID = :refund_id;";
+
+	private static final String SELECT_ORGANIZER_REFUND_BY_OORDER_ID = "SELECT * FROM Refund WHERE OOrder_ID =?";
 	
 	@Autowired
 	NamedParameterJdbcTemplate namedParameterJdbcTemplate;
@@ -42,9 +44,15 @@ public class RefundRepositoryImpl implements RefundRepository {
 	JdbcTemplate jdbcTemplate;
 	
 	@Override
-	public List<OOrderRefundTable> getOrganizerRefund(int refund_id) {
-		// get organizer's refund information ONLY by refund_id
+	public List<OOrderRefundTable> getOrganizerRefundByRefundID(int refund_id) {
+		// get organizer's refund information by refund_id
 		return jdbcTemplate.query(SELECT_ORGANIZER_REFUND, new Object[] {refund_id}, new OOrderRefundRowmapper());
+	}
+	
+	@Override
+	public List<OOrderRefundTable> getOrganizerRefundByOorderID(int oorder_id) {
+		// get organizer's refund information by oorder_id
+		return jdbcTemplate.query(SELECT_ORGANIZER_REFUND_BY_OORDER_ID, new Object[] {oorder_id}, new OOrderRefundRowmapper());
 	}
 	
 	@Override
@@ -78,7 +86,7 @@ public class RefundRepositoryImpl implements RefundRepository {
 	@Override
 	public int deleteOrganizerRefund(int refund_id) {
 		// Delete an organizer refund by refund_id
-		List<OOrderRefundTable> et = getOrganizerRefund(refund_id); 
+		List<OOrderRefundTable> et = getOrganizerRefundByRefundID(refund_id); 
 		
 		if (et == null) {
 			// Didn't find this organizer refund; 
@@ -106,8 +114,8 @@ public class RefundRepositoryImpl implements RefundRepository {
 		
 		// Default time is current time based on machine 
 		Date date = new Date(); 
-		param.put("refund_created_time", organizerRefund.getRefund_created_time() == null ?
-				new Timestamp(date.getTime()) : organizerRefund.getRefund_created_time()); 
+		param.put("refund_updated_time", organizerRefund.getRefund_updated_time() == null ?
+				new Timestamp(date.getTime()) : organizerRefund.getRefund_updated_time()); 
 		
 		// Default status is created 
 		param.put("refund_status", organizerRefund.getRefund_status() == null ? 

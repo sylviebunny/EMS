@@ -28,17 +28,33 @@ public class RefundController {
 	
 	// Search organizer's refund by refund_id
 	@RequestMapping(value = "/organizer_refund/search/{organizer_refund_id}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
-	public ResponseEntity<String> getOrganizerRefund(@PathVariable int organizer_refund_id) {
+	public ResponseEntity<String> getOrganizerRefundByRefundID(@PathVariable int organizer_refund_id) {
 			
-			List<OOrderRefundTable> eventList = organizerRefundRepositoryImpl.getOrganizerRefund(organizer_refund_id);
+			List<OOrderRefundTable> organizerRefundList = organizerRefundRepositoryImpl.getOrganizerRefundByRefundID(organizer_refund_id);
 			
-			if (eventList == null || eventList.isEmpty()) {
+			if (organizerRefundList == null || organizerRefundList.isEmpty()) {
 				return new ResponseEntity<>(
 						"{\"message\" : \"No refund found\"}", HttpStatus.OK);
 			} else {
 				return new ResponseEntity<>(
 						new Gson().toJson((organizerRefundRepositoryImpl
-								.getOrganizerRefund(organizer_refund_id))), HttpStatus.OK);
+								.getOrganizerRefundByRefundID(organizer_refund_id))), HttpStatus.OK);
+			}
+	}
+	
+	// Search organizer's refund by oorder_id 
+	@RequestMapping(value = "/organizer_refund/search/organizer_order_id/{oorder_id}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
+	public ResponseEntity<String> getOrganizerRefundByOorder (@PathVariable int oorder_id) {
+			
+			List<OOrderRefundTable> organizerRefundList = organizerRefundRepositoryImpl.getOrganizerRefundByOorderID(oorder_id);
+			
+			if (organizerRefundList == null || organizerRefundList.isEmpty()) {
+				return new ResponseEntity<>(
+						"{\"message\" : \"No refund found\"}", HttpStatus.OK);
+			} else {
+				return new ResponseEntity<>(
+						new Gson().toJson((organizerRefundRepositoryImpl
+								.getOrganizerRefundByOorderID(oorder_id))), HttpStatus.OK);
 			}
 	}
 	

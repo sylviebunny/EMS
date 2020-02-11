@@ -21,7 +21,7 @@ public class OOrderRefundTable {
 	private int oorder_id; 
 	private String description; 
 	
-	private Timestamp refund_created_time;
+	private Timestamp refund_updated_time;
 	
 	private String refund_status; 
 	

@@ -42,7 +42,7 @@ public class RefundController {
 			}
 	}
 	
-	// Create organizer refund
+	// Create organizer refund by entering oorder_ID and description
 	@RequestMapping(value = "/organizer_refund/create", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> createOrganizerRefund (
 			@RequestBody(required = true) OOrderRefundTable organizerRefundTable) {
@@ -58,10 +58,26 @@ public class RefundController {
 			}
 	}
 	
-	// Delete event
-	@RequestMapping(value = "/organizer_refund/delete/{Refund_ID}", method = RequestMethod.DELETE, produces = "application/json;charset=UTF-8") 
-	public ResponseEntity<String> deleteEvent(@PathVariable int Refund_ID){
-		int affectedRow = organizerRefundRepositoryImpl.deleteOrganizerRefund(Refund_ID); 
+	// Update organizer refund by specific refund_Id, entering status and description
+	@RequestMapping(value = "/organizer_refund/update", method = RequestMethod.PUT, produces = "application/json;charset=UTF-8")
+	public ResponseEntity<String> updateOrganizerRefund (
+			@RequestBody(required = true) OOrderRefundTable organizerRefundTable) {
+			int affectedRow = organizerRefundRepositoryImpl.updateOrganizerRefund(organizerRefundTable);
+
+			if (affectedRow == 0) {
+				return new ResponseEntity<>(
+						"{\"message\" : \"Organizer refund not updated\"}",
+						HttpStatus.OK);
+			} else {
+				return new ResponseEntity<>(
+						"{\"message\" : \"Organizer refund successfully updated\"}", HttpStatus.OK);
+			}
+	}
+	
+	// Delete organizer refund by refund_id
+	@RequestMapping(value = "/organizer_refund/delete/{organizer_refund_id}", method = RequestMethod.DELETE, produces = "application/json;charset=UTF-8") 
+	public ResponseEntity<String> deleteOrganizerRefund(@PathVariable int organizer_refund_id){
+		int affectedRow = organizerRefundRepositoryImpl.deleteOrganizerRefund(organizer_refund_id); 
 		
 		if (affectedRow == Integer.MIN_VALUE) {
 			// Didn't find this event by event_id 

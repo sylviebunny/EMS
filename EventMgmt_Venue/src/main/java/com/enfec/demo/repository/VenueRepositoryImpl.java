@@ -99,8 +99,16 @@ public class VenueRepositoryImpl implements VenueRepository {
 		affectedRow1 = namedParameterJdbcTemplate.update(UPDATE_VADDRESS, pramSource1);
 		return affectedRow;
 	}
-	/*
-	public int deleteVenue(int Venue_ID);*/
+	
+	@Override
+	public int deleteVenue(int Venue_ID) {
+		String DELETE_VENUE = "DELETE FROM Venues WHERE Venue_ID = ?";
+		String DELETEfromVADDRESS = "DELETE FROM Venue_Address WHERE Venue_ID = ?";
+		int affectedRow = jdbcTemplate.update(DELETE_VENUE, Venue_ID);
+		int affectedRow1 = jdbcTemplate.update(DELETEfromVADDRESS, Venue_ID);
+		
+		return affectedRow;
+	}
 	
 	private Map<String, Object> venueMap(Venue venue) {
 		Map<String, Object>param = new HashMap<>();

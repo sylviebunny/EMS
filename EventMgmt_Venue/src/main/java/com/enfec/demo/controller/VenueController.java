@@ -62,7 +62,7 @@ public class VenueController {
 			}
 	}
 
-	/*
+	
 	@RequestMapping(value="/venue/delete/{Venue_ID}",method = RequestMethod.DELETE, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> deleteVenue(@PathVariable("Venue_ID") int id) {
 		int affectedRow = VenueRepositoryImpl.deleteVenue(id);
@@ -73,5 +73,5 @@ public class VenueController {
 			return new ResponseEntity<>(
 					"{\"message\" : \"Venue is not able to delete\"}", HttpStatus.OK);
 		}
-	}*/
+	}
 }

@@ -2,7 +2,9 @@ package com.enfec.sb.eventapi.repository;
 
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -20,6 +22,7 @@ import org.springframework.stereotype.Component;
 
 import com.enfec.sb.eventapi.model.EventRowmapper;
 import com.enfec.sb.eventapi.model.EventTable;
+import com.enfec.sb.eventapi.model.sortByZipcode;
 
 @Component
 public class EventRepositoryImpl implements EventRepository {
@@ -50,50 +53,101 @@ public class EventRepositoryImpl implements EventRepository {
 	JdbcTemplate jdbcTemplate; 
 	
 	@Override
-	public List<EventTable> getEventInfo(
-			Integer event_id, String event_name, String event_type_code, String commercial_type, Integer organizer_id, Integer venue_id) {
-		// Implementation for GET event by options
-		// event_id, event_name, type_code, free_or_commercial, organizer_id, venue_id
+	public List<Map> getFilteredEvents(List<EventTable> allEvent, String str) {
+		// Use filter bar, anyone can type anything, like WA/seattle/non-profitable/festival/98002
+		// We should not match str with ID or code information. 
 		
-		List<Object> parameter = new ArrayList<>(); 
-		StringBuilder PARAMETER = new StringBuilder(); 
-		if (event_id != null) { 
-			PARAMETER.append(" Event_ID=? AND");  
-			parameter.add(event_id); };
-		if (event_name != null) { 
-			PARAMETER.append(" Event_Name=? AND");
-			parameter.add(event_name); };
-		if (event_type_code != null) { 
-			PARAMETER.append(" Commercial_Type=? AND"); 
-			parameter.add(commercial_type); };
-		if (organizer_id != null) {
-			PARAMETER.append(" Organizer_ID=? AND"); 
-			parameter.add(organizer_id); }; 
-		if (venue_id != null) {
-			PARAMETER.append(" Venue_ID=? AND"); 
-			parameter.add(venue_id); };
+		// Convert EventTable to Map
+		List<Map> allEventMap = new ArrayList<>(); 
+		for (EventTable et: allEvent) {
+			allEventMap.add(eventMap(et, et.getEvent_id())); 
+		} 
 		
-		// Remove the last AND
-		PARAMETER.delete(PARAMETER.length() - 3, PARAMETER.length()); 
-		
-		// Convert List to Array
-		Object[] param = new Object[parameter.size()]; 
-		for (int i = 0; i < parameter.size(); i++) {
-			param[i] = parameter.get(i); 
+		// str can be null, if it's null, then print out allEvents
+		if (str == null || str.isEmpty()) {
+			return allEventMap; 
 		}
 		
-		final String SELECT_EVENT = SELECT_EVENT_PREFIX + PARAMETER.toString(); 
-		return jdbcTemplate.query(SELECT_EVENT, param, new EventRowmapper());
+		// If str is a zipcode, then we need to get the events from nearest to farthest
+		Integer zipcode = getZipcode(str); 
+		if (zipcode != null) {
+			return getEventByZipcode(allEventMap, zipcode); 
+		}
+		
+		List<Map> afterFilter = new ArrayList<>(); 
+		
+		// We don't match str with IDs
+		final HashSet<String> ignoreKeys = getIgnoreKeys(); 
+		
+		// Iterate through whole events map and find events that fit into str
+		for (Map<String,Object> eachEvent: allEventMap) {
+			for (String key: eachEvent.keySet()) {
+				if (!ignoreKeys.contains(key) && eachEvent.get(key) != null) {
+					String val = eachEvent.get(key).toString();
+					if (val.toLowerCase().contains(str.toLowerCase())) {
+						afterFilter.add(eachEvent); 
+						break; 
+					}
+				}
+			}
+		}
+		return afterFilter; 
 	}
 	
+	private List<Map> getEventByZipcode(List<Map> inputEventList, int zipcode) {
+		// Reorganize all List<Map> from nearest to farthest based on str. 
+		Collections.sort(inputEventList, new sortByZipcode(zipcode));
+		return inputEventList;
+	}
+
+	private Integer getZipcode(String str) {
+		// Check if str is a 5-digit zipcode. 
+		if (str != null && str.length() != 5) {
+			return null; 
+		}
+		
+		int zipcode = 0; 
+		for (int i = 0; i < str.length(); i++) {
+			if (str.charAt(i) < '0' || str.charAt(i) > '9') {
+				return null; 
+			}
+			zipcode = zipcode * 10 + (str.charAt(i) - '0'); 
+		}
+		return zipcode; 
+	}
+
+	private HashSet<String> getIgnoreKeys() {
+		
+		HashSet<String> ignoreKeys = new HashSet<>(); 
+		
+		ignoreKeys.add("event_type_code"); 
+		ignoreKeys.add("event_id"); 
+		ignoreKeys.add("event_status_code"); 
+		ignoreKeys.add("organizer_id"); 
+		ignoreKeys.add("venue_id"); 
+		
+		return ignoreKeys; 
+	}
+
+	@Override
 	public List<EventTable> getAllEvents() {
-		// Get All EventDefault information
+		// Get all related event information
 		return jdbcTemplate.query(GET_ALL_EVENT, new EventRowmapper()); 
 	}
 	
-	private List<EventTable> getEventInfoByID(int event_id) {
+	public List<EventTable> getEventByID(int event_id) {
 		// Implementation for GET event by EVENT_ID
-		return jdbcTemplate.query(SELECT_EVENT_BY_ID, new Object[] {event_id}, new EventRowmapper());
+		List<EventTable> allEvents = getAllEvents(); 
+		
+		List<EventTable> resultEvent = new ArrayList<>(); 
+		
+		for (EventTable eachEvent: allEvents) {
+			int currEventID = eachEvent.getEvent_id(); 
+			if (currEventID == event_id) {
+				resultEvent.add(eachEvent); 
+			}
+		}
+		return resultEvent; 
 	}
 	
 	@Override
@@ -137,9 +191,9 @@ public class EventRepositoryImpl implements EventRepository {
 	@Override
 	public int deleteEvent(int event_id) {
 		// Delete an event by event_id
-		List<EventTable> et = getEventInfoByID(event_id); 
+		List<EventTable> et = getEventByID(event_id); 
 		
-		if (et == null) {
+		if (et == null || et.size() == 0) {
 			// Didn't find this event; 
 			return Integer.MIN_VALUE; 
 		} else {
@@ -225,36 +279,6 @@ public class EventRepositoryImpl implements EventRepository {
 				null :eventTable.getOrganizer_name());
 		
 		return param;
-	}
-
-	public List<Map> getFilteredEvents(List<EventTable> allEvent, String str) {
-		
-		// Convert EventTable to Map
-		List<Map> allEventMap = new ArrayList<>(); 
-		for (EventTable et: allEvent) {
-			allEventMap.add(eventMap(et, et.getEvent_id())); 
-		} 
-		
-		// str can be null
-		if (str == null || str.isEmpty()) {
-			return allEventMap; 
-		}
-		
-		List<Map> afterFilter = new ArrayList<>(); 
-		
-		// Iterate through whole events map and find events that fit into str
-		for (Map<String,Object> eachEvent: allEventMap) {
-			for (String key: eachEvent.keySet()) {
-				if (eachEvent.get(key) != null) {
-					String val = eachEvent.get(key).toString();
-					if (val.toLowerCase().contains(str.toLowerCase())) {
-						afterFilter.add(eachEvent); 
-						break; 
-					}
-				}
-			}
-		}
-		return afterFilter; 
 	}
 	
 }

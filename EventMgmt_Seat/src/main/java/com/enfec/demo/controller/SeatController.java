@@ -1,6 +1,7 @@
 package com.enfec.demo.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,8 +21,8 @@ public class SeatController {
 
 	@RequestMapping(value = "/seat/create", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> createSeat(@RequestBody(required = true) Seat seat) {
+		try {	
 			int affectedRow = SeatRepositoryImpl.createSeat(seat);
-
 			if (affectedRow == 0) {
 				return new ResponseEntity<>(
 						"{\"message\" : \"Seat not created\"}", HttpStatus.OK);
@@ -29,12 +30,20 @@ public class SeatController {
 				return new ResponseEntity<>(
 						"{\"message\" : \"Seat created\"}", HttpStatus.OK);
 			}
+		} catch (DataIntegrityViolationException dataIntegrityViolationException) {
+			return new ResponseEntity<>("{\"message\" : \"Bad Request: invalid info\"}",
+					HttpStatus.BAD_REQUEST);
+		} catch (Exception exception) {
+			return new ResponseEntity<>(
+					"{\"message\" : \"Exception in creating seat info\"}",
+					HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 	
 	@RequestMapping(value = "/seat/search/{Seat_ID}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> getSeatList(@PathVariable("Seat_ID") int Seat_ID) {
+		try {
 			Seat seat = SeatRepositoryImpl.getSeatInfo(Seat_ID);
-			
 			if (seat == null) {
 				return new ResponseEntity<>(
 						"{\"message\" : \"No seat found\"}", HttpStatus.OK);
@@ -43,13 +52,18 @@ public class SeatController {
 						new Gson().toJson((SeatRepositoryImpl
 								.getSeatInfo(Seat_ID))), HttpStatus.OK);
 			}
+		} catch (Exception e) {
+			return new ResponseEntity<>(
+					"{\"message\" : \"Exception in getting seat info\"}",
+					HttpStatus.INTERNAL_SERVER_ERROR);
+		} 
 	}
 
 	//The foreign key information must exist first in the db
 	@RequestMapping(value = "/seat/update", method = RequestMethod.PUT, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> updateSeat(@RequestBody(required = true) Seat seat) {
+		try {	
 			int affectedRow = SeatRepositoryImpl.updateSeat(seat);
-
 			if (affectedRow == 0) {
 				return new ResponseEntity<>(
 						"{\"message\" : \"Seat not found\"}", HttpStatus.OK);
@@ -57,18 +71,32 @@ public class SeatController {
 				return new ResponseEntity<>(
 						"{\"message\" : \"Seat updated\"}", HttpStatus.OK);
 			}
+		} catch (DataIntegrityViolationException dataIntegrityViolationException) {
+			return new ResponseEntity<>("{\"message\" : \"Bad Request: invalid info\"}",
+					HttpStatus.BAD_REQUEST);
+		} catch (Exception exception) {
+			return new ResponseEntity<>(
+					"{\"message\" : \"Exception in updating seat info\"}",
+					HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 
 	
 	@RequestMapping(value="/seat/delete/{Seat_ID}",method = RequestMethod.DELETE, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> deleteSeat(@PathVariable("Seat_ID") int id) {
-		int affectedRow = SeatRepositoryImpl.deleteSeat(id);
-		if(affectedRow > 0 )  {
+		try {
+			int affectedRow = SeatRepositoryImpl.deleteSeat(id);
+			if(affectedRow > 0 )  {
+				return new ResponseEntity<>(
+						"{\"message\" : \"Seat deleted\"}", HttpStatus.OK);
+			} else {
+				return new ResponseEntity<>(
+						"{\"message\" : \"Seat is not able to delete\"}", HttpStatus.OK);
+			}
+		} catch (Exception e) {
 			return new ResponseEntity<>(
-					"{\"message\" : \"Seat deleted\"}", HttpStatus.OK);
-		} else {
-			return new ResponseEntity<>(
-					"{\"message\" : \"Seat is not able to delete\"}", HttpStatus.OK);
-		}
+					"{\"message\" : \"Exception in deleting seat info\"}",
+					HttpStatus.INTERNAL_SERVER_ERROR);
+		} 
 	}
 }

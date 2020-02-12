@@ -2,6 +2,7 @@ package com.enfec.sb.eventapi.model;
 
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.stereotype.Component;
 
@@ -52,4 +53,5 @@ public class EventTable {
 	
 	// Organizer Info
 	private String organizer_name; 
+	
 }

@@ -235,6 +235,11 @@ public class EventRepositoryImpl implements EventRepository {
 			allEventMap.add(eventMap(et, et.getEvent_id())); 
 		} 
 		
+		// str can be null
+		if (str == null || str.isEmpty()) {
+			return allEventMap; 
+		}
+		
 		List<Map> afterFilter = new ArrayList<>(); 
 		
 		// Iterate through whole events map and find events that fit into str
@@ -244,6 +249,7 @@ public class EventRepositoryImpl implements EventRepository {
 					String val = eachEvent.get(key).toString();
 					if (val.toLowerCase().contains(str.toLowerCase())) {
 						afterFilter.add(eachEvent); 
+						break; 
 					}
 				}
 			}

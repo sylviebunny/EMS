@@ -11,6 +11,7 @@ public class OrganizerContactRowmapper implements RowMapper<OrganizerContactTabl
 	@Override
 	public OrganizerContactTable mapRow(ResultSet rs, int rowNum) throws SQLException {
 		OrganizerContactTable organizerContactTable = new OrganizerContactTable();
+		organizerContactTable.setContact_id(rs.getInt("Contact_ID"));
 		organizerContactTable.setOrganizer_id(rs.getInt("Organizer_ID"));
 		organizerContactTable.setContact_name((rs.getString("Contact_Name")));
 		organizerContactTable.setTelephone((rs.getString("Telephone")));

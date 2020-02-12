@@ -144,7 +144,7 @@ public class OrganizerRepositoryImpl implements OrganizerRepository{
 
 	@Override
 	public int updateAddress(Address address) {
-		String UPDATE_ADDRESS = "UPDATE Address SET Street1 = :Street1, Street2 = :Street2, City = :City, State = :State, Zipcode = :Zipcode, Other_Details = :Other_Details WHERE Organizer_ID = :Organizer_ID";
+		String UPDATE_ADDRESS = "UPDATE Address SET Street1 = :Street1, Street2 = :Street2, City = :City, State = :State, Zipcode = :Zipcode, Other_Details = :Other_Details WHERE Organizer_ID = :Organizer_ID AND Address_ID =:Address_ID";
 		
 		int affectedRow;
 		Map<String, Object> param = AddressMap(address);
@@ -186,7 +186,7 @@ public class OrganizerRepositoryImpl implements OrganizerRepository{
 	public int updateOrganizerContact(OrganizerContactTable organizerContactTable) {
 		// Update contact information of organizer into contact table
 		String UPDATE_ORGANIZER_CONTACT_INFO = "UPDATE Contacts SET Contact_Name=:contact_name, Telephone=:telephone, "
-				+ "Web_Site_Address=:web_site_address WHERE Organizer_ID=:organizer_id AND Address_ID =:address_id";
+				+ "Web_Site_Address=:web_site_address WHERE Organizer_ID=:organizer_id AND Contact_ID =:contact_id";
 		
 		try {
 			int affectedRow; 
@@ -231,6 +231,7 @@ public class OrganizerRepositoryImpl implements OrganizerRepository{
 	private Map<String, Object> AddressMap(Address address) {
 		Map<String, Object>param = new HashMap<>();
 
+		param.put("Address_ID", address.getAddress_ID()); 
 		param.put("Street1", address.getStreet1().isEmpty() ? null:address.getStreet1());
 		param.put("Street2", address.getStreet2().isEmpty() ? null:address.getStreet2());
 		param.put("City", address.getCity().isEmpty() ? null:address.getCity());
@@ -243,6 +244,7 @@ public class OrganizerRepositoryImpl implements OrganizerRepository{
 	
 	private Map<String, Object> getOrganizerContactMap(OrganizerContactTable organizerContactTable) {
 		Map<String, Object> contactMap = new HashMap<>(); 
+		contactMap.put("contact_id", organizerContactTable.getContact_id()); 
 		contactMap.put("organizer_id", organizerContactTable.getOrganizer_id()); 
 		contactMap.put("address_id", organizerContactTable.getAddress_id()); 
 		contactMap.put("contact_name", organizerContactTable.getContact_name() == null || organizerContactTable.getContact_name().isEmpty() ? null : organizerContactTable.getContact_name()); 

@@ -5,8 +5,11 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.lang.reflect.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -86,23 +89,6 @@ public class EventRepositoryImpl implements EventRepository {
 	public List<EventTable> getAllEvents() {
 		// Get All EventDefault information
 		return jdbcTemplate.query(GET_ALL_EVENT, new EventRowmapper()); 
-	}
-	
-	public List<Map> getAllInfo (List<EventTable> eventList){
-		List<Map> allEvent = new ArrayList<>(); 
-		Map<String, Object> oneEntity = new HashMap<>();
-		for (int i = 0; i < eventList.size(); i++) {
-			// oneEntity is an allEvent entity including all information. 
-			oneEntity = eventMap(eventList.get(i), eventList.get(i).getEvent_id()); 
-			int currVenueID = eventList.get(i).getVenue_id(); 
-			oneEntity = getVenueAndAddressInfo(oneEntity, currVenueID); 
-			allEvent.add(oneEntity);
-		}
-		return allEvent; 
-	}
-	
-	private Map<String, Object> getVenueAndAddressInfo(Map<String, Object> oneEntity, int currVenueID) {
-		return oneEntity; 
 	}
 	
 	private List<EventTable> getEventInfoByID(int event_id) {
@@ -239,6 +225,30 @@ public class EventRepositoryImpl implements EventRepository {
 				null :eventTable.getOrganizer_name());
 		
 		return param;
+	}
+
+	public List<Map> getFilteredEvents(List<EventTable> allEvent, String str) {
+		
+		// Convert EventTable to Map
+		List<Map> allEventMap = new ArrayList<>(); 
+		for (EventTable et: allEvent) {
+			allEventMap.add(eventMap(et, et.getEvent_id())); 
+		} 
+		
+		List<Map> afterFilter = new ArrayList<>(); 
+		
+		// Iterate through whole events map and find events that fit into str
+		for (Map<String,Object> eachEvent: allEventMap) {
+			for (String key: eachEvent.keySet()) {
+				if (eachEvent.get(key) != null) {
+					String val = eachEvent.get(key).toString();
+					if (val.toLowerCase().contains(str.toLowerCase())) {
+						afterFilter.add(eachEvent); 
+					}
+				}
+			}
+		}
+		return afterFilter; 
 	}
 	
 }

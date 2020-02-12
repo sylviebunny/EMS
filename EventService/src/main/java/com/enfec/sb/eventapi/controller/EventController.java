@@ -33,12 +33,12 @@ public class EventController {
 				@RequestParam(name = "event_id", required = false) Integer event_id, 
 				@RequestParam(name = "event_name", required = false) String event_name, 
 				@RequestParam(name = "event_type_code", required = false) String type_code, 
-				@RequestParam(name = "commercial_type", required = false) String commercial_type, 
 				@RequestParam(name = "organizer_id", required = false) Integer organizer_id, 
 				@RequestParam(name = "venue_id", required = false) Integer venue_id
 			) {
 
-			// Get all events information from database into a List<Map>
+			// Get all events information from database and get all related information 
+			// Put them into List<EventTable>
 			List<EventTable> getAllEvent = eventRepositoryImpl.getAllEvents(); 
 			
 			// Precheck if each parameter is valid 
@@ -48,17 +48,38 @@ public class EventController {
 				return new ResponseEntity<>(
 						"{\"message\" : \"Invalid id\"}", HttpStatus.BAD_REQUEST); 
 			}
-			
-			
-			List<Map> allEventDefault = eventRepositoryImpl.getAllInfo(getAllEvent);
+	
 //			List<EventTable> eventList = eventRepositoryImpl.getEventInfo(event_id, event_name, type_code, commercial_type, organizer_id, venue_id);
+			List<Map> resultEvents = eventRepositoryImpl.getFilteredEvents(getAllEvent, null); 
 			
-			if (allEventDefault.isEmpty()) {
+			if (getAllEvent.isEmpty()) {
 				return new ResponseEntity<>(
 						"{\"message\" : \"No event found\"}", HttpStatus.OK);
 			} else {
 				return new ResponseEntity<>(
-						new Gson().toJson(allEventDefault), HttpStatus.OK);
+						new Gson().toJson(getAllEvent), HttpStatus.OK);
+			}
+	}
+	
+	@RequestMapping(value = "/event/search/{anything}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
+	public ResponseEntity<String> getEventListByFilterBar (
+				@PathVariable(required = false) String anything
+			) {
+
+			// Get all events information from database and get all related information 
+			// Put them into List<EventTable>
+			List<EventTable> getAllEvent = eventRepositoryImpl.getAllEvents(); 
+			
+	
+//			List<EventTable> eventList = eventRepositoryImpl.getEventInfo(event_id, event_name, type_code, commercial_type, organizer_id, venue_id);
+			List<Map> resultEvents = eventRepositoryImpl.getFilteredEvents(getAllEvent, anything); 
+			
+			if (resultEvents.isEmpty()) {
+				return new ResponseEntity<>(
+						"{\"message\" : \"No event found\"}", HttpStatus.OK);
+			} else {
+				return new ResponseEntity<>(
+						new Gson().toJson(resultEvents), HttpStatus.OK);
 			}
 	}
 	

@@ -1,13 +1,8 @@
 package com.enfec.demo.repository;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
+
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.sql.Timestamp;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -54,7 +49,6 @@ public class RoomRepositoryImpl implements RoomRepository{
 	    Number key = keyHolder.getKey();
 	    //key is primary key
 
-//	    jdbcTemplate.execute(TIME_ZONE);
 	    int count1 = jdbcTemplate.update(CREATE_ROOM1, key.longValue(),room.getEvent_ID(),room.getBooking_Status_Code(),
 	    		room.isOccupancy(),room.isCommercial_or_Free(),room.getOccupancy_Date_From(),room.getOccupancy_Date_To());
 	    return count;
@@ -176,7 +170,7 @@ public class RoomRepositoryImpl implements RoomRepository{
 		} else {
 			throw new NullPointerException("Room_ID cannot be null");
 		}		
-		param.put("Space_Request_ID", room.getSpace_Request_ID() != 0 ? room.getSpace_Request_ID() : null);
+//		param.put("Space_Request_ID", room.getSpace_Request_ID() != 0 ? room.getSpace_Request_ID() : null);
 		param.put("Event_ID", room.getEvent_ID() != 0 ? room.getEvent_ID() : null); 
 		param.put("Booking_Status_Code", room.getBooking_Status_Code() == null || room.getBooking_Status_Code().isEmpty() ? null:room.getBooking_Status_Code());
 		param.put("Occupancy", room.isOccupancy() ? room.isOccupancy() : false);

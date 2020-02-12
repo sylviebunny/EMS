@@ -3,6 +3,7 @@ package com.enfec.demo.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,8 +24,8 @@ public class RoomController {
 	
 	@RequestMapping(value = "/room/create", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> createRoom(@RequestBody(required = true) Room room) {
+		try {	
 			int affectedRow = RoomRepositoryImpl.createRoom(room);
-
 			if (affectedRow == 0) {
 				return new ResponseEntity<>(
 						"{\"message\" : \"Room not booked\"}", HttpStatus.OK);
@@ -32,12 +33,20 @@ public class RoomController {
 				return new ResponseEntity<>(
 						"{\"message\" : \"Room booked\"}", HttpStatus.OK);
 			}
+		} catch (DataIntegrityViolationException dataIntegrityViolationException) {
+			return new ResponseEntity<>("{\"message\" : \"Bad Request: invalid info\"}",
+					HttpStatus.BAD_REQUEST);
+		} catch (Exception exception) {
+			return new ResponseEntity<>(
+					"{\"message\" : \"Exception in creating room info\"}",
+					HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 	
 	@RequestMapping(value = "/room/search/{Room_ID}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> getRoomList(@PathVariable("Room_ID") int Room_ID) {
+		try {	
 			Room room = RoomRepositoryImpl.getRoomInfo(Room_ID);
-			
 			if (room == null) {
 				return new ResponseEntity<>(
 						"{\"message\" : \"No room found\"}", HttpStatus.OK);
@@ -46,13 +55,18 @@ public class RoomController {
 						new Gson().toJson((RoomRepositoryImpl
 								.getRoomInfo(Room_ID))), HttpStatus.OK);
 			}
+		} catch (Exception e) {
+			return new ResponseEntity<>(
+					"{\"message\" : \"Exception in getting room info\"}",
+					HttpStatus.INTERNAL_SERVER_ERROR);
+		} 
 	}
 
 	//The foreign key information must exist first in the db
 	@RequestMapping(value = "/room/update", method = RequestMethod.PUT, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> updateRoom(@RequestBody(required = true) Room room) {
+		try {	
 			int affectedRow = RoomRepositoryImpl.updateRoom(room);
-
 			if (affectedRow == 0) {
 				return new ResponseEntity<>(
 						"{\"message\" : \"Room not found\"}", HttpStatus.OK);
@@ -60,17 +74,31 @@ public class RoomController {
 				return new ResponseEntity<>(
 						"{\"message\" : \"Room updated\"}", HttpStatus.OK);
 			}
+		} catch (DataIntegrityViolationException dataIntegrityViolationException) {
+			return new ResponseEntity<>("{\"message\" : \"Bad Request: invalid info\"}",
+					HttpStatus.BAD_REQUEST);
+		} catch (Exception exception) {
+			return new ResponseEntity<>(
+					"{\"message\" : \"Exception in updating room info\"}",
+					HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 
 	@RequestMapping(value="/room/delete/{Room_ID}",method = RequestMethod.DELETE, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> deleteRoom(@PathVariable("Room_ID") int id) {
-		int affectedRow = RoomRepositoryImpl.deleteRoom(id);
-		if(affectedRow > 0 )  {
+		try {
+			int affectedRow = RoomRepositoryImpl.deleteRoom(id);
+			if(affectedRow > 0 )  {
+				return new ResponseEntity<>(
+						"{\"message\" : \"Room deleted\"}", HttpStatus.OK);
+			} else {
+				return new ResponseEntity<>(
+						"{\"message\" : \"Room is not able to delete\"}", HttpStatus.OK);
+			}
+		} catch (Exception e) {
 			return new ResponseEntity<>(
-					"{\"message\" : \"Room deleted\"}", HttpStatus.OK);
-		} else {
-			return new ResponseEntity<>(
-					"{\"message\" : \"Room is not able to delete\"}", HttpStatus.OK);
-		}
+					"{\"message\" : \"Exception in deleting room info\"}",
+					HttpStatus.INTERNAL_SERVER_ERROR);
+		} 
 	}
 }

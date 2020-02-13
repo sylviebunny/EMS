@@ -173,8 +173,8 @@ public class RoomRepositoryImpl implements RoomRepository{
 //		param.put("Space_Request_ID", room.getSpace_Request_ID() != 0 ? room.getSpace_Request_ID() : null);
 		param.put("Event_ID", room.getEvent_ID() != 0 ? room.getEvent_ID() : null); 
 		param.put("Booking_Status_Code", room.getBooking_Status_Code() == null || room.getBooking_Status_Code().isEmpty() ? null:room.getBooking_Status_Code());
-		param.put("Occupancy", room.isOccupancy() ? room.isOccupancy() : false);
-		param.put("Commercial_or_Free", room.isCommercial_or_Free() ? room.isCommercial_or_Free() : false);
+		param.put("Occupancy", room.isOccupancy() ? room.isOccupancy() : null);
+		param.put("Commercial_or_Free", room.isCommercial_or_Free() ? room.isCommercial_or_Free() : null);
 		param.put("Occupancy_Date_From", room.getOccupancy_Date_From() == null ? null:room.getOccupancy_Date_From());
 		param.put("Occupancy_Date_To", room.getOccupancy_Date_To() == null ? null:room.getOccupancy_Date_To());
 		return param;

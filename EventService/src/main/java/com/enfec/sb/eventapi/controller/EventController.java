@@ -26,41 +26,25 @@ public class EventController {
 	@Autowired
 	EventRepositoryImpl eventRepositoryImpl;
 	
-	// Search event by options
-	// Organizers or customers can search an event by using filters through name/type/commercial/organizer/venue
+	// Search event by Event_ID
 	@RequestMapping(value = "/event/search", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> getEventList (
-				@RequestParam(name = "event_id", required = false) Integer event_id, 
-				@RequestParam(name = "event_name", required = false) String event_name, 
-				@RequestParam(name = "event_type_code", required = false) String type_code, 
-				@RequestParam(name = "organizer_id", required = false) Integer organizer_id, 
-				@RequestParam(name = "venue_id", required = false) Integer venue_id
+				@RequestParam(name = "event_id", required = true) Integer event_id
 			) {
 
-			// Get all events information from database and get all related information 
-			// Put them into List<EventTable>
-			List<EventTable> getAllEvent = eventRepositoryImpl.getAllEvents(); 
+			List<EventTable> resultEvent = eventRepositoryImpl.getEventByID(event_id); 
 			
-			// Precheck if each parameter is valid 
-			if ((event_id != null && event_id <= 0) || 
-				(organizer_id != null && organizer_id <= 0) || 
-				(venue_id != null && venue_id <= 0)) {
-				return new ResponseEntity<>(
-						"{\"message\" : \"Invalid id\"}", HttpStatus.BAD_REQUEST); 
-			}
-	
-//			List<EventTable> eventList = eventRepositoryImpl.getEventInfo(event_id, event_name, type_code, commercial_type, organizer_id, venue_id);
-			List<Map> resultEvents = eventRepositoryImpl.getFilteredEvents(getAllEvent, null); 
-			
-			if (getAllEvent.isEmpty()) {
+			if (resultEvent.isEmpty()) {
 				return new ResponseEntity<>(
 						"{\"message\" : \"No event found\"}", HttpStatus.OK);
 			} else {
 				return new ResponseEntity<>(
-						new Gson().toJson(getAllEvent), HttpStatus.OK);
+						new Gson().toJson(resultEvent), HttpStatus.OK);
 			}
 	}
 	
+	// Search events by anything, like city/state/zipcode/event_name/event_type
+	// This ignores scenarios that it will show all events matches each_ID
 	@RequestMapping(value = "/event/search/{anything}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> getEventListByFilterBar (
 				@PathVariable(required = false) String anything
@@ -70,8 +54,6 @@ public class EventController {
 			// Put them into List<EventTable>
 			List<EventTable> getAllEvent = eventRepositoryImpl.getAllEvents(); 
 			
-	
-//			List<EventTable> eventList = eventRepositoryImpl.getEventInfo(event_id, event_name, type_code, commercial_type, organizer_id, venue_id);
 			List<Map> resultEvents = eventRepositoryImpl.getFilteredEvents(getAllEvent, anything); 
 			
 			if (resultEvents.isEmpty()) {

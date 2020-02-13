@@ -3,6 +3,7 @@ package com.enfec.demo.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,8 +26,8 @@ public class OrganizerController {
 	//For "Organizers" table
 	@RequestMapping(value = "/organizer/create", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> createOrganizer(@RequestBody(required = true) OrganizerTable organizerTable) {
+		try {	
 			int affectedRow = OrganizerRepositoryImpl.createOrganizer(organizerTable);
-
 			if (affectedRow == 0) {
 				return new ResponseEntity<>(
 						"{\"message\" : \"Organizer not registerd\"}", HttpStatus.OK);
@@ -34,12 +35,20 @@ public class OrganizerController {
 				return new ResponseEntity<>(
 						"{\"message\" : \"Organizer Registered\"}", HttpStatus.OK);
 			}
+		} catch (DataIntegrityViolationException dataIntegrityViolationException) {
+			return new ResponseEntity<>("{\"message\" : \"Bad Request: invalid info\"}",
+					HttpStatus.BAD_REQUEST);
+		} catch (Exception exception) {
+			return new ResponseEntity<>(
+					"{\"message\" : \"Exception in creating organizer info\"}",
+					HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 	
 	@RequestMapping(value = "/organizer/search/{Organizer_ID}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> getOrganizerList(@PathVariable int Organizer_ID) {
+		try {	
 			List<OrganizerTable> organizerList = OrganizerRepositoryImpl.getOrganizerInfo(Organizer_ID);
-			
 			if (organizerList.isEmpty()) {
 				return new ResponseEntity<>(
 						"{\"message\" : \"No device found\"}", HttpStatus.OK);
@@ -48,12 +57,17 @@ public class OrganizerController {
 						new Gson().toJson((OrganizerRepositoryImpl
 								.getOrganizerInfo(Organizer_ID))), HttpStatus.OK);
 			}
+		} catch (Exception e) {
+			return new ResponseEntity<>(
+					"{\"message\" : \"Exception in getting organzier info\"}",
+					HttpStatus.INTERNAL_SERVER_ERROR);
+		} 
 	}
 
 	@RequestMapping(value = "/organizer/update", method = RequestMethod.PUT, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> updateOrganizer(@RequestBody(required = true) OrganizerTable OrganizerTable) {
-			int affectedRow = OrganizerRepositoryImpl.updateOrganizer(OrganizerTable);
-
+		try {	
+		int affectedRow = OrganizerRepositoryImpl.updateOrganizer(OrganizerTable);
 			if (affectedRow == 0) {
 				return new ResponseEntity<>(
 						"{\"message\" : \"Organizer not found\"}", HttpStatus.OK);
@@ -61,26 +75,40 @@ public class OrganizerController {
 				return new ResponseEntity<>(
 						"{\"message\" : \"Organizer updated\"}", HttpStatus.OK);
 			}
+		} catch (DataIntegrityViolationException dataIntegrityViolationException) {
+			return new ResponseEntity<>("{\"message\" : \"Bad Request: invalid info\"}",
+					HttpStatus.BAD_REQUEST);
+		} catch (Exception exception) {
+			return new ResponseEntity<>(
+					"{\"message\" : \"Exception in updating organizer info\"}",
+					HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 
 	@RequestMapping(value="/organizer/delete/{Organizer_ID}",method = RequestMethod.DELETE, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> deleteOrganizer(@PathVariable("Organizer_ID") int id) {
-		int affectedRow = OrganizerRepositoryImpl.deleteOrganizer(id);
-		if(affectedRow > 0 )  {
+		try {
+			int affectedRow = OrganizerRepositoryImpl.deleteOrganizer(id);
+			if(affectedRow > 0 )  {
+				return new ResponseEntity<>(
+						"{\"message\" : \"Organizer deleted\"}", HttpStatus.OK);
+			} else {
+				return new ResponseEntity<>(
+						"{\"message\" : \"Organizer is not able to delete\"}", HttpStatus.OK);
+			}
+		} catch (Exception e) {
 			return new ResponseEntity<>(
-					"{\"message\" : \"Organizer deleted\"}", HttpStatus.OK);
-		} else {
-			return new ResponseEntity<>(
-					"{\"message\" : \"Organizer is not able to delete\"}", HttpStatus.OK);
-		}
+					"{\"message\" : \"Exception in deleting organizer info\"}",
+					HttpStatus.INTERNAL_SERVER_ERROR);
+		} 
 	}
 	
 	
 	//For Organizer's "Address" table
 	@RequestMapping(value = "/organizer/address/create", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> createAddress(@RequestBody(required = true) Address address) {
+		try {	
 			int affectedRow = OrganizerRepositoryImpl.createAddress(address);
-
 			if (affectedRow == 0) {
 				return new ResponseEntity<>(
 						"{\"message\" : \"Address not added\"}", HttpStatus.OK);
@@ -88,12 +116,20 @@ public class OrganizerController {
 				return new ResponseEntity<>(
 						"{\"message\" : \"Address added\"}", HttpStatus.OK);
 			}
+		} catch (DataIntegrityViolationException dataIntegrityViolationException) {
+			return new ResponseEntity<>("{\"message\" : \"Bad Request: invalid info\"}",
+					HttpStatus.BAD_REQUEST);
+		} catch (Exception exception) {
+			return new ResponseEntity<>(
+					"{\"message\" : \"Exception in creating organizer address info\"}",
+					HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 	
 	@RequestMapping(value = "/organizer/address/search/{Organizer_ID}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> getAddressList(@PathVariable int Organizer_ID) {
+		try {
 			List<Address> addressList = OrganizerRepositoryImpl.getAddressInfo(Organizer_ID);
-			
 			if (addressList.isEmpty()) {
 				return new ResponseEntity<>(
 						"{\"message\" : \"No address found\"}", HttpStatus.OK);
@@ -102,12 +138,17 @@ public class OrganizerController {
 						new Gson().toJson((OrganizerRepositoryImpl
 								.getAddressInfo(Organizer_ID))), HttpStatus.OK);
 			}
+		} catch (Exception e) {
+			return new ResponseEntity<>(
+					"{\"message\" : \"Exception in getting organzier address info\"}",
+					HttpStatus.INTERNAL_SERVER_ERROR);
+		} 
 	}
 	
 	@RequestMapping(value = "/organizer/address/update", method = RequestMethod.PUT, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> updateAddress(@RequestBody(required = true) Address address) {
+		try {	
 			int affectedRow = OrganizerRepositoryImpl.updateAddress(address);
-
 			if (affectedRow == 0) {
 				return new ResponseEntity<>(
 						"{\"message\" : \"Information not found\"}", HttpStatus.OK);
@@ -115,6 +156,14 @@ public class OrganizerController {
 				return new ResponseEntity<>(
 						"{\"message\" : \"Address updated\"}", HttpStatus.OK);
 			}
+		} catch (DataIntegrityViolationException dataIntegrityViolationException) {
+			return new ResponseEntity<>("{\"message\" : \"Bad Request: invalid info\"}",
+					HttpStatus.BAD_REQUEST);
+		} catch (Exception exception) {
+			return new ResponseEntity<>(
+					"{\"message\" : \"Exception in updating organizer address info\"}",
+					HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 	
 	
@@ -123,6 +172,7 @@ public class OrganizerController {
 	@RequestMapping(value = "/organizer/contact/create", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> registerOrganizerInfo(
 			@RequestBody(required = true) OrganizerContactTable organizerContactTable) {
+		try {
 			int affectedRow = OrganizerRepositoryImpl
 					.createOrganizerContact(organizerContactTable);
 
@@ -139,10 +189,19 @@ public class OrganizerController {
 				return new ResponseEntity<>(
 						"{\"message\" : \"Organizer contact created\"}", HttpStatus.OK);
 			}
+		} catch (DataIntegrityViolationException dataIntegrityViolationException) {
+			return new ResponseEntity<>("{\"message\" : \"Bad Request: invalid info\"}",
+					HttpStatus.BAD_REQUEST);
+		} catch (Exception exception) {
+			return new ResponseEntity<>(
+					"{\"message\" : \"Exception in creating organizer contact info\"}",
+					HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 	
 	@RequestMapping(value = "/organizer/contact/search/{Organizer_ID}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> getOrganizerContactList(@PathVariable int Organizer_ID) {
+		try {
 			List<OrganizerContactTable> organizerContactList = OrganizerRepositoryImpl
 					.getOrganizerContactInfo(Organizer_ID);
 			if (organizerContactList.isEmpty()) {
@@ -153,13 +212,19 @@ public class OrganizerController {
 						new Gson().toJson((OrganizerRepositoryImpl
 								.getOrganizerContactInfo(Organizer_ID))), HttpStatus.OK);
 			}
+		} catch (Exception e) {
+			return new ResponseEntity<>(
+					"{\"message\" : \"Exception in getting organzier contact info\"}",
+					HttpStatus.INTERNAL_SERVER_ERROR);
+		} 
 	}
 	
 	// This method for creating contact information of organizer
 	@RequestMapping(value = "/organizer/contact/update", method = RequestMethod.PUT, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> updateOrganizerInfo(
 			@RequestBody(required = true) OrganizerContactTable organizerContactTable) {
-			int affectedRow = OrganizerRepositoryImpl
+		try {	
+		int affectedRow = OrganizerRepositoryImpl
 					.updateOrganizerContact(organizerContactTable);
 
 			if (affectedRow == 0) {
@@ -171,5 +236,13 @@ public class OrganizerController {
 				return new ResponseEntity<>(
 						"{\"message\" : \"Organizer contact successfully updated\"}", HttpStatus.OK);
 			}
+		} catch (DataIntegrityViolationException dataIntegrityViolationException) {
+			return new ResponseEntity<>("{\"message\" : \"Bad Request: invalid info\"}",
+					HttpStatus.BAD_REQUEST);
+		} catch (Exception exception) {
+			return new ResponseEntity<>(
+					"{\"message\" : \"Exception in updating organizer contact info\"}",
+					HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 }

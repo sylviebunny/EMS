@@ -12,6 +12,7 @@ public interface CustomerOrderRepository {
 	
 	//Ticket interface
 	public Object getTicket(String ticketID);
+	public Object getTicketByOrder(String customerOrderID);
 	public int createTicket(TicketTable ticketTable);
 	public int updateTicket(TicketTable ticketTable);
 	public int deleteTicket(String ticketID);

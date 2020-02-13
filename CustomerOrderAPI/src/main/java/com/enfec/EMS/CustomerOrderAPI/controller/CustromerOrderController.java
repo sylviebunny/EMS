@@ -112,6 +112,20 @@ public class CustromerOrderController {
 					new Gson().toJson((customerOrderRepositoryImpl.getTicket(ticketID))), HttpStatus.OK);
 		}
 	
+	//Get ticket by Order
+	@RequestMapping(value = "/TicketByOrder/{customerOrderID}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
+	public ResponseEntity<String>getTicketByOrderList(@PathVariable String customerOrderID) { 
+			List<TicketTable> ticketByOrderList = customerOrderRepositoryImpl.getTicketByOrder(customerOrderID);
+			if (ticketByOrderList.isEmpty()) {
+				logger.info("No Ticket found by this order for: {} ", customerOrderID);
+				return new ResponseEntity<>(
+						"{\"message\" : \"No Ticket found by this order\"}", HttpStatus.OK);
+			
+			}
+			return new ResponseEntity<>(
+					new Gson().toJson((customerOrderRepositoryImpl.getTicketByOrder(customerOrderID))), HttpStatus.OK);
+		}
+	
 	
 	
 	//Create ticket

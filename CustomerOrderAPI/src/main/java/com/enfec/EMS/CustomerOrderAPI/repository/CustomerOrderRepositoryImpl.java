@@ -23,18 +23,20 @@ import org.slf4j.LoggerFactory;
 public class CustomerOrderRepositoryImpl implements CustomerOrderRepository {
 	private static final Logger logger = LoggerFactory.getLogger(CustomerOrderRepositoryImpl.class);
 	
-	//Customer Order
+	//Customer Order SQL
 	final String SELECT_CUSTOMER_ORDER = "SELECT COrder_ID, Customer_ID, OrderCreateTime FROM Customer_Orders WHERE COrder_ID=?";
 	final String CREATE_CUSTOMER_ORDER = "INSERT INTO Customer_Orders(Customer_ID,OrderCreateTime) VALUES (:customerID, :orderTime)";
 	//final String UPDATE_CUSTOMER_ORDER = "UPDATE Customers SET User_name =:name, Email_Address =:email, CPassword =:psw, Phone =:phone WHERE Customer_ID =:id";
 	final String DELETE_CUSTOMER_ORDER = "DELETE FROM Customer_Orders WHERE COrder_ID =?";
 	
-	//Customer Order
+	//Tickets SQL
 	final String SELECT_TICKET = "SELECT Ticket_ID, COrder_ID, Event_ID, Room_ID, Seat_ID, RealPrice FROM Tickets WHERE Ticket_ID=?";
 	final String CREATE_TICKET = "INSERT INTO Tickets(COrder_ID, Event_ID, Room_ID, Seat_ID, RealPrice) VALUES (:customerOrderID, :eventID, :roomID, :seatID, :realPrice)";
 	final String UPDATE_TICKET = "UPDATE Tickets SET Ticket_ID = :ticketID, COrder_ID = :customerOrderID, Event_ID = :eventID,"
 			+ "Room_ID = :roomID, Seat_ID = :seatID, RealPrice = :realPrice WHERE Ticket_ID = :ticketID";
 	final String DELETE_TICKET = "DELETE FROM Tickets WHERE Ticket_ID =?";
+	final String SELECT_TICKET_BY_ORDER = "SELECT Ticket_ID, COrder_ID, Event_ID, Room_ID, Seat_ID, RealPrice FROM Tickets WHERE COrder_ID=?";
+
 
 	
 	@Autowired
@@ -101,6 +103,11 @@ public class CustomerOrderRepositoryImpl implements CustomerOrderRepository {
 	@Override
 	public List<TicketTable> getTicket(String ticketID){
 		return jdbcTemplate.query(SELECT_TICKET, new Object[] {ticketID}, new TicketRowmapper());
+	}
+	
+	@Override
+	public List<TicketTable>getTicketByOrder(String customerOrderID){
+		return jdbcTemplate.query(SELECT_TICKET_BY_ORDER, new Object[] {customerOrderID}, new TicketRowmapper());
 	}
 
 	@Override

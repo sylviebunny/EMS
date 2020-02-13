@@ -89,7 +89,7 @@ public class SeatCategoryRepositoryImpl implements SeatCategoryRepository {
 		} else {
 			throw new NullPointerException("Category_ID cannot be null");
 		}
-		param.put("Category_Name", sc.getCategory_Name().isEmpty() ? null:sc.getCategory_Name());
+		param.put("Category_Name", sc.getCategory_Name() == null || sc.getCategory_Name().isEmpty() ? null:sc.getCategory_Name());
 		param.put("Price", sc.getPrice() != 0 ? sc.getPrice() : null);
 		return param;
 	}

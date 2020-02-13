@@ -65,7 +65,7 @@ public class VenueController {
 
 	//The foreign key information must exist first in the db
 	@RequestMapping(value = "/venue/update", method = RequestMethod.PUT, produces = "application/json;charset=UTF-8")
-	public ResponseEntity<String> updateRoom(@RequestBody(required = true) Venue venue) {
+	public ResponseEntity<String> updateVenue(@RequestBody(required = true) Venue venue) {
 		try {	
 			int affectedRow = VenueRepositoryImpl.updateVenue(venue);
 

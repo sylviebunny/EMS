@@ -118,8 +118,8 @@ public class VenueRepositoryImpl implements VenueRepository {
 		} else {
 			throw new NullPointerException("Venue_ID cannot be null");
 		}	
-		param.put("Venue_Name", venue.getVenue_Name().isEmpty() ? null : venue.getVenue_Name());
-		param.put("Other_Details", venue.getOther_Details().isEmpty() ? null : venue.getOther_Details());
+		param.put("Venue_Name", venue.getVenue_Name() == null || venue.getVenue_Name().isEmpty() ? null:venue.getVenue_Name());
+		param.put("Other_Details", venue.getOther_Details() == null || venue.getOther_Details().isEmpty() ? null:venue.getOther_Details());
 		return param;
 	}
 	
@@ -131,12 +131,12 @@ public class VenueRepositoryImpl implements VenueRepository {
 		} else {
 			throw new NullPointerException("Venue_ID cannot be null");
 		}		
-//		param.put("VenueAddress_ID", venue.getVenueAddress_ID() != 0 ? venue.getVenueAddress_ID() : null);
-		param.put("Street1", venue.getStreet1().isEmpty() ? null:venue.getStreet1());
-		param.put("Street2", venue.getStreet2().isEmpty() ? null:venue.getStreet2());
-		param.put("City", venue.getCity().isEmpty() ? null:venue.getCity());
-		param.put("State", venue.getState().isEmpty() ? null:venue.getState());
-		param.put("Zipcode", venue.getZipcode() == 0 ? null:venue.getZipcode());
+//		param.put("VenueAddress_ID", venue.getVenueAddress_ID() != 0 ? venue.getVenueAddress_ID() : null);	
+		param.put("Street1", venue.getStreet1() == null || venue.getStreet1().isEmpty() ? null:venue.getStreet1());
+		param.put("Street2", venue.getStreet2() == null || venue.getStreet2().isEmpty() ? null:venue.getStreet2());
+		param.put("City", venue.getCity() == null || venue.getCity().isEmpty() ? null:venue.getCity());
+		param.put("State", venue.getState() == null || venue.getState().isEmpty() ? null:venue.getState());
+		param.put("Zipcode", venue.getZipcode() != 0 ? venue.getZipcode() : null);
 		return param;
 	}
 }

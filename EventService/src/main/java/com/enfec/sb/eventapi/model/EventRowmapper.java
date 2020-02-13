@@ -18,8 +18,8 @@ public class EventRowmapper implements RowMapper<EventTable> {
 		EventTable et = new EventTable();
 		
 		et.setEvent_id(rs.getInt("Event_ID"));
-		et.setEvent_status_code(rs.getString("Event_Status_Code"));
-		et.setEvent_type_code(rs.getString("Event_Type_Code"));
+		et.setEvent_status_code(rs.getInt("Event_Status_Code"));
+		et.setEvent_type_code(rs.getInt("Event_Type_Code"));
 		et.setCommercial_type(rs.getString("Commercial_Type"));
 		et.setOrganizer_id(rs.getInt("Organizer_ID"));
 		et.setVenue_id(rs.getInt("Venue_ID"));

@@ -19,8 +19,8 @@ import lombok.Setter;
 public class EventTable {
 	
 	private int event_id; 
-	private String event_status_code; 
-	private String event_type_code; 
+	private int event_status_code; 
+	private int event_type_code; 
 	private String commercial_type; 			// Profitable/Non-profitable/Free...
 	
 	private int organizer_id; 

@@ -12,6 +12,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.*;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -211,11 +214,9 @@ public class EventRepositoryImpl implements EventRepository {
 			param.put("event_id", event_id); 
 		}
 		
-		param.put("event_status_code", eventTable.getEvent_status_code() == null || eventTable.getEvent_status_code().isEmpty() ? 
-				null : eventTable.getEvent_status_code());
+		param.put("event_status_code", eventTable.getEvent_status_code());
 		
-		param.put("event_type_code", eventTable.getEvent_type_code() == null || eventTable.getEvent_type_code().isEmpty() ? 
-				null : eventTable.getEvent_type_code());
+		param.put("event_type_code", eventTable.getEvent_type_code());
 		
 		param.put("commercial_type", eventTable.getCommercial_type() == null ? 
 				null : eventTable.getCommercial_type());
@@ -279,6 +280,30 @@ public class EventRepositoryImpl implements EventRepository {
 				null :eventTable.getOrganizer_name());
 		
 		return param;
+	}
+	
+	private final SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd"); 
+	
+	@Override
+	public List<Map> getFilteredEvents(List<EventTable> allEvent, Timestamp start_date, Timestamp end_date) {
+		// Convert EventTable to Map
+		List<Map> allEventMap = new ArrayList<>(); 
+		for (EventTable et: allEvent) {
+			allEventMap.add(eventMap(et, et.getEvent_id())); 
+		} 
+		
+		
+		List<Map> dateRangeEvents = new ArrayList<>();
+		for (Map eachEvent: allEventMap) {
+			Timestamp eventStartTime = (Timestamp)eachEvent.get("event_start_time"); 
+			Timestamp eventEndTime = (Timestamp)eachEvent.get("event_end_time"); 
+			if (eventStartTime.after(start_date) && eventStartTime.before(end_date)) {
+				// They are within the date period
+				dateRangeEvents.add(eachEvent); 
+			}
+		}
+		
+		return dateRangeEvents; 
 	}
 	
 }

@@ -1,5 +1,7 @@
 package com.enfec.sb.eventapi.controller;
 
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -7,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,6 +30,8 @@ public class EventController {
 	EventRepositoryImpl eventRepositoryImpl;
 	
 	// Search event by Event_ID
+	// This method should be ONLY used by admin
+	// URI template: ../event/search?event_id=80001
 	@RequestMapping(value = "/event/search", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> getEventList (
 				@RequestParam(name = "event_id", required = true) Integer event_id
@@ -44,11 +49,10 @@ public class EventController {
 	}
 	
 	// Search events by anything, like city/state/zipcode/event_name/event_type
-	// This ignores scenarios that it will show all events matches each_ID
+	// This ignores scenarios that it will show all events matches all IDs. 
 	@RequestMapping(value = "/event/search/{anything}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> getEventListByFilterBar (
-				@PathVariable(required = false) String anything
-			) {
+			@PathVariable(required = false) String anything) {
 
 			// Get all events information from database and get all related information 
 			// Put them into List<EventTable>
@@ -65,10 +69,26 @@ public class EventController {
 			}
 	}
 	
+	// Get events from start_date to end_date
+	@RequestMapping(value = "event/search/by_date", method = RequestMethod.GET, produces = "application/json;charset=UTF-8") 
+	public ResponseEntity<String> getEventsThroughDate (
+			@RequestParam(required = true) @DateTimeFormat(pattern="yyyy-MM-dd") Date start_date, 
+			@RequestParam(required = true) @DateTimeFormat(pattern="yyyy-MM-dd") Date end_date) {
+		List<EventTable> allEvent = eventRepositoryImpl.getAllEvents(); 
+		
+		Timestamp st = new Timestamp(start_date.getTime());
+		Timestamp et = new Timestamp(end_date.getTime()); 
+		List<Map> result_events = eventRepositoryImpl.getFilteredEvents(allEvent, st, et); 
+		
+		return new ResponseEntity<>(
+				new Gson().toJson(result_events), HttpStatus.OK); 
+	}
+	
 	// Create event
 	@RequestMapping(value = "/event/create", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> registerEvent(
 			@RequestBody(required = true) EventTable eventTable) {
+		try {
 			int affectedRow = eventRepositoryImpl.createEvent(eventTable);
 
 			if (affectedRow == 0) {
@@ -79,12 +99,20 @@ public class EventController {
 				return new ResponseEntity<>(
 						"{\"message\" : \"Event successfully registered\"}", HttpStatus.OK);
 			}
+		} catch (DataIntegrityViolationException dve) {
+			return new ResponseEntity<> (
+					"{\"message\" : \"Lack of required event information or invalid input\"}", HttpStatus.BAD_REQUEST);
+		} catch (Exception ex) {
+			return new ResponseEntity<> (
+					"{\"message\" : \"Unknown Error, need contact admin\"}", HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 	
 	// Update event
 	@RequestMapping(value = "/event/update", method = RequestMethod.PUT, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> updateEvent(
 			@RequestBody(required = true) EventTable eventTable) {
+		try {
 			int affectedRow = eventRepositoryImpl.updateEvent(eventTable);
 
 			if (affectedRow == 0) {
@@ -94,6 +122,13 @@ public class EventController {
 				return new ResponseEntity<>(
 						"{\"message\" : \"Event successfully updated\"}", HttpStatus.OK);
 			}
+		} catch (DataIntegrityViolationException dve) {
+			return new ResponseEntity<> (
+					"{\"message\" : \"Lack of required event information or invalid input\"}", HttpStatus.BAD_REQUEST);
+		} catch (Exception ex) {
+			return new ResponseEntity<> (
+					"{\"message\" : \"Unknown Error, need contact admin\"}", HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 	
 	// Delete event

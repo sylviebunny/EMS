@@ -1,5 +1,6 @@
 package com.enfec.sb.eventapi.repository;
 
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 
@@ -13,7 +14,8 @@ public interface EventRepository {
 	public int deleteEvent(int event_id);
 
 	public List<Map> getFilteredEvents(List<EventTable> allEvent, String str);
-
+	public List<Map> getFilteredEvents(List<EventTable> allEvent, Timestamp start_date, Timestamp end_date);
+	
 	public List<EventTable> getAllEvents();
 
 

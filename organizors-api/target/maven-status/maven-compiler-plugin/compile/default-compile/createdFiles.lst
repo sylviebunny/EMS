@@ -1,0 +1,6 @@
+com\enfec\sb\deviceInfoapi\DeviceInfoApiApplication.class
+com\enfec\sb\deviceInfoapi\repository\OrganizorsRepositoryImpl.class
+com\enfec\sb\deviceInfoapi\model\OrganizorsRowmapper.class
+com\enfec\sb\deviceInfoapi\model\OrganizorsTable.class
+com\enfec\sb\deviceInfoapi\repository\OrganizorsRepository.class
+com\enfec\sb\deviceInfoapi\controller\DeviceInfoController.class

@@ -1,5 +1,7 @@
 package com.enfec.demo.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -96,6 +98,26 @@ public class SeatController {
 		} catch (Exception e) {
 			return new ResponseEntity<>(
 					"{\"message\" : \"Exception in deleting seat info\"}",
+					HttpStatus.INTERNAL_SERVER_ERROR);
+		} 
+	}
+	
+	//Search available seats by room_id
+	@RequestMapping(value = "/seat/getavailable/{Room_ID}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
+	public ResponseEntity<String> getAvailableSeatList(@PathVariable("Room_ID") int Room_ID) {
+		try {
+			List<Seat> seatList = SeatRepositoryImpl.getAvailableSeatInfo(Room_ID);
+			if (seatList.isEmpty()) {
+				return new ResponseEntity<>(
+						"{\"message\" : \"No available seat found\"}", HttpStatus.OK);
+			} else {
+				return new ResponseEntity<>(
+						new Gson().toJson((SeatRepositoryImpl
+								.getAvailableSeatInfo(Room_ID))), HttpStatus.OK);
+			}
+		} catch (Exception e) {
+			return new ResponseEntity<>(
+					"{\"message\" : \"Exception in getting available seats info\"}",
 					HttpStatus.INTERNAL_SERVER_ERROR);
 		} 
 	}

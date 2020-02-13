@@ -2,6 +2,7 @@ package com.enfec.demo.repository;
 
 import java.sql.PreparedStatement;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,6 +63,14 @@ public class SeatRepositoryImpl implements SeatRepository{
 		}
 		return seat;
 	}
+	
+	
+	@Override
+	public List<Seat> getAvailableSeatInfo(int Room_ID) {
+		String SELECT_AVAILABLE_SEATS = "select * FROM Seats a join Seat_Category b on a.Category_ID = b.Category_ID where Room_ID = ? AND Availability = true";
+		return jdbcTemplate.query(SELECT_AVAILABLE_SEATS, new Object[] { Room_ID }, new BeanPropertyRowMapper<Seat>(Seat.class));
+	}
+	
 	
 //	Update with partial info
 	@Override

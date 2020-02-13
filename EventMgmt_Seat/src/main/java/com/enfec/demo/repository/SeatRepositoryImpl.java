@@ -117,9 +117,9 @@ public class SeatRepositoryImpl implements SeatRepository{
 		}	
 		param.put("Room_ID", seat.getRoom_ID() != 0 ? seat.getRoom_ID() : null);
 		param.put("Category_ID", seat.getCategory_ID() != 0 ? seat.getCategory_ID() : null);
-		param.put("Row_Number", seat.getRow_Number().isEmpty() ? null:seat.getRow_Number());
-		param.put("Col_Number", seat.getCol_Number().isEmpty() ? null:seat.getCol_Number());
-		param.put("Availability", seat.isAvailability() ? seat.isAvailability() : false);
+		param.put("Row_Number", seat.getRow_Number() == null || seat.getRow_Number().isEmpty() ? null:seat.getRow_Number());
+		param.put("Col_Number", seat.getCol_Number() == null || seat.getCol_Number().isEmpty() ? null:seat.getCol_Number());
+		param.put("Availability", seat.isAvailability() ? seat.isAvailability() : null);
 		return param;
 	}
 }

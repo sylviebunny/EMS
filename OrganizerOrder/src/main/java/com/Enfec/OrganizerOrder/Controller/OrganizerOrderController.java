@@ -44,7 +44,7 @@ public class OrganizerOrderController {
         } catch (Exception e) {
             logger.error("Exception in getting organizer order info: {}", e.getMessage());
             return new ResponseEntity<>(
-                    "{\"message\" : \"Exception in gettin gorganizer info\"}", HttpStatus.INTERNAL_SERVER_ERROR);
+                    "{\"message\" : \"Exception in getting organizer info\"}", HttpStatus.INTERNAL_SERVER_ERROR);
 
         }
     }
@@ -57,14 +57,14 @@ public class OrganizerOrderController {
             try {
                 int affectedRow = organizerOrderRepositoryImplement.registerOrganizerOrder(organizerOrderTable);
                 if (affectedRow == 0) {
-                    logger.info("Organizer order not registered event_ID: {} ", organizerOrderTable.getEvent_ID());
+                    logger.info("Organizer order not registered event_ID: {} ", organizerOrderTable.getEventID());
                     return new ResponseEntity<>("{\"message\" : \"Organizer order not registered\"}", HttpStatus.OK);
                 } else {
-                    logger.info("Organizer registered event_ID: {}", organizerOrderTable.getEvent_ID());
+                    logger.info("Organizer registered event_ID: {}", organizerOrderTable.getEventID());
                     return new ResponseEntity<>("{\"message\" : \"Organizer order made\"}", HttpStatus.OK);
                 }
             } catch (DataIntegrityViolationException dataIntegrityViolationException) {
-                logger.error("Invalid Event_ID: {} ", organizerOrderTable.getEvent_ID());
+                logger.error("Invalid Event_ID: {} ", organizerOrderTable.getEventID());
                 return new ResponseEntity<>("{\"MESSAGE\" : \"Invalid Event_ID\"}", HttpStatus.BAD_REQUEST);
 
             } catch (Exception exception) {
@@ -75,7 +75,7 @@ public class OrganizerOrderController {
             }
         }
 
-            @RequestMapping(value = "/organizerorder/delete/{OrganizerOrderID}", method = RequestMethod.DELETE, produces = "application/json;charset=UTF-8")
+            @RequestMapping(value = "/organizerorder/delete/{organizerOrderID}", method = RequestMethod.DELETE, produces = "application/json;charset=UTF-8")
             public ResponseEntity<String> deleteOrganizerOrder(@PathVariable("organizerOrderID") int id) {
                 int affectedRow = organizerOrderRepositoryImplement.deleteOrganizerOrder(id);
                 if (affectedRow > 0) {

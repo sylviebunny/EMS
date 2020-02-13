@@ -11,10 +11,10 @@ public class OrganizerOrderRowmapper implements RowMapper<OrganizerOrderTable> {
     @Override
     public OrganizerOrderTable mapRow(ResultSet rs, int rowNum) throws SQLException {
         OrganizerOrderTable organizerOrderTable = new OrganizerOrderTable();
-        organizerOrderTable.setOOrder_ID(rs.getInt("OOrder_ID"));
+        organizerOrderTable.setOrganizerOrderID(rs.getInt("OOrder_ID"));
         organizerOrderTable.setEventID(rs.getInt("Event_ID"));
-        organizerOrderTable.setOrganizer_ID(rs.getInt("Organizer_ID"));
-        organizerOrderTable.setTime(rs.getTimestamp("Time"));
+        organizerOrderTable.setOrganizerID(rs.getInt("Organizer_ID"));
+        organizerOrderTable.setDateTime(rs.getTimestamp("Time"));
 
         return organizerOrderTable;
 

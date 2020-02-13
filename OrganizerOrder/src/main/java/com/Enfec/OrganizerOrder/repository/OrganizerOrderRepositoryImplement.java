@@ -19,9 +19,9 @@ import com.Enfec.OrganizerOrder.model.OrganizerOrderRowmapper;
 public class OrganizerOrderRepositoryImplement implements OrganizerOrderRepository {
     private static final Logger logger = LoggerFactory.getLogger(OrganizerOrderRepositoryImplement.class);
 
-    final String SELECT_ORGANIZER_ORDER = "SELECT OOrder_ID, Event_ID, Organizer_ID, TIME FROM Organizer_Orders where OOrder_ID = ?";
+    final String SELECT_ORGANIZER_ORDER = "SELECT OOrder_ID, Event_ID, Organizer_ID, Time FROM Organizer_Orders where OOrder_ID = ?";
     final String REGISTER_ORGANIZER_ORDER = "INSERT INTO Organizer_Orders(OOrder_ID, Event_ID, Organizer_ID, Time) VALUES" + "(:organizerOrderID,:eventID,:organizerID,:dateTime)";
-    final String DELETE_ORGANIZER_ORDER = "DELETE FROM Organizer_Orders WHERE OOrder_ID = ?;";
+    final String DELETE_ORGANIZER_ORDER = "DELETE FROM Organizer_Orders WHERE OOrder_ID = ?";
 
 
     @Autowired
@@ -32,16 +32,16 @@ public class OrganizerOrderRepositoryImplement implements OrganizerOrderReposito
 
     private Map<String, Object> organizerOrderMap(OrganizerOrderTable organizerOrderTable) {
         Map<String, Object> param = new HashMap<>();
-        if (organizerOrderTable.getOOrder_ID() != 0) {
-            param.put("Organizer_Order_ID", organizerOrderTable.getOOrder_ID());
+        if (organizerOrderTable.getOrganizerOrderID() != 0) {
+            param.put("organizerOrderID", organizerOrderTable.getOrganizerOrderID());
         } else {
             logger.error("Organizer order ID is missing");
             throw new NullPointerException("Organizer order ID cannot be null");
         }
 
-        param.put("Event_ID ", organizerOrderTable.getEvent_ID() == 0 ? 0 : organizerOrderTable.getEvent_ID());
-        param.put("Organizer_ID", organizerOrderTable.getOrganizer_ID() == 0 ? 0 : organizerOrderTable.getOrganizer_ID());
-        param.put("Time", organizerOrderTable.getTime() == null ? null : organizerOrderTable.getTime());
+        param.put("eventID", organizerOrderTable.getEventID() == 0 ? null : organizerOrderTable.getEventID());
+        param.put("organizerID", organizerOrderTable.getOrganizerID() == 0 ? null : organizerOrderTable.getOrganizerID());
+        param.put("dateTime", organizerOrderTable.getDateTime() == null ? null : organizerOrderTable.getDateTime());
 
         return param;
 
@@ -71,6 +71,17 @@ public class OrganizerOrderRepositoryImplement implements OrganizerOrderReposito
 
         return affectedRow;
     }
+
+
+
+
+
+
+
+
+
+
+
 
 
 

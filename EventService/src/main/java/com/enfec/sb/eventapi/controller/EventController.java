@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.zip.DataFormatException;
+
 import com.enfec.sb.eventapi.model.EventTable;
 import com.enfec.sb.eventapi.repository.EventRepositoryImpl;
 import com.google.gson.Gson;
@@ -74,14 +76,34 @@ public class EventController {
 	public ResponseEntity<String> getEventsThroughDate (
 			@RequestParam(required = true) @DateTimeFormat(pattern="yyyy-MM-dd") Date start_date, 
 			@RequestParam(required = true) @DateTimeFormat(pattern="yyyy-MM-dd") Date end_date) {
-		List<EventTable> allEvent = eventRepositoryImpl.getAllEvents(); 
-		
-		Timestamp st = new Timestamp(start_date.getTime());
-		Timestamp et = new Timestamp(end_date.getTime()); 
-		List<Map> result_events = eventRepositoryImpl.getFilteredEvents(allEvent, st, et); 
-		
-		return new ResponseEntity<>(
-				new Gson().toJson(result_events), HttpStatus.OK); 
+		try {
+			
+			
+			Timestamp st = new Timestamp(start_date.getTime());
+			Timestamp et = new Timestamp(end_date.getTime()); 
+			// Check if enter the right date range
+			if (st == null || et == null || et.before(st)) {
+				throw new DataFormatException();
+			}
+			
+			List<EventTable> allEvent = eventRepositoryImpl.getAllEvents(); 
+			
+			List<Map> result_events = eventRepositoryImpl.getFilteredEvents(allEvent, st, et); 
+			
+			if (result_events == null || result_events.size() == 0) {
+				return new ResponseEntity<>(
+						"{\"message\" : \"No event within this period\"}", HttpStatus.OK); 
+			} else {
+				return new ResponseEntity<>(
+						new Gson().toJson(result_events), HttpStatus.OK); 
+			}
+		} catch (DataFormatException ex) {
+			return new ResponseEntity<>(
+					"{\"message\" : \"Invalid input date\"}", HttpStatus.BAD_REQUEST); 
+		} catch (Exception e) {
+			return new ResponseEntity<>(
+					"{\"message\" : \"Unknown error, please contact admin\"}", HttpStatus.INTERNAL_SERVER_ERROR); 
+		}
 	}
 	
 	// Create event

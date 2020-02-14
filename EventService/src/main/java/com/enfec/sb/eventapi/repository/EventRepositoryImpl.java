@@ -32,20 +32,20 @@ public class EventRepositoryImpl implements EventRepository {
 	private static final Logger logger = LoggerFactory.getLogger(EventRepositoryImpl.class);
 
 	final String REGISTER_EVENT = "INSERT INTO Events(Event_Status_Code, Event_Type_Code, Commercial_Type, Organizer_ID, Venue_ID, "
-			+ "Event_Name, Event_Start_Time, Event_End_Time, Number_of_Participants, Derived_Days_Duration, Event_Cost, Discount, Comments) VALUES "
+			+ "Event_Name, Event_Start_Time, Event_End_Time, Timezone, Number_of_Participants, Derived_Days_Duration, Event_Cost, Discount, Comments) VALUES "
 			+ "(:event_status_code, :event_type_code, :commercial_type, :organizer_id, "
-			+ ":venue_id, :event_name, :event_start_time, :event_end_time, :number_of_participants, :derived_days_duration, :event_cost, :discount, :comments)";
+			+ ":venue_id, :event_name, :event_start_time, :event_end_time, :timezone, :number_of_participants, :derived_days_duration, :event_cost, :discount, :comments)";
 	
 	String UPDATE_EVENT_INFO_PREFIX = "UPDATE Events SET "; 
 	String UPDATE_EVENT_INFO_SUFFIX = " WHERE Event_ID = :event_id AND Organizer_ID =:organizer_id";
 	
 	private static final String DELETE_EVENT = "DELETE FROM Events WHERE Event_ID =?";
 
-	private static final String SELECT_EVENT_BY_ID = "SELECT * FROM Events WHERE Event_ID =?";
-	
-	private static final String SELECT_EVENT_PREFIX = "SELECT * FROM Events WHERE";
+//	private static final String SELECT_EVENT_BY_ID = "SELECT * FROM Events WHERE Event_ID =?";
+//	
+//	private static final String SELECT_EVENT_PREFIX = "SELECT * FROM Events WHERE";
 
-	private static final String GET_ALL_EVENT = "SELECT Event_ID, Events.Event_Status_Code, Events.Event_Type_Code, Commercial_Type, Events.Organizer_ID, Events.Venue_ID, Event_Name, Event_Start_Time, Event_End_Time, Number_of_Participants, Derived_Days_Duration, Event_Cost, Discount, Comments, Venue_Name, Venues.Other_Details, Street1, Street2, City, State, Zipcode, Event_Status_Description, Event_Type_Description, Organizer_Name\n" + 
+	private static final String GET_ALL_EVENT = "SELECT Event_ID, Events.Event_Status_Code, Events.Event_Type_Code, Commercial_Type, Events.Organizer_ID, Events.Venue_ID, Event_Name, Event_Start_Time, Event_End_Time, Timezone, Number_of_Participants, Derived_Days_Duration, Event_Cost, Discount, Comments, Venue_Name, Venues.Other_Details, Street1, Street2, City, State, Zipcode, Event_Status_Description, Event_Type_Description, Organizer_Name\n" + 
 			"FROM Events, Venues, Venue_Address, Ref_Event_Status, Ref_Event_Types, Organizers\n" + 
 			"WHERE Events.Venue_ID = Venues.Venue_ID AND Events.Venue_ID = Venue_Address.Venue_ID AND Events.Event_Status_Code = Ref_Event_Status.Event_Status_Code AND Events.Event_Type_Code = Ref_Event_Types.Event_Type_Code AND Organizers.Organizer_ID = Events.Organizer_ID; ";
 	
@@ -55,6 +55,10 @@ public class EventRepositoryImpl implements EventRepository {
 	@Autowired
 	JdbcTemplate jdbcTemplate; 
 	
+	/* 
+	 * ---------------------------------- Event GET ----------------------------------
+	 * 
+	 */
 	@Override
 	public List<Map> getFilteredEvents(List<EventTable> allEvent, String str) {
 		// Use filter bar, anyone can type anything, like WA/seattle/non-profitable/festival/98002
@@ -71,7 +75,7 @@ public class EventRepositoryImpl implements EventRepository {
 			return allEventMap; 
 		}
 		
-		// If str is a zipcode, then we need to get the events from nearest to farthest
+		// If str is a valid zipcode, then we need to get the events from nearest to farthest
 		Integer zipcode = getZipcode(str); 
 		if (zipcode != null) {
 			return getEventByZipcode(allEventMap, zipcode); 
@@ -153,6 +157,35 @@ public class EventRepositoryImpl implements EventRepository {
 		return resultEvent; 
 	}
 	
+	private final SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd"); 
+	
+	@Override
+	public List<Map> getFilteredEvents(List<EventTable> allEvent, Timestamp start_date, Timestamp end_date) {
+		// Convert EventTable to Map
+		List<Map> allEventMap = new ArrayList<>(); 
+		for (EventTable et: allEvent) {
+			allEventMap.add(eventMap(et, et.getEvent_id())); 
+		} 
+		
+		
+		List<Map> dateRangeEvents = new ArrayList<>();
+		for (Map eachEvent: allEventMap) {
+			Timestamp eventStartTime = Timestamp.valueOf((String)eachEvent.get("event_start_time")); 
+			Timestamp eventEndTime = Timestamp.valueOf((String)eachEvent.get("event_end_time"));
+			if (eventStartTime.after(start_date) && eventStartTime.before(end_date)) {
+				// the event that is within the date period
+				dateRangeEvents.add(eachEvent); 
+			}
+		}
+		
+		return dateRangeEvents; 
+	}
+	
+	/* 
+	 * ---------------------------------- Event POST ----------------------------------
+	 * 
+	 */
+	
 	@Override
 	public int createEvent (EventTable eventTable) {
 		// Create an event
@@ -164,6 +197,11 @@ public class EventRepositoryImpl implements EventRepository {
 		
 		return affectedRow; 
 	}
+	
+	/* 
+	 * ---------------------------------- Event UPDATE ----------------------------------
+	 * 
+	 */
 	
 	@Override
 	public int updateEvent(EventTable eventTable) {
@@ -191,6 +229,10 @@ public class EventRepositoryImpl implements EventRepository {
 
 	}
 	
+	/* 
+	 * ---------------------------------- Event DELETE ----------------------------------
+	 * 
+	 */
 	@Override
 	public int deleteEvent(int event_id) {
 		// Delete an event by event_id
@@ -205,6 +247,10 @@ public class EventRepositoryImpl implements EventRepository {
 		}
 	}
 	
+	/* 
+	 * ---------------------------------- Event mapping ----------------------------------
+	 * 
+	 */
 	private Map<String, Object> eventMap(EventTable eventTable, Integer event_id) {
 		// Mapping event's information query's variable to URL POST body
 		Map<String, Object>param = new HashMap<>();
@@ -231,6 +277,9 @@ public class EventRepositoryImpl implements EventRepository {
 		
 		param.put("event_end_time", eventTable.getEvent_end_time() == null ? 
 				null : eventTable.getEvent_end_time());
+		
+		param.put("timezone", eventTable.getTimezone() == null || eventTable.getTimezone().length() == 0 ?
+				"UTC" : eventTable.getTimezone()); 
 		
 		param.put("number_of_participants", eventTable.getNumber_of_participants() == null ? 
 				null : eventTable.getNumber_of_participants());
@@ -280,30 +329,6 @@ public class EventRepositoryImpl implements EventRepository {
 				null :eventTable.getOrganizer_name());
 		
 		return param;
-	}
-	
-	private final SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd"); 
-	
-	@Override
-	public List<Map> getFilteredEvents(List<EventTable> allEvent, Timestamp start_date, Timestamp end_date) {
-		// Convert EventTable to Map
-		List<Map> allEventMap = new ArrayList<>(); 
-		for (EventTable et: allEvent) {
-			allEventMap.add(eventMap(et, et.getEvent_id())); 
-		} 
-		
-		
-		List<Map> dateRangeEvents = new ArrayList<>();
-		for (Map eachEvent: allEventMap) {
-			Timestamp eventStartTime = (Timestamp)eachEvent.get("event_start_time"); 
-			Timestamp eventEndTime = (Timestamp)eachEvent.get("event_end_time"); 
-			if (eventStartTime.after(start_date) && eventStartTime.before(end_date)) {
-				// the event that is within the date period
-				dateRangeEvents.add(eachEvent); 
-			}
-		}
-		
-		return dateRangeEvents; 
 	}
 	
 }

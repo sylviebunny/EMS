@@ -31,6 +31,10 @@ public class EventController {
 	@Autowired
 	EventRepositoryImpl eventRepositoryImpl;
 	
+	/* 
+	 * ---------------------------------- Event GET ----------------------------------
+	 * 
+	 */
 	// Search event by Event_ID
 	// This method should be ONLY used by admin
 	// URI template: ../event/search?event_id=80001
@@ -106,6 +110,10 @@ public class EventController {
 		}
 	}
 	
+	/* 
+	 * ---------------------------------- Event POST ----------------------------------
+	 * 
+	 */
 	// Create event
 	@RequestMapping(value = "/event/create", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> registerEvent(
@@ -130,6 +138,10 @@ public class EventController {
 		}
 	}
 	
+	/* 
+	 * ---------------------------------- Event UPDATE ----------------------------------
+	 * 
+	 */
 	// Update event
 	@RequestMapping(value = "/event/update", method = RequestMethod.PUT, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> updateEvent(
@@ -153,6 +165,10 @@ public class EventController {
 		}
 	}
 	
+	/* 
+	 * ---------------------------------- Event DELETE ----------------------------------
+	 * 
+	 */
 	// Delete event
 	@RequestMapping(value = "/event/delete/{Event_ID}", method = RequestMethod.DELETE, produces = "application/json;charset=UTF-8") 
 	public ResponseEntity<String> deleteEvent(@PathVariable int Event_ID){

@@ -26,8 +26,9 @@ public class EventTable {
 	private int organizer_id; 
 	private String event_name; 
 	
-	private Timestamp event_start_time;
-	private Timestamp event_end_time; 
+	private String event_start_time;
+	private String event_end_time; 
+	private String timezone; 
 	
 	private Integer number_of_participants; 
 	private String derived_days_duration; 

@@ -298,7 +298,7 @@ public class EventRepositoryImpl implements EventRepository {
 			Timestamp eventStartTime = (Timestamp)eachEvent.get("event_start_time"); 
 			Timestamp eventEndTime = (Timestamp)eachEvent.get("event_end_time"); 
 			if (eventStartTime.after(start_date) && eventStartTime.before(end_date)) {
-				// They are within the date period
+				// the event that is within the date period
 				dateRangeEvents.add(eachEvent); 
 			}
 		}

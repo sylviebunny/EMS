@@ -2,9 +2,16 @@ package com.enfec.sb.eventapi.model;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.Base64;
+import java.util.Calendar;
+import java.util.TimeZone;
+import java.util.Date;
 
 import org.springframework.jdbc.core.RowMapper;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 
 public class EventRowmapper implements RowMapper<EventTable> {
@@ -24,8 +31,11 @@ public class EventRowmapper implements RowMapper<EventTable> {
 		et.setOrganizer_id(rs.getInt("Organizer_ID"));
 		et.setVenue_id(rs.getInt("Venue_ID"));
 		et.setEvent_name(rs.getString("Event_Name"));
-		et.setEvent_start_time(rs.getTimestamp("Event_Start_Time"));
-		et.setEvent_end_time(rs.getTimestamp("Event_End_Time"));
+		
+		et.setEvent_start_time(rs.getString("Event_Start_Time")); 
+		et.setEvent_end_time(rs.getString("Event_End_Time"));
+		et.setTimezone(rs.getString("Timezone"));
+		
 		et.setNumber_of_participants(rs.getInt("Number_of_Participants"));
 		et.setDerived_days_duration(rs.getString("Derived_Days_Duration"));
 		et.setEvent_cost(rs.getDouble("Event_Cost"));

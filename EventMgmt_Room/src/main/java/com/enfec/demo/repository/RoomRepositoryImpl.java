@@ -33,7 +33,7 @@ public class RoomRepositoryImpl implements RoomRepository{
 //		Create: "Mon, 10 Feb 2020 10:30:00 PST"
 //		Get: "Feb 10, 2020 10:25:00 AM"
 		String CREATE_ROOM = "INSERT INTO Rooms(Venue_ID,Room_Name,Room_Capability,Rate_for_Day,Other_Details) VALUES(?,?,?,?,?)";
-		String CREATE_ROOM1 = "INSERT INTO Space_Requests(Room_ID,Event_ID,Booking_Status_Code,Occupancy,Commercial_or_Free,Occupancy_Date_From,Occupancy_Date_To) VALUES(?,?,?,?,?,?,?)";
+		String CREATE_ROOM1 = "INSERT INTO Space_Requests(Room_ID,Event_ID,Booking_Status,Occupancy,Commercial_or_Free,Occupancy_Date_From,Occupancy_Date_To) VALUES(?,?,?,?,?,?,?)";
 		
 		KeyHolder keyHolder = new GeneratedKeyHolder();
 	    int count = jdbcTemplate.update(
@@ -49,8 +49,8 @@ public class RoomRepositoryImpl implements RoomRepository{
 	    Number key = keyHolder.getKey();
 	    //key is primary key
 
-	    int count1 = jdbcTemplate.update(CREATE_ROOM1, key.longValue(),room.getEvent_ID(),room.getBooking_Status_Code(),
-	    		room.isOccupancy(),room.isCommercial_or_Free(),room.getOccupancy_Date_From(),room.getOccupancy_Date_To());
+	    int count1 = jdbcTemplate.update(CREATE_ROOM1, key.longValue(),room.getEvent_ID(),room.getBooking_Status(),
+	    		room.getOccupancy(),room.getCommercial_or_Free(),room.getOccupancy_Date_From(),room.getOccupancy_Date_To());
 	    return count;
 	}
 //	2020-02-07T16:00:00.000-0800
@@ -172,9 +172,9 @@ public class RoomRepositoryImpl implements RoomRepository{
 		}		
 //		param.put("Space_Request_ID", room.getSpace_Request_ID() != 0 ? room.getSpace_Request_ID() : null);
 		param.put("Event_ID", room.getEvent_ID() != 0 ? room.getEvent_ID() : null); 
-		param.put("Booking_Status_Code", room.getBooking_Status_Code() == null || room.getBooking_Status_Code().isEmpty() ? null:room.getBooking_Status_Code());
-		param.put("Occupancy", room.isOccupancy() ? room.isOccupancy() : null);
-		param.put("Commercial_or_Free", room.isCommercial_or_Free() ? room.isCommercial_or_Free() : null);
+		param.put("Booking_Status", room.getBooking_Status() == null || room.getBooking_Status().isEmpty() ? null:room.getBooking_Status());
+		param.put("Occupancy", room.getOccupancy()  == null || room.getOccupancy().isEmpty() ? null:room.getOccupancy());
+		param.put("Commercial_or_Free", room.getCommercial_or_Free() == null || room.getCommercial_or_Free().isEmpty() ? null:room.getCommercial_or_Free());
 		param.put("Occupancy_Date_From", room.getOccupancy_Date_From() == null ? null:room.getOccupancy_Date_From());
 		param.put("Occupancy_Date_To", room.getOccupancy_Date_To() == null ? null:room.getOccupancy_Date_To());
 		return param;

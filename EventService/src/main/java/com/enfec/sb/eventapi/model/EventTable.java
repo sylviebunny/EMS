@@ -45,6 +45,8 @@ public class EventTable {
 	private String city; 
 	private String state; 
 	private Integer zipcode; 
+	private Double latitude; 
+	private Double longitude; 
 	
 	// Event Status
 	private String event_status_description; 

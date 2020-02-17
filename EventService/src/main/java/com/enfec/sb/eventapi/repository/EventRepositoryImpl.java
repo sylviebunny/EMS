@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,6 +27,15 @@ import org.springframework.stereotype.Component;
 import com.enfec.sb.eventapi.model.EventRowmapper;
 import com.enfec.sb.eventapi.model.EventTable;
 import com.enfec.sb.eventapi.model.sortByZipcode;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
 
 @Component
 public class EventRepositoryImpl implements EventRepository {
@@ -45,9 +55,11 @@ public class EventRepositoryImpl implements EventRepository {
 //	
 //	private static final String SELECT_EVENT_PREFIX = "SELECT * FROM Events WHERE";
 
-	private static final String GET_ALL_EVENT = "SELECT Event_ID, Events.Event_Status_Code, Events.Event_Type_Code, Commercial_Type, Events.Organizer_ID, Events.Venue_ID, Event_Name, Event_Start_Time, Event_End_Time, Timezone, Number_of_Participants, Derived_Days_Duration, Event_Cost, Discount, Comments, Venue_Name, Venues.Other_Details, Street1, Street2, City, State, Zipcode, Event_Status_Description, Event_Type_Description, Organizer_Name\n" + 
+	private static final String GET_ALL_EVENT = "SELECT Event_ID, Events.Event_Status_Code, Events.Event_Type_Code, Commercial_Type, Events.Organizer_ID, Events.Venue_ID, Event_Name, Event_Start_Time, Event_End_Time, Timezone, Number_of_Participants, Derived_Days_Duration, Event_Cost, Discount, Comments, Venue_Name, Venues.Other_Details, Street1, Street2, City, State, Zipcode, Latitude, Longitude, Event_Status_Description, Event_Type_Description, Organizer_Name\n" + 
 			"FROM Events, Venues, Venue_Address, Ref_Event_Status, Ref_Event_Types, Organizers\n" + 
 			"WHERE Events.Venue_ID = Venues.Venue_ID AND Events.Venue_ID = Venue_Address.Venue_ID AND Events.Event_Status_Code = Ref_Event_Status.Event_Status_Code AND Events.Event_Type_Code = Ref_Event_Types.Event_Type_Code AND Organizers.Organizer_ID = Events.Organizer_ID; ";
+
+private static final String GET_ALL_VENUE = "SELECT * FROM Venue_Address";
 	
 	@Autowired
 	NamedParameterJdbcTemplate namedParameterJdbcTemplate;
@@ -58,6 +70,13 @@ public class EventRepositoryImpl implements EventRepository {
 	/* 
 	 * ---------------------------------- Event GET ----------------------------------
 	 * 
+	 */
+	
+	/*
+	 * 	----------------------------------------------------------------------------------------------------
+	 * 		Get filtered events by typing anything like state/city/commericial_type/event_type/
+	 * 		zipcode/event_name ...
+	 *  ----------------------------------------------------------------------------------------------------
 	 */
 	@Override
 	public List<Map> getFilteredEvents(List<EventTable> allEvent, String str) {
@@ -75,7 +94,7 @@ public class EventRepositoryImpl implements EventRepository {
 			return allEventMap; 
 		}
 		
-		// If str is a valid zipcode, then we need to get the events from nearest to farthest
+		// If str is a valid zipcode, then we need to get the events mapping from zipcode to location info
 		Integer zipcode = getZipcode(str); 
 		if (zipcode != null) {
 			return getEventByZipcode(allEventMap, zipcode); 
@@ -101,12 +120,92 @@ public class EventRepositoryImpl implements EventRepository {
 		return afterFilter; 
 	}
 	
+	private HashSet<String> getIgnoreKeys() {
+		
+		HashSet<String> ignoreKeys = new HashSet<>(); 
+		
+		ignoreKeys.add("event_type_code"); 
+		ignoreKeys.add("event_id"); 
+		ignoreKeys.add("event_status_code"); 
+		ignoreKeys.add("organizer_id"); 
+		ignoreKeys.add("venue_id"); 
+		
+		return ignoreKeys; 
+	}
+	
+	/*
+	 * 	----------------------------------------------------------------------------------------------------
+	 * 				zip code related functions
+	 *  ----------------------------------------------------------------------------------------------------
+	 */
+	/*
+	 * 		Based on given zipcode, get all events within a distance. 
+	 */
 	private List<Map> getEventByZipcode(List<Map> inputEventList, int zipcode) {
-		// Reorganize all List<Map> from nearest to farthest based on str. 
-		Collections.sort(inputEventList, new sortByZipcode(zipcode));
+		// Reorganize all List<Map> from nearest to farthest based on given zipcode. 
+//		Collections.sort(inputEventList, new sortByZipcode(zipcode));
+		
+		storeZipcodeInfo(); 
+		
 		return inputEventList;
 	}
 
+	/* 
+	 *  	Store zipcodes information in Venue_Address table after calling public API. 
+	 */
+	private int storeZipcodeInfo() {
+		// Get all venue_address's zipcodes, call public APIs get latitude and longitude, then store in 
+		// venue_address table 
+		List<EventTable> allVenue = jdbcTemplate.query(GET_ALL_VENUE, new EventRowmapper());
+		
+		for (EventTable eachVenue: allVenue) {
+			if (eachVenue.getLatitude() == 0.0 || eachVenue.getLongitude() == 0.0) {
+				// Don't have zip code information, so need to call public API to get current zip code info 
+				if (eachVenue.getZipcode() != null) {
+					Map<String, Object> zipInfo = callRapidGetZipCodeInfo(eachVenue.getZipcode().toString());
+					Double latitude = (Double)zipInfo.get("lat"); 
+					Double longitude = (Double)zipInfo.get("lng"); 
+				}
+			}
+		}
+		return 0;
+	}
+	
+	/*
+	 * 		For a given zipcode, call API to get latitude and zipcode information. 
+	 */
+	private final ObjectMapper mapper = new ObjectMapper(); 
+	
+	private Map<String, Object> callRapidGetZipCodeInfo(String zipcode) {
+		Map<String, Object> zipInfo = new HashMap<>(); 
+		
+		StringBuilder URLlink = new StringBuilder("https://redline-redline-zipcode.p.rapidapi.com/rest/multi-info.json/"); 
+		URLlink.append(zipcode); 
+		URLlink.append("/degrees"); 
+		
+		try {
+			HttpResponse<String> response = Unirest.get(URLlink.toString())
+					.header("x-rapidapi-host", HOST_NAME)
+					.header("x-rapidapi-key", ACCESS_KEY)
+					.asString();
+			
+			try {
+				// Parse from JSON to Map<String, Object>
+				zipInfo = mapper.readValue(response.getBody(), new TypeReference<HashMap<String,Object>>(){});
+			} catch (JsonMappingException e) {
+				e.printStackTrace();
+			} catch (JsonProcessingException e) {
+				e.printStackTrace();
+			} 
+		} catch (UnirestException e) {
+			e.printStackTrace();
+		}
+		return (Map<String, Object>) zipInfo.get(zipcode); 
+	}
+	
+	/*
+	 * 		Check if a string is a valid zipcode and get zipcode in int type
+	 */
 	private Integer getZipcode(String str) {
 		// Check if str is a 5-digit zipcode. 
 		if (str != null && str.length() != 5) {
@@ -123,25 +222,22 @@ public class EventRepositoryImpl implements EventRepository {
 		return zipcode; 
 	}
 
-	private HashSet<String> getIgnoreKeys() {
-		
-		HashSet<String> ignoreKeys = new HashSet<>(); 
-		
-		ignoreKeys.add("event_type_code"); 
-		ignoreKeys.add("event_id"); 
-		ignoreKeys.add("event_status_code"); 
-		ignoreKeys.add("organizer_id"); 
-		ignoreKeys.add("venue_id"); 
-		
-		return ignoreKeys; 
-	}
-
+	/*
+	 * 	----------------------------------------------------------------------------------------------------
+	 * 				Get all the event related information and store them in List<EventTable>
+	 *  ----------------------------------------------------------------------------------------------------
+	 */
 	@Override
 	public List<EventTable> getAllEvents() {
 		// Get all related event information
 		return jdbcTemplate.query(GET_ALL_EVENT, new EventRowmapper()); 
 	}
 	
+	/*
+	 * 	----------------------------------------------------------------------------------------------------
+	 * 				Get an event based on event_id
+	 *  ----------------------------------------------------------------------------------------------------
+	 */
 	public List<EventTable> getEventByID(int event_id) {
 		// Implementation for GET event by EVENT_ID
 		List<EventTable> allEvents = getAllEvents(); 
@@ -157,8 +253,11 @@ public class EventRepositoryImpl implements EventRepository {
 		return resultEvent; 
 	}
 	
-	private final SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd"); 
-	
+	/*
+	 * 	----------------------------------------------------------------------------------------------------
+	 * 				Get all the events within a date range
+	 *  ----------------------------------------------------------------------------------------------------
+	 */
 	@Override
 	public List<Map> getFilteredEvents(List<EventTable> allEvent, Timestamp start_date, Timestamp end_date) {
 		// Convert EventTable to Map
@@ -318,6 +417,12 @@ public class EventRepositoryImpl implements EventRepository {
 		
 		param.put("zipcode", eventTable.getZipcode() == null ? 
 				null :eventTable.getZipcode());
+		
+		param.put("latitude", eventTable.getLatitude() == null ? 
+				null : eventTable.getLatitude());
+		
+		param.put("longitude", eventTable.getLongitude() == null ? 
+				null : eventTable.getLongitude()); 
 		
 		param.put("event_type_description", eventTable.getEvent_type_description() == null || eventTable.getEvent_type_description().isEmpty() ? 
 				null :eventTable.getEvent_type_description());

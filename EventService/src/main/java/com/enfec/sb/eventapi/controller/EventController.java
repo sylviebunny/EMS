@@ -1,5 +1,6 @@
 package com.enfec.sb.eventapi.controller;
 
+import java.rmi.NotBoundException;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
@@ -60,18 +61,23 @@ public class EventController {
 	public ResponseEntity<String> getEventListByFilterBar (
 			@PathVariable(required = false) String anything) {
 
+
 			// Get all events information from database and get all related information 
 			// Put them into List<EventTable>
 			List<EventTable> getAllEvent = eventRepositoryImpl.getAllEvents(); 
-			
-			List<Map> resultEvents = eventRepositoryImpl.getFilteredEvents(getAllEvent, anything); 
-			
-			if (resultEvents.isEmpty()) {
+			try {
+				List<Map> resultEvents = eventRepositoryImpl.getFilteredEvents(getAllEvent, anything); 
+				
+				if (resultEvents.isEmpty()) {
+					return new ResponseEntity<>(
+							"{\"message\" : \"No event found\"}", HttpStatus.OK);
+				} else {
+					return new ResponseEntity<>(
+							new Gson().toJson(resultEvents), HttpStatus.OK);
+				}
+			} catch (NotBoundException nbe) {
 				return new ResponseEntity<>(
-						"{\"message\" : \"No event found\"}", HttpStatus.OK);
-			} else {
-				return new ResponseEntity<>(
-						new Gson().toJson(resultEvents), HttpStatus.OK);
+						"{\"message\" : \"Not a valid zipcode\"}", HttpStatus.OK);
 			}
 	}
 	

@@ -45,7 +45,7 @@ public class SeatRepositoryImpl implements SeatRepository{
 	                ps.setInt(2, seat.getCategory_ID() );
 	                ps.setString(3, seat.getRow_Number() );
 	                ps.setString(4, seat.getCol_Number());
-	                ps.setBoolean(5, seat.isAvailability());
+	                ps.setString(5, seat.getAvailability());
 	                return ps;
 	              }, keyHolder);
 	    return count;
@@ -128,7 +128,7 @@ public class SeatRepositoryImpl implements SeatRepository{
 		param.put("Category_ID", seat.getCategory_ID() != 0 ? seat.getCategory_ID() : null);
 		param.put("Row_Number", seat.getRow_Number() == null || seat.getRow_Number().isEmpty() ? null:seat.getRow_Number());
 		param.put("Col_Number", seat.getCol_Number() == null || seat.getCol_Number().isEmpty() ? null:seat.getCol_Number());
-		param.put("Availability", seat.isAvailability() ? seat.isAvailability() : null);
+		param.put("Availability", seat.getAvailability() == null || seat.getAvailability().isEmpty() ? null:seat.getAvailability());
 		return param;
 	}
 }

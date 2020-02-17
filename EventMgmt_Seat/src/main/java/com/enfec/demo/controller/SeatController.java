@@ -33,11 +33,11 @@ public class SeatController {
 						"{\"message\" : \"Seat created\"}", HttpStatus.OK);
 			}
 		} catch (DataIntegrityViolationException dataIntegrityViolationException) {
-			return new ResponseEntity<>("{\"message\" : \"Bad Request: invalid info\"}",
+			return new ResponseEntity<>("{\"message\" : \"Room_id or category_id not found or Invalid input\"}",
 					HttpStatus.BAD_REQUEST);
 		} catch (Exception exception) {
 			return new ResponseEntity<>(
-					"{\"message\" : \"Exception in creating seat info\"}",
+					"{\"message\" : \"Exception in creating seat info, please contact admin\"}",
 					HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -56,7 +56,7 @@ public class SeatController {
 			}
 		} catch (Exception e) {
 			return new ResponseEntity<>(
-					"{\"message\" : \"Exception in getting seat info\"}",
+					"{\"message\" : \"Exception in getting seat info, please contact admin\"}",
 					HttpStatus.INTERNAL_SERVER_ERROR);
 		} 
 	}
@@ -68,17 +68,17 @@ public class SeatController {
 			int affectedRow = SeatRepositoryImpl.updateSeat(seat);
 			if (affectedRow == 0) {
 				return new ResponseEntity<>(
-						"{\"message\" : \"Seat not found\"}", HttpStatus.OK);
+						"{\"message\" : \"Input seat_id not found\"}", HttpStatus.OK);
 			} else {
 				return new ResponseEntity<>(
 						"{\"message\" : \"Seat updated\"}", HttpStatus.OK);
 			}
 		} catch (DataIntegrityViolationException dataIntegrityViolationException) {
-			return new ResponseEntity<>("{\"message\" : \"Bad Request: invalid info\"}",
+			return new ResponseEntity<>("{\"message\" : \"Room_id or category_id not found or Invalid input\"}",
 					HttpStatus.BAD_REQUEST);
 		} catch (Exception exception) {
 			return new ResponseEntity<>(
-					"{\"message\" : \"Exception in updating seat info\"}",
+					"{\"message\" : \"Exception in updating seat info, please contact admin\"}",
 					HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -93,11 +93,11 @@ public class SeatController {
 						"{\"message\" : \"Seat deleted\"}", HttpStatus.OK);
 			} else {
 				return new ResponseEntity<>(
-						"{\"message\" : \"Seat is not able to delete\"}", HttpStatus.OK);
+						"{\"message\" : \"Seat not found\"}", HttpStatus.OK);
 			}
 		} catch (Exception e) {
 			return new ResponseEntity<>(
-					"{\"message\" : \"Exception in deleting seat info\"}",
+					"{\"message\" : \"Exception in deleting seat info, please contact admin\"}",
 					HttpStatus.INTERNAL_SERVER_ERROR);
 		} 
 	}
@@ -109,7 +109,7 @@ public class SeatController {
 			List<Seat> seatList = SeatRepositoryImpl.getAvailableSeatInfo(Room_ID);
 			if (seatList.isEmpty()) {
 				return new ResponseEntity<>(
-						"{\"message\" : \"No available seat found\"}", HttpStatus.OK);
+						"{\"message\" : \"Room not found or No available seat\"}", HttpStatus.OK);
 			} else {
 				return new ResponseEntity<>(
 						new Gson().toJson((SeatRepositoryImpl
@@ -117,7 +117,7 @@ public class SeatController {
 			}
 		} catch (Exception e) {
 			return new ResponseEntity<>(
-					"{\"message\" : \"Exception in getting available seats info\"}",
+					"{\"message\" : \"Exception in getting available seats info, please contact admin\"}",
 					HttpStatus.INTERNAL_SERVER_ERROR);
 		} 
 	}

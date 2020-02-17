@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.enfec.demo.exception.RecordNotFoundException;
 import com.enfec.demo.model.Venue;
 import com.enfec.demo.repository.VenueRepositoryImpl;
 import com.google.gson.Gson;
@@ -35,11 +36,11 @@ public class VenueController {
 						"{\"message\" : \"Venue created\"}", HttpStatus.OK);
 			}
 		} catch (DataIntegrityViolationException dataIntegrityViolationException) {
-			return new ResponseEntity<>("{\"message\" : \"Bad Request: invalid info\"}",
+			return new ResponseEntity<>("{\"message\" : \"Invalid input\"}",
 					HttpStatus.BAD_REQUEST);
 		} catch (Exception exception) {
 			return new ResponseEntity<>(
-					"{\"message\" : \"Exception in creating venue info\"}",
+					"{\"message\" : \"Exception in creating venue info, please contact admin\"}",
 					HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -58,7 +59,7 @@ public class VenueController {
 			}
 		} catch (Exception e) {
 			return new ResponseEntity<>(
-					"{\"message\" : \"Exception in getting venue info\"}",
+					"{\"message\" : \"Exception in getting venue info, please contact admin\"}",
 					HttpStatus.INTERNAL_SERVER_ERROR);
 		} 
 	}
@@ -71,17 +72,17 @@ public class VenueController {
 
 			if (affectedRow == 0) {
 				return new ResponseEntity<>(
-						"{\"message\" : \"Venue not found\"}", HttpStatus.OK);
+						"{\"message\" : \"Input venue_id not found\"}", HttpStatus.OK);
 			} else {
 				return new ResponseEntity<>(
 						"{\"message\" : \"Venue updated\"}", HttpStatus.OK);
 			}
 		} catch (DataIntegrityViolationException dataIntegrityViolationException) {
-			return new ResponseEntity<>("{\"message\" : \"Bad Request: invalid info\"}",
+			return new ResponseEntity<>("{\"message\" : \"Invalid input\"}",
 					HttpStatus.BAD_REQUEST);
 		} catch (Exception exception) {
 			return new ResponseEntity<>(
-					"{\"message\" : \"Exception in updating venue info\"}",
+					"{\"message\" : \"Exception in updating venue info, please contact admin\"}",
 					HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -96,11 +97,11 @@ public class VenueController {
 						"{\"message\" : \"Venue deleted\"}", HttpStatus.OK);
 			} else {
 				return new ResponseEntity<>(
-						"{\"message\" : \"Venue is not able to delete\"}", HttpStatus.OK);
+						"{\"message\" : \"Venue not found\"}", HttpStatus.OK);
 			}
 		} catch (Exception e) {
 			return new ResponseEntity<>(
-					"{\"message\" : \"Exception in deleting venue info\"}",
+					"{\"message\" : \"Exception in deleting venue info, please contact admin\"}",
 					HttpStatus.INTERNAL_SERVER_ERROR);
 		} 
 	}

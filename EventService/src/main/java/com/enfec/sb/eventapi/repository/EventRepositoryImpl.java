@@ -145,11 +145,12 @@ private static final String GET_ALL_VENUE = "SELECT * FROM Venue_Address";
 		// Reorganize all List<Map> from nearest to farthest based on given zipcode. 
 //		Collections.sort(inputEventList, new sortByZipcode(zipcode));
 		
-		storeZipcodeInfo(); 
+		int inserted_row = storeZipcodeInfo(); 
 		
 		return inputEventList;
 	}
 
+	private static final String FILL_ZIPCODE_INFO = "UPDATE Venue_Address SET Latitude =:lat,Longitude =:lng WHERE Zipcode =:zip_code";
 	/* 
 	 *  	Store zipcodes information in Venue_Address table after calling public API. 
 	 */
@@ -158,23 +159,33 @@ private static final String GET_ALL_VENUE = "SELECT * FROM Venue_Address";
 		// venue_address table 
 		List<EventTable> allVenue = jdbcTemplate.query(GET_ALL_VENUE, new EventRowmapper());
 		
+		int count_affected_row = 0; 
+		
 		for (EventTable eachVenue: allVenue) {
-			if (eachVenue.getLatitude() == 0.0 || eachVenue.getLongitude() == 0.0) {
-				// Don't have zip code information, so need to call public API to get current zip code info 
-				if (eachVenue.getZipcode() != null) {
+			if (eachVenue.getZipcode() != null && eachVenue.getZipcode() != 0) {
+				if (eachVenue.getLatitude() == 0.0 || eachVenue.getLongitude() == 0.0) {
+					
+					// Don't have zipcode information, so need to call public API to get current zip code info 
 					Map<String, Object> zipInfo = callRapidGetZipCodeInfo(eachVenue.getZipcode().toString());
 					Double latitude = (Double)zipInfo.get("lat"); 
-					Double longitude = (Double)zipInfo.get("lng"); 
+					Double longitude = (Double)zipInfo.get("lng");
+					
+					// Store zipcode info into database
+					SqlParameterSource pramSource = new MapSqlParameterSource(zipInfo);
+					count_affected_row += namedParameterJdbcTemplate.update(FILL_ZIPCODE_INFO, pramSource);
 				}
 			}
 		}
-		return 0;
+		return count_affected_row;
 	}
 	
 	/*
 	 * 		For a given zipcode, call API to get latitude and zipcode information. 
 	 */
 	private final ObjectMapper mapper = new ObjectMapper(); 
+	
+	private final String HOST_NAME = "redline-redline-zipcode.p.rapidapi.com"; 
+	private final String ACCESS_KEY = "58142ab02fmsh8f7533fdeadef97p188c6ejsnb3d5d912460e"; 
 	
 	private Map<String, Object> callRapidGetZipCodeInfo(String zipcode) {
 		Map<String, Object> zipInfo = new HashMap<>(); 

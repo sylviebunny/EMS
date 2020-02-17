@@ -15,7 +15,10 @@ public class TicketTable {
 	private int eventID;
 	private int roomID;
 	private int seatID;
+	private int discountType;
 	private double realPrice;
 	
+	private double originalPrice;
+	private double percentage_Off;
 
 }

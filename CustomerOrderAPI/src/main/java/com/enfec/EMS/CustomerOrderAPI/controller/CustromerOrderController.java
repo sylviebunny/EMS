@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.enfec.EMS.CustomerOrderAPI.model.CustomerOrderTable;
+import com.enfec.EMS.CustomerOrderAPI.model.DiscountTable;
 import com.enfec.EMS.CustomerOrderAPI.model.TicketTable;
 import com.enfec.EMS.CustomerOrderAPI.repository.CustomerOrderRepositoryImpl;
 import com.google.gson.Gson;
@@ -129,79 +130,173 @@ public class CustromerOrderController {
 	
 	
 	//Create ticket
-		@RequestMapping(value = "/Ticket/Create", method = RequestMethod.POST, produces = "applications/json; charset=UTF-8")
-		public ResponseEntity<String>createTicket(
-				@RequestBody(required = true) TicketTable ticketTable){
-			try {
-				int affectedRow = customerOrderRepositoryImpl.createTicket(ticketTable);
-				if(affectedRow == 0) {
-					logger.info("Ticket not created customerOrderID: {}", ticketTable.getCustomerOrderID());
-					return new ResponseEntity<String>(
-							"{\"message\" : \"Ticket not created\"}",
-							HttpStatus.OK);
-				}else {
-					logger.info("Ticket created customerOrderID: {}", ticketTable.getCustomerOrderID());
-					return new ResponseEntity<String>("{\"message\": \"Ticket created\"}", HttpStatus.OK);
-				}
-			
-			}catch(DataIntegrityViolationException dataIntegrityViolationException){
-				logger.error("Invalid ticket id:{}", ticketTable.getTicketID());
+	@RequestMapping(value = "/Ticket/Create", method = RequestMethod.POST, produces = "applications/json; charset=UTF-8")
+	public ResponseEntity<String>createTicket(
+			@RequestBody(required = true) TicketTable ticketTable){
+		try {
+			int affectedRow = customerOrderRepositoryImpl.createTicket(ticketTable);
+			if(affectedRow == 0) {
+				logger.info("Ticket not created customerOrderID: {}", ticketTable.getCustomerOrderID());
 				return new ResponseEntity<String>(
-						"{\"message\": \"Invalid ticket id\"}", 
-						HttpStatus.BAD_REQUEST);
-			}catch(Exception exception){
-				logger.error("Exceprtion in creating Ticket:{}", exception.getMessage());
-				return new ResponseEntity<String>(
-						"{\"message\": \"Exception in creating Ticket info\"}", 
-						HttpStatus.INTERNAL_SERVER_ERROR);
+						"{\"message\" : \"Ticket not created\"}",
+						HttpStatus.OK);
+			}else {
+				logger.info("Ticket created customerOrderID: {}", ticketTable.getCustomerOrderID());
+				return new ResponseEntity<String>("{\"message\": \"Ticket created\"}", HttpStatus.OK);
 			}
+		
+		}catch(DataIntegrityViolationException dataIntegrityViolationException){
+			logger.error("Invalid ticket id:{}", ticketTable.getTicketID());
+			return new ResponseEntity<String>(
+					"{\"message\": \"Invalid ticket id\"}", 
+					HttpStatus.BAD_REQUEST);
+		}catch(Exception exception){
+			logger.error("Exceprtion in creating Ticket:{}", exception.getMessage());
+			return new ResponseEntity<String>(
+					"{\"message\": \"Exception in creating Ticket info\"}", 
+					HttpStatus.INTERNAL_SERVER_ERROR);
 		}
+	}
 		
 		
-		//Update ticket
-		@RequestMapping(value = "/Ticket/Update", method = RequestMethod.PUT, produces = "applications/json; charset=UTF-8")
-		public ResponseEntity<String>updateTicket(
-				@RequestBody(required = true) TicketTable ticketTable){
-			try {
-				int affectedRow = customerOrderRepositoryImpl.updateTicket(ticketTable);
-				if(affectedRow == 0) {
-					logger.info("Ticket not updated customerOrderID: {}", ticketTable.getCustomerOrderID());
-					return new ResponseEntity<String>(
-							"{\"message\" : \"Ticket not updated\"}",
-							HttpStatus.OK);
-				}else {
-					logger.info("Custoer updated customerOrderID: {}", ticketTable.getCustomerOrderID());
-					return new ResponseEntity<String>(
-							"{\"message\": \"Ticket updated\"}", HttpStatus.OK);
-				}
-			
-			}catch(DataIntegrityViolationException dataIntegrityViolationException){
-				logger.error("Invalid Ticket id:{}", ticketTable.getTicketID());
+	//Update ticket
+	@RequestMapping(value = "/Ticket/Update", method = RequestMethod.PUT, produces = "applications/json; charset=UTF-8")
+	public ResponseEntity<String>updateTicket(
+			@RequestBody(required = true) TicketTable ticketTable){
+		try {
+			int affectedRow = customerOrderRepositoryImpl.updateTicket(ticketTable);
+			if(affectedRow == 0) {
+				logger.info("Ticket not updated customerOrderID: {}", ticketTable.getCustomerOrderID());
 				return new ResponseEntity<String>(
-						"{\"message\": \"Invalid Ticket id\"}", HttpStatus.BAD_REQUEST);
-			}catch(Exception exception){
-				logger.error("Exceprtion in updating Ticket:{}", exception.getMessage());
+						"{\"message\" : \"Ticket not updated\"}",
+						HttpStatus.OK);
+			}else {
+				logger.info("Custoer updated customerOrderID: {}", ticketTable.getCustomerOrderID());
 				return new ResponseEntity<String>(
-						"{\"message\": \"Exception in updating Ticket info\"}", 
-						HttpStatus.INTERNAL_SERVER_ERROR);
+						"{\"message\": \"Ticket updated\"}", HttpStatus.OK);
 			}
-		}
 		
-		@RequestMapping(value = "/Ticket/Delete/{ticketID}", method = RequestMethod.DELETE, produces = "application/json;charset=UTF-8")
-		public ResponseEntity<String> deleteTicket(
-				@PathVariable String ticketID) {
+		}catch(DataIntegrityViolationException dataIntegrityViolationException){
+			logger.error("Invalid Ticket id:{}", ticketTable.getTicketID());
+			return new ResponseEntity<String>(
+					"{\"message\": \"Invalid Ticket id\"}", HttpStatus.BAD_REQUEST);
+		}catch(Exception exception){
+			logger.error("Exceprtion in updating Ticket:{}", exception.getMessage());
+			return new ResponseEntity<String>(
+					"{\"message\": \"Exception in updating Ticket info\"}", 
+					HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+		
+		
+	//Delete ticket
+	@RequestMapping(value = "/Ticket/Delete/{ticketID}", method = RequestMethod.DELETE, produces = "application/json;charset=UTF-8")
+	public ResponseEntity<String> deleteTicket(
+			@PathVariable String ticketID) {
 
-				int affectedRow = customerOrderRepositoryImpl.deleteTicket(ticketID);
-				if (affectedRow==0) {
-					return new ResponseEntity<>(
-							"{\"message\" : \"Ticket not found\"}", HttpStatus.OK);
-				}else {
+			int affectedRow = customerOrderRepositoryImpl.deleteTicket(ticketID);
+			if (affectedRow==0) {
 				return new ResponseEntity<>(
-						"{\"message\" : \"Ticket deleted\"}", HttpStatus.OK);
-				}
-				
+						"{\"message\" : \"Ticket not found\"}", HttpStatus.OK);
+			}else {
+			return new ResponseEntity<>(
+					"{\"message\" : \"Ticket deleted\"}", HttpStatus.OK);
+			}
+			
 
+	}
+	
+	
+	
+	//Discount Functions
+	//Get discount
+	@RequestMapping(value = "/Discount/{discountID}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
+	public ResponseEntity<String>getDiscountList(@PathVariable String discountID) { 
+			List<DiscountTable> discouontList = customerOrderRepositoryImpl.getDiscount(discountID);
+			if (discouontList.isEmpty()) {
+				logger.info("No Discount found for: {} ", discountID);
+				return new ResponseEntity<>(
+						"{\"message\" : \"No Discount found\"}", HttpStatus.OK);
+			
+			}
+			return new ResponseEntity<>(
+					new Gson().toJson((customerOrderRepositoryImpl.getDiscount(discountID))), HttpStatus.OK);
 		}
+	
+	
+	//Create discount
+	@RequestMapping(value = "/Discount/Create", method = RequestMethod.POST, produces = "applications/json; charset=UTF-8")
+	public ResponseEntity<String>createDiscount(
+			@RequestBody(required = true) DiscountTable discountTable){
+		try {
+			int affectedRow = customerOrderRepositoryImpl.createDiscount(discountTable);
+			if(affectedRow == 0) {
+				logger.info("Discount not created discountName: {}", discountTable.getDiscountName());
+				return new ResponseEntity<String>(
+						"{\"message\" : \"Discount not created\"}",
+						HttpStatus.OK);
+			}else {
+				logger.info("Discount created discountName: {}", discountTable.getDiscountName());
+				return new ResponseEntity<String>("{\"message\": \"Discount created\"}", HttpStatus.OK);
+			}
+		
+		}catch(DataIntegrityViolationException dataIntegrityViolationException){
+			logger.error("Invalid discount id:{}", discountTable.getDiscountID());
+			return new ResponseEntity<String>(
+					"{\"message\": \"Invalid discount id\"}", 
+					HttpStatus.BAD_REQUEST);
+		}catch(Exception exception){
+			logger.error("Exceprtion in creating Discount:{}", exception.getMessage());
+			return new ResponseEntity<String>(
+					"{\"message\": \"Exception in creating Discount info\"}", 
+					HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+			
+			
+	//Update Discount
+	@RequestMapping(value = "/Discount/Update", method = RequestMethod.PUT, produces = "applications/json; charset=UTF-8")
+	public ResponseEntity<String>updateDiscount(
+			@RequestBody(required = true) DiscountTable discountTable){
+		try {
+			int affectedRow = customerOrderRepositoryImpl.updateDiscount(discountTable);
+			if(affectedRow == 0) {
+				logger.info("Discount not updated discountName: {}", discountTable.getDiscountName());
+				return new ResponseEntity<String>(
+						"{\"message\" : \"Discount not updated\"}",
+						HttpStatus.OK);
+			}else {
+				logger.info("Discount updated discountName: {}", discountTable.getDiscountName());
+				return new ResponseEntity<String>(
+						"{\"message\": \"Discount updated\"}", HttpStatus.OK);
+			}
+		
+		}catch(DataIntegrityViolationException dataIntegrityViolationException){
+			logger.error("Invalid Discount id:{}", discountTable.getDiscountID());
+			return new ResponseEntity<String>(
+					"{\"message\": \"Invalid Discount id\"}", HttpStatus.BAD_REQUEST);
+		}catch(Exception exception){
+			logger.error("Exceprtion in updating Discount:{}", exception.getMessage());
+			return new ResponseEntity<String>(
+					"{\"message\": \"Exception in updating Discount info\"}", 
+					HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+		
+	//Delete discount
+	@RequestMapping(value = "/Discount/Delete/{discountID}", method = RequestMethod.DELETE, produces = "application/json;charset=UTF-8")
+	public ResponseEntity<String> deleteDiscount(@PathVariable String discountID) {
+
+			int affectedRow = customerOrderRepositoryImpl.deleteDiscount(discountID);
+			if (affectedRow==0) {
+				return new ResponseEntity<>(
+						"{\"message\" : \"Discount not found\"}", HttpStatus.OK);
+			}else {
+			return new ResponseEntity<>(
+					"{\"message\" : \"Discount deleted\"}", HttpStatus.OK);
+			}
+	
+	}
 	
 	
 }

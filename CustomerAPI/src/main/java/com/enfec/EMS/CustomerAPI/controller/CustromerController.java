@@ -2,6 +2,7 @@ package com.enfec.EMS.CustomerAPI.controller;
 
 
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -113,5 +114,18 @@ public class CustromerController {
 			}
 
 	}
+	
+	@RequestMapping(value = "/Customers/Login", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
+	public ResponseEntity<String>cLogin(@RequestBody(required = true) CustomerTable customerTable) { 
+			boolean isMatch = customerRepositoryImpl.isMatching(customerTable.getEmail(), customerTable.getPsw());
+			if(isMatch) {
+				return new ResponseEntity<>(
+						"{\"message\" : \"Customer login success\"}", HttpStatus.OK);
+			}else {
+			return new ResponseEntity<>(
+					"{\"message\" : \"Customer login fail\"}", HttpStatus.OK);
+			}
+			
+		}
 	
 }

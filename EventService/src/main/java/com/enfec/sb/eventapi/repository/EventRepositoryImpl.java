@@ -27,7 +27,8 @@ import org.springframework.stereotype.Component;
 
 import com.enfec.sb.eventapi.model.EventRowmapper;
 import com.enfec.sb.eventapi.model.EventTable;
-import com.enfec.sb.eventapi.model.sortByDistance;
+import com.enfec.sb.eventapi.model.SortByDistance;
+import com.enfec.sb.eventapi.model.SortByStartTime;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -122,6 +123,7 @@ private static final String GET_ALL_VENUE = "SELECT * FROM Venue_Address";
 				}
 			}
 		}
+		Collections.sort(afterFilter, new SortByStartTime());
 		return afterFilter; 
 	}
 	
@@ -160,6 +162,7 @@ private static final String GET_ALL_VENUE = "SELECT * FROM Venue_Address";
 		}
 		double givenLat = (double)mapedGivenZipcode.get("lat"); 
 		double givenLng = (double)mapedGivenZipcode.get("lng"); 
+	
 		
 		for (Map eachEvent: inputEventList) {
 			// Get distance between the coordinates of given zipcode and the coordinates of each event
@@ -172,9 +175,23 @@ private static final String GET_ALL_VENUE = "SELECT * FROM Venue_Address";
 			}
 		}
 		
-		Collections.sort(inputEventList, new sortByDistance());
+		// Filter all events that are within 50 miles
+		List<Map> resultList = new ArrayList<>(); 
+		for (Map eachEvent: inputEventList) {
+			Object currDis = eachEvent.get("distance_between"); 
+			if (currDis != null && (double)currDis < 50.0) {
+				resultList.add(eachEvent); 
+			}
+		}
 		
-		return inputEventList;
+		// If no event in result list, then print out all events 
+		if (resultList.isEmpty()) {
+			Collections.sort(inputEventList, new SortByDistance());
+			return inputEventList; 
+		} else {
+			Collections.sort(resultList, new SortByDistance()); 
+			return resultList;
+		}
 	}
 
 	private double getDistance(double givenLat, double givenLng, double currLat, double currLng) {
@@ -231,7 +248,6 @@ private static final String GET_ALL_VENUE = "SELECT * FROM Venue_Address";
 	 * 		For a given zipcode, call API to get latitude and zipcode information. 
 	 */
 	private final ObjectMapper mapper = new ObjectMapper(); 
-	
 	
 	private Map<String, Object> callRapidGetZipCodeInfo(String zipcode) {
 		Map<String, Object> zipInfo = new HashMap<>(); 
@@ -334,6 +350,7 @@ private static final String GET_ALL_VENUE = "SELECT * FROM Venue_Address";
 			}
 		}
 		
+		Collections.sort(dateRangeEvents, new SortByStartTime()); 
 		return dateRangeEvents; 
 	}
 	

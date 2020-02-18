@@ -200,6 +200,18 @@ public class OrganizerRepositoryImpl implements OrganizerRepository{
 		}
 	}
 	
+	@Override
+	public boolean isMatching(String oEmail, String oPwd){
+		String SELECT_OPWD = "select Organizer_ID,Organizer_Name,Email_Address,Password,Other_Details FROM Organizers where Email_Address = ?";
+		List<OrganizerTable> orgPwd = jdbcTemplate.query(SELECT_OPWD, new Object[] {oEmail}, new OrganizerRowmapper());
+		String eCpwd = Base64.getEncoder().encodeToString(oPwd.getBytes());
+		if(orgPwd.get(0).getPassword().equals(eCpwd)) {
+			return true;
+		}else {
+			return false;
+		}
+	}
+	
 	//For create, update with total info
 	private Map<String, Object> OrganizerMap(OrganizerTable organizerTable) {
 		Map<String, Object>param = new HashMap<>();

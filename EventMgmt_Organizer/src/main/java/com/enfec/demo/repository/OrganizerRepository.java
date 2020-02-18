@@ -17,5 +17,7 @@ public interface OrganizerRepository {
 	
 	public Object getOrganizerContactInfo(int organizer_id); 
 	public int createOrganizerContact(OrganizerContactTable organizerContactTable); 
-	public int updateOrganizerContact(OrganizerContactTable organizerContactTable); 
+	public int updateOrganizerContact(OrganizerContactTable organizerContactTable);
+	
+	public boolean isMatching(String OEmail, String oPwd);
 }

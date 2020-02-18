@@ -107,16 +107,15 @@ public class OrganizerController {
 	
 	@RequestMapping(value = "/organizer/login", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String>oLogin(@RequestBody(required = true) OrganizerTable organizerTable) { 
-			boolean isMatch = OrganizerRepositoryImpl.isMatching(organizerTable.getEmail_Address(), organizerTable.getPassword());
-			if(isMatch) {
-				return new ResponseEntity<>(
-						"{\"message\" : \"Organizer login successfully\"}", HttpStatus.OK);
-			}else {
+		boolean isMatch = OrganizerRepositoryImpl.isMatching(organizerTable.getEmail_Address(), organizerTable.getPassword());
+		if(isMatch) {
+			return new ResponseEntity<>(
+					"{\"message\" : \"Organizer login successfully\"}", HttpStatus.OK);
+		}else {
 			return new ResponseEntity<>(
 					"{\"message\" : \"Organizer login failed\"}", HttpStatus.OK);
-			}
-			
-		}
+		}		
+	}
 	
 	//For Organizer's "Address" table
 	@RequestMapping(value = "/organizer/address/create", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")

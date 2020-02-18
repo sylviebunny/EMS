@@ -34,11 +34,11 @@ public class seatCategoryController {
 							"{\"message\" : \"Seat category created\"}", HttpStatus.OK);
 				}
 			} catch (DataIntegrityViolationException dataIntegrityViolationException) {
-				return new ResponseEntity<>("{\"message\" : \"Bad Request: invalid info\"}",
+				return new ResponseEntity<>("{\"message\" : \"Invalid input\"}",
 						HttpStatus.BAD_REQUEST);
 			} catch (Exception exception) {
 				return new ResponseEntity<>(
-						"{\"message\" : \"Exception in creating seat category info\"}",
+						"{\"message\" : \"Exception in creating seat category info, please contact admin\"}",
 						HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 	}
@@ -57,7 +57,7 @@ public class seatCategoryController {
 			} 
 		} catch (Exception e) {
 				return new ResponseEntity<>(
-						"{\"message\" : \"Exception in getting seat category info\"}",
+						"{\"message\" : \"Exception in getting seat category info, please contact admin\"}",
 						HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -75,11 +75,11 @@ public class seatCategoryController {
 						"{\"message\" : \"Seat category updated\"}", HttpStatus.OK);
 			} 
 		} catch (DataIntegrityViolationException dataIntegrityViolationException) {
-			return new ResponseEntity<>("{\"message\" : \"Bad Request: invalid info\"}",
+			return new ResponseEntity<>("{\"message\" : \"Invalid input\"}",
 					HttpStatus.BAD_REQUEST);
 		} catch (Exception exception) {
 			return new ResponseEntity<>(
-					"{\"message\" : \"Exception in updating seat category info\"}",
+					"{\"message\" : \"Exception in updating seat category info, please contact admin\"}",
 					HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -94,11 +94,11 @@ public class seatCategoryController {
 						"{\"message\" : \"Seat category deleted\"}", HttpStatus.OK);
 			} else {
 				return new ResponseEntity<>(
-						"{\"message\" : \"Seat category is not able to delete\"}", HttpStatus.OK);
+						"{\"message\" : \"Seat category not found\"}", HttpStatus.OK);
 			}
 		} catch (Exception e) {
 			return new ResponseEntity<>(
-					"{\"message\" : \"Exception in deleting seat category info\"}",
+					"{\"message\" : \"Exception in deleting seat category info, please contact admin\"}",
 					HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}

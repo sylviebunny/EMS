@@ -16,7 +16,7 @@ public class Seat {
 	public int Category_ID;
 	public String Row_Number;
 	public String Col_Number; 
-	public boolean Availability;
+	public String Availability;
 	public String Category_Name;
 	public double Price;
 }

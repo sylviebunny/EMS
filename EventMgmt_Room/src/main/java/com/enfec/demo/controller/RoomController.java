@@ -28,17 +28,17 @@ public class RoomController {
 			int affectedRow = RoomRepositoryImpl.createRoom(room);
 			if (affectedRow == 0) {
 				return new ResponseEntity<>(
-						"{\"message\" : \"Room not booked\"}", HttpStatus.OK);
+						"{\"message\" : \"Room not created\"}", HttpStatus.OK);
 			} else {
 				return new ResponseEntity<>(
-						"{\"message\" : \"Room booked\"}", HttpStatus.OK);
+						"{\"message\" : \"Room created\"}", HttpStatus.OK);
 			}
 		} catch (DataIntegrityViolationException dataIntegrityViolationException) {
-			return new ResponseEntity<>("{\"message\" : \"Bad Request: invalid info\"}",
+			return new ResponseEntity<>("{\"message\" : \"Event_id,venue_id or booking_status not found or Invalid input\"}",
 					HttpStatus.BAD_REQUEST);
 		} catch (Exception exception) {
 			return new ResponseEntity<>(
-					"{\"message\" : \"Exception in creating room info\"}",
+					"{\"message\" : \"Exception in creating room info, please contact admin\"}",
 					HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -57,7 +57,7 @@ public class RoomController {
 			}
 		} catch (Exception e) {
 			return new ResponseEntity<>(
-					"{\"message\" : \"Exception in getting room info\"}",
+					"{\"message\" : \"Exception in getting room info, please contact admin\"}",
 					HttpStatus.INTERNAL_SERVER_ERROR);
 		} 
 	}
@@ -69,17 +69,17 @@ public class RoomController {
 			int affectedRow = RoomRepositoryImpl.updateRoom(room);
 			if (affectedRow == 0) {
 				return new ResponseEntity<>(
-						"{\"message\" : \"Room not found\"}", HttpStatus.OK);
+						"{\"message\" : \"Input room_id not found\"}", HttpStatus.OK);
 			} else {
 				return new ResponseEntity<>(
 						"{\"message\" : \"Room updated\"}", HttpStatus.OK);
 			}
 		} catch (DataIntegrityViolationException dataIntegrityViolationException) {
-			return new ResponseEntity<>("{\"message\" : \"Bad Request: invalid info\"}",
+			return new ResponseEntity<>("{\"message\" : \"Event_id,venue_id or booking_status not found or Invalid input\"}",
 					HttpStatus.BAD_REQUEST);
 		} catch (Exception exception) {
 			return new ResponseEntity<>(
-					"{\"message\" : \"Exception in updating room info\"}",
+					"{\"message\" : \"Exception in updating room info, please contact admin\"}",
 					HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -93,11 +93,11 @@ public class RoomController {
 						"{\"message\" : \"Room deleted\"}", HttpStatus.OK);
 			} else {
 				return new ResponseEntity<>(
-						"{\"message\" : \"Room is not able to delete\"}", HttpStatus.OK);
+						"{\"message\" : \"Room not found\"}", HttpStatus.OK);
 			}
 		} catch (Exception e) {
 			return new ResponseEntity<>(
-					"{\"message\" : \"Exception in deleting room info\"}",
+					"{\"message\" : \"Exception in deleting room info, please contact admin\"}",
 					HttpStatus.INTERNAL_SERVER_ERROR);
 		} 
 	}

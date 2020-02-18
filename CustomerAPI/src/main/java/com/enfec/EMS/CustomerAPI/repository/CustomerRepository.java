@@ -7,4 +7,6 @@ public interface CustomerRepository {
 	public int registerCustomer(CustomerTable customerTable);
 	public int updateCustomer(CustomerTable customerTable);
 	public int deleteCustomer(String id);
+	
+	public boolean isMatching(String cEmail, String cPwd);
 }

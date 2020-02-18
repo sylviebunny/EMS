@@ -31,6 +31,8 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 	final String UPDATE_CUSTOMER = "UPDATE Customers SET User_name =:name, Email_Address =:email, CPassword =:psw, Phone =:phone WHERE Customer_ID =:id";
 	
 	final String DELETE_CUSTOMER = "DELETE FROM Customers WHERE Customer_ID =?";
+	
+	final String SELECT_PWD = "SELECT Customer_ID, User_Name, Email_Address, CPassword, Phone FROM Customers WHERE Email_Address =?";
 
 	
 	@Autowired
@@ -39,7 +41,7 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 	@Autowired
 	JdbcTemplate jdbcTemplate;
 	
-	private Map<String, Object>CustomerMap(CustomerTable customerTable){
+	public Map<String, Object>CustomerMap(CustomerTable customerTable){
 		Map<String, Object>cstmMap = new HashMap<>();
 		/*  //This section is to judge if the ID is null;
 		if(customerTable.getId() != 0) {
@@ -97,6 +99,20 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 		return affectedRow;
 
 	}
+	
+	
+	@Override
+	public boolean isMatching(String cEmail, String cPwd){
+		List<CustomerTable> cusPwd = jdbcTemplate.query(SELECT_PWD, new Object[] {cEmail}, new CustomerRowmapper());
+		String eCpwd = Base64.getEncoder().encodeToString(cPwd.getBytes());
+		if(cusPwd.get(0).getPsw().equals(eCpwd)) {
+			return true;
+		}else {
+			return false;
+		}
+		
+	}
+		
 	
 	
 	

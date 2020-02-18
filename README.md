@@ -2,7 +2,7 @@
 
 ## Event Service
 
-**../event/search?event_id=1**
+**../event/search?event_id=1**\
        Search event by event_id, this should be only accessed by admin.  
 
 ** ../event/search/{anything} **

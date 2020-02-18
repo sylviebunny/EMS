@@ -4,7 +4,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-public class sortByDistance implements Comparator<Map>{
+public class SortByDistance implements Comparator<Map>{
 	
 	@Override
 	public int compare(Map e1, Map e2) {

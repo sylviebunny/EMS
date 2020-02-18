@@ -78,6 +78,9 @@ public class EventController {
 			} catch (NotBoundException nbe) {
 				return new ResponseEntity<>(
 						"{\"message\" : \"Not a valid zipcode\"}", HttpStatus.OK);
+			} catch (Exception ex) {
+				return new ResponseEntity<>(
+						"{\"message\" : \"Unknown error, please contact with developer\"}", HttpStatus.OK); 
 			}
 	}
 	

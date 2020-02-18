@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.*;
+import java.rmi.NotBoundException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 
@@ -26,7 +27,7 @@ import org.springframework.stereotype.Component;
 
 import com.enfec.sb.eventapi.model.EventRowmapper;
 import com.enfec.sb.eventapi.model.EventTable;
-import com.enfec.sb.eventapi.model.sortByZipcode;
+import com.enfec.sb.eventapi.model.sortByDistance;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -79,7 +80,7 @@ private static final String GET_ALL_VENUE = "SELECT * FROM Venue_Address";
 	 *  ----------------------------------------------------------------------------------------------------
 	 */
 	@Override
-	public List<Map> getFilteredEvents(List<EventTable> allEvent, String str) {
+	public List<Map> getFilteredEvents(List<EventTable> allEvent, String str) throws NotBoundException {
 		// Use filter bar, anyone can type anything, like WA/seattle/non-profitable/festival/98002
 		// We should not match str with ID or code information. 
 		
@@ -97,7 +98,11 @@ private static final String GET_ALL_VENUE = "SELECT * FROM Venue_Address";
 		// If str is a valid zipcode, then we need to get the events mapping from zipcode to location info
 		Integer zipcode = getZipcode(str); 
 		if (zipcode != null) {
-			return getEventByZipcode(allEventMap, zipcode); 
+			try {
+				return getEventByZipcode(allEventMap, zipcode); 
+			} catch (NotBoundException nbe) {
+				throw nbe; 
+			}
 		}
 		
 		List<Map> afterFilter = new ArrayList<>(); 
@@ -141,15 +146,61 @@ private static final String GET_ALL_VENUE = "SELECT * FROM Venue_Address";
 	/*
 	 * 		Based on given zipcode, get all events within a distance. 
 	 */
-	private List<Map> getEventByZipcode(List<Map> inputEventList, int zipcode) {
+	private List<Map> getEventByZipcode(List<Map> inputEventList, int zipcode) throws NotBoundException {
 		// Reorganize all List<Map> from nearest to farthest based on given zipcode. 
-//		Collections.sort(inputEventList, new sortByZipcode(zipcode));
 		
-		storeZipcodeInfo(); 
+		// Check venue_address table, and call RapidAPI for filling out all zipcode information. 
+		int inserted_row = storeZipcodeInfo(); 
+		
+		// Get zipcode info for given zipcode
+		Map<String, Object> mapedGivenZipcode = callRapidGetZipCodeInfo(String.valueOf(zipcode)); 
+		// mapedGivenZipcode can be null, like 10000, it is not a valid zipcode
+		if (mapedGivenZipcode == null) {
+			throw new NotBoundException(); 
+		}
+		double givenLat = (double)mapedGivenZipcode.get("lat"); 
+		double givenLng = (double)mapedGivenZipcode.get("lng"); 
+		
+		for (Map eachEvent: inputEventList) {
+			// Get distance between the coordinates of given zipcode and the coordinates of each event
+			Double currLat = (Double)eachEvent.get("latitude"); 
+			Double currLng = (Double)eachEvent.get("longitude"); 
+			if (currLat != null && currLng != null && currLat != 0.0 && currLng != 0.0) {
+				double distance = getDistance(givenLat, givenLng, currLat, currLng);
+				// Add distance info to current event's map
+				eachEvent.put("distance_between", distance); 
+			}
+		}
+		
+		Collections.sort(inputEventList, new sortByDistance());
 		
 		return inputEventList;
 	}
 
+	private double getDistance(double givenLat, double givenLng, double currLat, double currLng) {
+		// Get distance between two coordinates (latitude, longitude)
+		givenLng = Math.toRadians(givenLng); 
+        currLng = Math.toRadians(currLng); 
+        givenLat = Math.toRadians(givenLat); 
+        currLat = Math.toRadians(currLat); 
+  
+        // Haversine formula  
+        double dlon = currLng - givenLng;  
+        double dlat = currLat - givenLat; 
+        double a = Math.pow(Math.sin(dlat / 2), 2) 
+                 + Math.cos(givenLat) * Math.cos(currLat) 
+                 * Math.pow(Math.sin(dlon / 2),2); 
+              
+        double c = 2 * Math.asin(Math.sqrt(a)); 
+  
+        // Radius of earth in kilometers. Use 3956 for miles, 6371 for kilometers. 
+        double r = 3956; 
+  
+        // calculate the result 
+        return(c * r); 
+	}
+	
+	private static final String FILL_ZIPCODE_INFO = "UPDATE Venue_Address SET Latitude =:lat,Longitude =:lng WHERE Zipcode =:zip_code";
 	/* 
 	 *  	Store zipcodes information in Venue_Address table after calling public API. 
 	 */
@@ -158,23 +209,29 @@ private static final String GET_ALL_VENUE = "SELECT * FROM Venue_Address";
 		// venue_address table 
 		List<EventTable> allVenue = jdbcTemplate.query(GET_ALL_VENUE, new EventRowmapper());
 		
+		int count_affected_row = 0; 
+		
 		for (EventTable eachVenue: allVenue) {
-			if (eachVenue.getLatitude() == 0.0 || eachVenue.getLongitude() == 0.0) {
-				// Don't have zip code information, so need to call public API to get current zip code info 
-				if (eachVenue.getZipcode() != null) {
+			if (eachVenue.getZipcode() != null && eachVenue.getZipcode() != 0) {
+				if (eachVenue.getLatitude() == 0.0 || eachVenue.getLongitude() == 0.0) {
+					
+					// Don't have zipcode information, so need to call public API to get current zip code info 
 					Map<String, Object> zipInfo = callRapidGetZipCodeInfo(eachVenue.getZipcode().toString());
-					Double latitude = (Double)zipInfo.get("lat"); 
-					Double longitude = (Double)zipInfo.get("lng"); 
+					
+					// Store zipcode info into database
+					SqlParameterSource pramSource = new MapSqlParameterSource(zipInfo);
+					count_affected_row += namedParameterJdbcTemplate.update(FILL_ZIPCODE_INFO, pramSource);
 				}
 			}
 		}
-		return 0;
+		return count_affected_row;
 	}
 	
 	/*
 	 * 		For a given zipcode, call API to get latitude and zipcode information. 
 	 */
 	private final ObjectMapper mapper = new ObjectMapper(); 
+	
 	
 	private Map<String, Object> callRapidGetZipCodeInfo(String zipcode) {
 		Map<String, Object> zipInfo = new HashMap<>(); 

@@ -30,18 +30,20 @@ public class OrganizerController {
 			int affectedRow = OrganizerRepositoryImpl.createOrganizer(organizerTable);
 			if (affectedRow == 0) {
 				return new ResponseEntity<>(
-						"{\"message\" : \"Organizer not registerd\"}", HttpStatus.OK);
+						"{\"message\" : \"Organizer not registered\"}", HttpStatus.OK);
 			} else {
 				return new ResponseEntity<>(
-						"{\"message\" : \"Organizer Registered\"}", HttpStatus.OK);
+						"{\"message\" : \"Organizer registered\"}", HttpStatus.OK);
 			}
 		} catch (DataIntegrityViolationException dataIntegrityViolationException) {
-			return new ResponseEntity<>("{\"message\" : \"Bad Request: invalid info\"}",
+			return new ResponseEntity<>("{\"message\" : \"Invalid input\"}",
 					HttpStatus.BAD_REQUEST);
+			//input type incorrect
 		} catch (Exception exception) {
 			return new ResponseEntity<>(
-					"{\"message\" : \"Exception in creating organizer info\"}",
+					"{\"message\" : \"Exception in creating organizer info, please contact admin\"}",
 					HttpStatus.INTERNAL_SERVER_ERROR);
+			//lack of required info or server error
 		}
 	}
 	
@@ -51,7 +53,7 @@ public class OrganizerController {
 			List<OrganizerTable> organizerList = OrganizerRepositoryImpl.getOrganizerInfo(Organizer_ID);
 			if (organizerList.isEmpty()) {
 				return new ResponseEntity<>(
-						"{\"message\" : \"No device found\"}", HttpStatus.OK);
+						"{\"message\" : \"No organizer found\"}", HttpStatus.OK);
 			} else {
 				return new ResponseEntity<>(
 						new Gson().toJson((OrganizerRepositoryImpl
@@ -59,7 +61,7 @@ public class OrganizerController {
 			}
 		} catch (Exception e) {
 			return new ResponseEntity<>(
-					"{\"message\" : \"Exception in getting organzier info\"}",
+					"{\"message\" : \"Exception in getting organzier info, please contact admin\"}",
 					HttpStatus.INTERNAL_SERVER_ERROR);
 		} 
 	}
@@ -76,11 +78,11 @@ public class OrganizerController {
 						"{\"message\" : \"Organizer updated\"}", HttpStatus.OK);
 			}
 		} catch (DataIntegrityViolationException dataIntegrityViolationException) {
-			return new ResponseEntity<>("{\"message\" : \"Bad Request: invalid info\"}",
+			return new ResponseEntity<>("{\"message\" : \"Invalid input\"}",
 					HttpStatus.BAD_REQUEST);
 		} catch (Exception exception) {
 			return new ResponseEntity<>(
-					"{\"message\" : \"Exception in updating organizer info\"}",
+					"{\"message\" : \"Exception in updating organizer info, please contact admin\"}",
 					HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -94,15 +96,27 @@ public class OrganizerController {
 						"{\"message\" : \"Organizer deleted\"}", HttpStatus.OK);
 			} else {
 				return new ResponseEntity<>(
-						"{\"message\" : \"Organizer is not able to delete\"}", HttpStatus.OK);
+						"{\"message\" : \"Organizer not found\"}", HttpStatus.OK);
 			}
 		} catch (Exception e) {
 			return new ResponseEntity<>(
-					"{\"message\" : \"Exception in deleting organizer info\"}",
+					"{\"message\" : \"Exception in deleting organizer info, please contact admin\"}",
 					HttpStatus.INTERNAL_SERVER_ERROR);
 		} 
 	}
 	
+	@RequestMapping(value = "/organizer/login", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
+	public ResponseEntity<String>oLogin(@RequestBody(required = true) OrganizerTable organizerTable) { 
+			boolean isMatch = OrganizerRepositoryImpl.isMatching(organizerTable.getEmail_Address(), organizerTable.getPassword());
+			if(isMatch) {
+				return new ResponseEntity<>(
+						"{\"message\" : \"Organizer login successfully\"}", HttpStatus.OK);
+			}else {
+			return new ResponseEntity<>(
+					"{\"message\" : \"Organizer login failed\"}", HttpStatus.OK);
+			}
+			
+		}
 	
 	//For Organizer's "Address" table
 	@RequestMapping(value = "/organizer/address/create", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
@@ -111,17 +125,17 @@ public class OrganizerController {
 			int affectedRow = OrganizerRepositoryImpl.createAddress(address);
 			if (affectedRow == 0) {
 				return new ResponseEntity<>(
-						"{\"message\" : \"Address not added\"}", HttpStatus.OK);
+						"{\"message\" : \"Input organizer_id not found\"}", HttpStatus.OK);
 			} else {
 				return new ResponseEntity<>(
 						"{\"message\" : \"Address added\"}", HttpStatus.OK);
 			}
 		} catch (DataIntegrityViolationException dataIntegrityViolationException) {
-			return new ResponseEntity<>("{\"message\" : \"Bad Request: invalid info\"}",
+			return new ResponseEntity<>("{\"message\" : \"Invalid input\"}",
 					HttpStatus.BAD_REQUEST);
 		} catch (Exception exception) {
 			return new ResponseEntity<>(
-					"{\"message\" : \"Exception in creating organizer address info\"}",
+					"{\"message\" : \"Exception in creating organizer address info, please contact admin\"}",
 					HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -132,7 +146,7 @@ public class OrganizerController {
 			List<Address> addressList = OrganizerRepositoryImpl.getAddressInfo(Organizer_ID);
 			if (addressList.isEmpty()) {
 				return new ResponseEntity<>(
-						"{\"message\" : \"No address found\"}", HttpStatus.OK);
+						"{\"message\" : \"No address or organizer found\"}", HttpStatus.OK);
 			} else {
 				return new ResponseEntity<>(
 						new Gson().toJson((OrganizerRepositoryImpl
@@ -140,7 +154,7 @@ public class OrganizerController {
 			}
 		} catch (Exception e) {
 			return new ResponseEntity<>(
-					"{\"message\" : \"Exception in getting organzier address info\"}",
+					"{\"message\" : \"Exception in getting organzier address info, please contact admin\"}",
 					HttpStatus.INTERNAL_SERVER_ERROR);
 		} 
 	}
@@ -151,17 +165,17 @@ public class OrganizerController {
 			int affectedRow = OrganizerRepositoryImpl.updateAddress(address);
 			if (affectedRow == 0) {
 				return new ResponseEntity<>(
-						"{\"message\" : \"Information not found\"}", HttpStatus.OK);
+						"{\"message\" : \"Input organizer_id or address_id not found\"}", HttpStatus.OK);
 			} else {
 				return new ResponseEntity<>(
 						"{\"message\" : \"Address updated\"}", HttpStatus.OK);
 			}
 		} catch (DataIntegrityViolationException dataIntegrityViolationException) {
-			return new ResponseEntity<>("{\"message\" : \"Bad Request: invalid info\"}",
+			return new ResponseEntity<>("{\"message\" : \"Invalid input\"}",
 					HttpStatus.BAD_REQUEST);
 		} catch (Exception exception) {
 			return new ResponseEntity<>(
-					"{\"message\" : \"Exception in updating organizer address info\"}",
+					"{\"message\" : \"Exception in updating organizer address info, please contact admin\"}",
 					HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -179,7 +193,7 @@ public class OrganizerController {
 			if (affectedRow == -1) {
 				// Generate Runtime Exception 
 				return new ResponseEntity<>(
-						"{\"message\" : \"Address_ID or organizer_ID is not in Database\"}",
+						"{\"message\" : \"Input organizer_id or address_id not found\"}",
 						HttpStatus.OK);
 			} else if (affectedRow == Integer.MIN_VALUE) {
 				return new ResponseEntity<>(
@@ -190,11 +204,11 @@ public class OrganizerController {
 						"{\"message\" : \"Organizer contact created\"}", HttpStatus.OK);
 			}
 		} catch (DataIntegrityViolationException dataIntegrityViolationException) {
-			return new ResponseEntity<>("{\"message\" : \"Bad Request: invalid info\"}",
+			return new ResponseEntity<>("{\"message\" : \"Invalid input\"}",
 					HttpStatus.BAD_REQUEST);
 		} catch (Exception exception) {
 			return new ResponseEntity<>(
-					"{\"message\" : \"Exception in creating organizer contact info\"}",
+					"{\"message\" : \"Exception in creating organizer contact info, please contact admin\"}",
 					HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -206,7 +220,7 @@ public class OrganizerController {
 					.getOrganizerContactInfo(Organizer_ID);
 			if (organizerContactList.isEmpty()) {
 				return new ResponseEntity<>(
-						"{\"message\" : \"No organizer found\"}", HttpStatus.OK);
+						"{\"message\" : \"No organizer or contact found\"}", HttpStatus.OK);
 			} else {
 				return new ResponseEntity<>(
 						new Gson().toJson((OrganizerRepositoryImpl
@@ -214,7 +228,7 @@ public class OrganizerController {
 			}
 		} catch (Exception e) {
 			return new ResponseEntity<>(
-					"{\"message\" : \"Exception in getting organzier contact info\"}",
+					"{\"message\" : \"Exception in getting organzier contact info, please contact admin\"}",
 					HttpStatus.INTERNAL_SERVER_ERROR);
 		} 
 	}
@@ -230,18 +244,18 @@ public class OrganizerController {
 			if (affectedRow == 0) {
 				// Generate Runtime Exception 
 				return new ResponseEntity<>(
-						"{\"message\" : \"Address_ID or organizer_ID is not in Database\"}",
+						"{\"message\" : \"Input contact_id, organizer_id or address_id not found\"}",
 						HttpStatus.OK);
 			} else {
 				return new ResponseEntity<>(
 						"{\"message\" : \"Organizer contact successfully updated\"}", HttpStatus.OK);
 			}
 		} catch (DataIntegrityViolationException dataIntegrityViolationException) {
-			return new ResponseEntity<>("{\"message\" : \"Bad Request: invalid info\"}",
+			return new ResponseEntity<>("{\"message\" : \"Invalid input\"}",
 					HttpStatus.BAD_REQUEST);
 		} catch (Exception exception) {
 			return new ResponseEntity<>(
-					"{\"message\" : \"Exception in updating organizer contact info\"}",
+					"{\"message\" : \"Exception in updating organizer contact info, please contact admin\"}",
 					HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}

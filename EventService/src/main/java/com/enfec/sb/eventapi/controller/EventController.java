@@ -43,7 +43,7 @@ public class EventController {
 	public ResponseEntity<String> getEventList (
 				@RequestParam(name = "event_id", required = true) Integer event_id
 			) {
-
+		try {
 			List<EventTable> resultEvent = eventRepositoryImpl.getEventByID(event_id); 
 			
 			if (resultEvent.isEmpty()) {
@@ -53,6 +53,10 @@ public class EventController {
 				return new ResponseEntity<>(
 						new Gson().toJson(resultEvent), HttpStatus.OK);
 			}
+		} catch (Exception ex) {
+			return new ResponseEntity<>(
+					"{\"message\" : \"Unknown error, please contact developer\"}", HttpStatus.OK);
+		}
 	}
 	
 	// Search events by anything, like city/state/zipcode/event_name/event_type
@@ -78,6 +82,9 @@ public class EventController {
 			} catch (NotBoundException nbe) {
 				return new ResponseEntity<>(
 						"{\"message\" : \"Not a valid zipcode\"}", HttpStatus.OK);
+			} catch (Exception ex) {
+				return new ResponseEntity<>(
+						"{\"message\" : \"Unknown error, please contact with developer\"}", HttpStatus.OK); 
 			}
 	}
 	

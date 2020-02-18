@@ -1,5 +1,5 @@
 # Enfec-EMS
-This is an event management system created by Enfec back end developers. The whole system covers 3 types users, customer/organizer/admin. Customer can use this website to search any ongoing events, choose seats and place tickets orders; Organizer can place venue orders and post event information; Admin can help both organizers and customers resolve user issues. 
+This is an event management system created by Enfec back-end developers. The whole system covers 3 types users: customer/organizer/admin. Customer can use this website to search any ongoing events, choose seats and place tickets orders; Organizer can place venue orders and post event information; Admin can help both organizers and customers resolve user issues. 
 
 ## Event Service
 

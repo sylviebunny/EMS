@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 
 
 public class Ref_Event_TypesTable {
-    public String getEventTypeCode() {
+    public int getEventTypeCode() {
         return eventTypeCode;
     }
 
@@ -22,7 +22,7 @@ public class Ref_Event_TypesTable {
         return eventTypeDescription;
     }
 
-    public void setEventTypeCode(String eventTypeCode) {
+    public void setEventTypeCode(int eventTypeCode) {
         this.eventTypeCode = eventTypeCode;
     }
 
@@ -30,7 +30,7 @@ public class Ref_Event_TypesTable {
         this.eventTypeDescription = eventTypeDescription;
     }
 
-    private String eventTypeCode;
+    private int eventTypeCode;
     private String eventTypeDescription;
 
 

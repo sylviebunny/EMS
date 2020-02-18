@@ -10,7 +10,7 @@ public class Ref_Event_TypesRowmapper implements RowMapper<Ref_Event_TypesTable>
     @Override
     public Ref_Event_TypesTable mapRow(ResultSet rs, int rowNum) throws SQLException {
         Ref_Event_TypesTable ref_event_typesTable = new Ref_Event_TypesTable();
-        ref_event_typesTable.setEventTypeCode(rs.getString("Event_Type_Code"));
+        ref_event_typesTable.setEventTypeCode(rs.getInt("Event_Type_Code"));
         ref_event_typesTable.setEventTypeDescription(rs.getString("Event_Type_Description"));
         return ref_event_typesTable;
     }

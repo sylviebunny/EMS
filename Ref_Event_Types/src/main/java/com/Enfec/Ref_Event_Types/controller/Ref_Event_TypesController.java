@@ -27,7 +27,7 @@ public class Ref_Event_TypesController {
     @Autowired
     Ref_Event_TypesRepositoryImplement ref_event_typesRepositoryImplement;
     @RequestMapping(value = "/getrefeventtypes/{eventTypeCode}", method = RequestMethod.GET, produces = "application/json;charset = UTF-8")
-    public ResponseEntity<String> getRefEventTypesList(@PathVariable String eventTypeCode) {
+    public ResponseEntity<String> getRefEventTypesList(@PathVariable int eventTypeCode) {
         try {
             List<Ref_Event_TypesTable> refEventTypesList = ref_event_typesRepositoryImplement.getRefEventTypes(eventTypeCode);
             if (refEventTypesList.isEmpty()) {

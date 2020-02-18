@@ -21,7 +21,7 @@ public class Ref_Event_TypesRepositoryImplement implements Ref_Event_TypesReposi
     private static final Logger logger = LoggerFactory.getLogger(Ref_Event_TypesRepositoryImplement.class);
 
     final String SELECT_REF_EVENT_TYPES = "SELECT Event_Type_Code, Event_Type_Description FROM Ref_Event_Types WHERE Event_Type_Code = ?";
-    final String REGISTER_REF_EVENT_TYPES = "INSERT INTO Ref_Event_Types(Event_Type_Code, Event_Type_Description) VALUES" + "(:eventTypeCode, :eventTypeDescription)";
+    final String REGISTER_REF_EVENT_TYPES = "INSERT INTO Ref_Event_Types(Event_Type_Description) VALUES (:eventTypeDescription)";
     final String DELETE_REF_EVENT_TYPES = "DELETE FROM Ref_Event_Types WHERE Event_Type_Code = ?";
     final String UPDATE_REF_EVENT_TYPES = "UPDATE Ref_Event_Types SET Event_Type_Description = :eventTypeDescription WHERE Event_Type_Code =:eventTypeCode";
 
@@ -33,13 +33,8 @@ public class Ref_Event_TypesRepositoryImplement implements Ref_Event_TypesReposi
 
     private Map<String, Object> refEventTypesMap(Ref_Event_TypesTable ref_event_typesTable) {
         Map<String, Object> param = new HashMap<>();
-        if (ref_event_typesTable.getEventTypeCode() != null) {
-            param.put("eventTypeCode", ref_event_typesTable.getEventTypeCode());
-        } else {
-            logger.error("There is no Event Type Code.");
-            throw new NullPointerException("Event Type Code cannot be null.");
-        }
 
+        param.put("eventTypeCode", ref_event_typesTable.getEventTypeCode());
         param.put("eventTypeDescription", ref_event_typesTable.getEventTypeDescription() == null ? null : ref_event_typesTable.getEventTypeDescription());
 
         return param;
@@ -47,7 +42,7 @@ public class Ref_Event_TypesRepositoryImplement implements Ref_Event_TypesReposi
     }
 
     @Override
-    public List<Ref_Event_TypesTable> getRefEventTypes(String eventTypeCode) {
+    public List<Ref_Event_TypesTable> getRefEventTypes(int eventTypeCode) {
         return jdbcTemplate.query(SELECT_REF_EVENT_TYPES, new Object[] {eventTypeCode}, new Ref_Event_TypesRowmapper());
 
     }

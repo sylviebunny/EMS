@@ -33,12 +33,9 @@ public class Ref_Event_StatusRepositoryImplement implements Ref_Event_StatusRepo
 
     private Map<String, Object> refEventStatusMap(Ref_Event_StatusTable ref_event_statusTable) {
         Map<String, Object> param = new HashMap<>();
-        if (ref_event_statusTable.getEventStatusCode() != null) {
-            param.put("eventStatusCode", ref_event_statusTable.getEventStatusCode());
-        } else {
-            logger.error("There is no Event Status Code.");
-            throw new NullPointerException("Event Status Code cannot be null.");
-        }
+
+        param.put("eventStatusCode", ref_event_statusTable.getEventStatusCode());
+
 
         param.put("eventStatusDescription", ref_event_statusTable.getEventStatusDescription() == null ? null : ref_event_statusTable.getEventStatusDescription());
 

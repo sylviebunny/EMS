@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 @Setter
 public class Ref_Event_StatusTable {
 
-    public String getEventStatusCode() {
+    public int getEventStatusCode() {
         return eventStatusCode;
     }
 
@@ -21,7 +21,7 @@ public class Ref_Event_StatusTable {
         return eventStatusDescription;
     }
 
-    public void setEventStatusCode(String eventStatusCode) {
+    public void setEventStatusCode(int eventStatusCode) {
         this.eventStatusCode = eventStatusCode;
     }
 
@@ -29,7 +29,7 @@ public class Ref_Event_StatusTable {
         this.eventStatusDescription = eventStatusDescription;
     }
 
-    private String eventStatusCode;
+    private int eventStatusCode;
     private String eventStatusDescription;
 
 

@@ -16,8 +16,9 @@ public interface EventRepository {
 
 	public List<Map> getFilteredEvents(List<EventTable> allEvent, String str) throws NotBoundException;
 	public List<Map> getFilteredEvents(List<EventTable> allEvent, Timestamp start_date, Timestamp end_date);
+	public List<Map> getEventByEventType(List<Map> inputEvents, String event_type);
 	
-	public List<EventTable> getAllEvents();
+	public List<EventTable> getAllEvents(); 
 
 
 	

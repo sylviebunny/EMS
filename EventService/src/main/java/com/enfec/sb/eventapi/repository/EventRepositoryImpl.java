@@ -53,10 +53,6 @@ public class EventRepositoryImpl implements EventRepository {
 	
 	private static final String DELETE_EVENT = "DELETE FROM Events WHERE Event_ID =?";
 
-//	private static final String SELECT_EVENT_BY_ID = "SELECT * FROM Events WHERE Event_ID =?";
-//	
-//	private static final String SELECT_EVENT_PREFIX = "SELECT * FROM Events WHERE";
-
 	private static final String GET_ALL_EVENT = "SELECT Event_ID, Events.Event_Status_Code, Events.Event_Type_Code, Commercial_Type, Events.Organizer_ID, Events.Venue_ID, Event_Name, Event_Start_Time, Event_End_Time, Timezone, Number_of_Participants, Derived_Days_Duration, Event_Cost, Discount, Comments, Venue_Name, Venues.Other_Details, Street1, Street2, City, State, Zipcode, Latitude, Longitude, Event_Status_Description, Event_Type_Description, Organizer_Name\n" + 
 			"FROM Events, Venues, Venue_Address, Ref_Event_Status, Ref_Event_Types, Organizers\n" + 
 			"WHERE Events.Venue_ID = Venues.Venue_ID AND Events.Venue_ID = Venue_Address.Venue_ID AND Events.Event_Status_Code = Ref_Event_Status.Event_Status_Code AND Events.Event_Type_Code = Ref_Event_Types.Event_Type_Code AND Organizers.Organizer_ID = Events.Organizer_ID; ";
@@ -142,13 +138,82 @@ private static final String GET_ALL_VENUE = "SELECT * FROM Venue_Address";
 	
 	/*
 	 * 	----------------------------------------------------------------------------------------------------
+	 * 				Get all the events within a date range, combining with other criteria
+	 *  ----------------------------------------------------------------------------------------------------
+	 */
+	/*
+	 * 	Get all events within a date range 
+	 */
+	@Override
+	public List<Map> getFilteredEvents(List<EventTable> allEvent, Timestamp start_date, Timestamp end_date) {
+		// Convert EventTable to Map
+		List<Map> allEventMap = new ArrayList<>(); 
+		for (EventTable et: allEvent) {
+			allEventMap.add(eventMap(et, et.getEvent_id())); 
+		} 
+		
+		
+		List<Map> dateRangeEvents = new ArrayList<>();
+		for (Map eachEvent: allEventMap) {
+			Timestamp eventStartTime = Timestamp.valueOf((String)eachEvent.get("event_start_time")); 
+			Timestamp eventEndTime = Timestamp.valueOf((String)eachEvent.get("event_end_time"));
+			if (eventStartTime.after(start_date) && eventStartTime.before(end_date)) {
+				// the event that is within the date period
+				dateRangeEvents.add(eachEvent); 
+			}
+		}
+		
+		Collections.sort(dateRangeEvents, new SortByStartTime()); 
+		return dateRangeEvents; 
+	}
+	
+	@Override
+	public List<Map> getEventByEventType(List<Map> inputEvents, String event_type) {
+		if (event_type == null || event_type.length() == 0) {
+			return inputEvents; 
+		}
+		
+		List<Map> resultEvents = new ArrayList<>();
+		
+		// Get all events that matches this type
+		for (Map eachEvent: inputEvents) {
+			String currType = eachEvent.get("event_type_description").toString(); 
+			if (currType.toLowerCase().contains(event_type.toLowerCase())) {
+				resultEvents.add(eachEvent); 
+			}
+		}
+		return resultEvents; 
+	}
+	
+	/*
+	 * 	----------------------------------------------------------------------------------------------------
+	 * 				Get an event based on event_id
+	 *  ----------------------------------------------------------------------------------------------------
+	 */
+	public List<EventTable> getEventByID(int event_id) {
+		// Implementation for GET event by EVENT_ID
+		List<EventTable> allEvents = getAllEvents(); 
+		
+		List<EventTable> resultEvent = new ArrayList<>(); 
+		
+		for (EventTable eachEvent: allEvents) {
+			int currEventID = eachEvent.getEvent_id(); 
+			if (currEventID == event_id) {
+				resultEvent.add(eachEvent); 
+			}
+		}
+		return resultEvent; 
+	}
+	
+	/*
+	 * 	----------------------------------------------------------------------------------------------------
 	 * 				zip code related functions
 	 *  ----------------------------------------------------------------------------------------------------
 	 */
 	/*
 	 * 		Based on given zipcode, get all events within a distance. 
 	 */
-	private List<Map> getEventByZipcode(List<Map> inputEventList, int zipcode) throws NotBoundException {
+	public List<Map> getEventByZipcode(List<Map> inputEventList, int zipcode) throws NotBoundException {
 		// Reorganize all List<Map> from nearest to farthest based on given zipcode. 
 		
 		// Check venue_address table, and call RapidAPI for filling out all zipcode information. 
@@ -304,54 +369,6 @@ private static final String GET_ALL_VENUE = "SELECT * FROM Venue_Address";
 	public List<EventTable> getAllEvents() {
 		// Get all related event information
 		return jdbcTemplate.query(GET_ALL_EVENT, new EventRowmapper()); 
-	}
-	
-	/*
-	 * 	----------------------------------------------------------------------------------------------------
-	 * 				Get an event based on event_id
-	 *  ----------------------------------------------------------------------------------------------------
-	 */
-	public List<EventTable> getEventByID(int event_id) {
-		// Implementation for GET event by EVENT_ID
-		List<EventTable> allEvents = getAllEvents(); 
-		
-		List<EventTable> resultEvent = new ArrayList<>(); 
-		
-		for (EventTable eachEvent: allEvents) {
-			int currEventID = eachEvent.getEvent_id(); 
-			if (currEventID == event_id) {
-				resultEvent.add(eachEvent); 
-			}
-		}
-		return resultEvent; 
-	}
-	
-	/*
-	 * 	----------------------------------------------------------------------------------------------------
-	 * 				Get all the events within a date range
-	 *  ----------------------------------------------------------------------------------------------------
-	 */
-	@Override
-	public List<Map> getFilteredEvents(List<EventTable> allEvent, Timestamp start_date, Timestamp end_date) {
-		// Convert EventTable to Map
-		List<Map> allEventMap = new ArrayList<>(); 
-		for (EventTable et: allEvent) {
-			allEventMap.add(eventMap(et, et.getEvent_id())); 
-		} 
-		
-		
-		List<Map> dateRangeEvents = new ArrayList<>();
-		for (Map eachEvent: allEventMap) {
-			Timestamp eventStartTime = Timestamp.valueOf((String)eachEvent.get("event_start_time")); 
-			Timestamp eventEndTime = Timestamp.valueOf((String)eachEvent.get("event_end_time"));
-			if (eventStartTime.after(start_date) && eventStartTime.before(end_date)) {
-				// the event that is within the date period
-				dateRangeEvents.add(eachEvent); 
-			}
-		}
-		
-		Collections.sort(dateRangeEvents, new SortByStartTime()); 
-		return dateRangeEvents; 
 	}
 	
 	/* 

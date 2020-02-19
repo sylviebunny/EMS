@@ -13,6 +13,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -88,13 +89,14 @@ public class EventController {
 			}
 	}
 	
-	// Get events from start_date to end_date
+	// Get events from start_date to end_date, combining with other criteria like zipcode/state/event_type
 	@RequestMapping(value = "event/search/by_date", method = RequestMethod.GET, produces = "application/json;charset=UTF-8") 
 	public ResponseEntity<String> getEventsThroughDate (
-			@RequestParam(required = true) @DateTimeFormat(pattern="yyyy-MM-dd") Date start_date, 
-			@RequestParam(required = true) @DateTimeFormat(pattern="yyyy-MM-dd") Date end_date) {
+			@RequestParam(required = true) @DateTimeFormat(pattern="MM/dd/yyyy") Date start_date, 
+			@RequestParam(required = true) @DateTimeFormat(pattern="MM/dd/yyyy") Date end_date, 
+			@RequestParam(required = false) String zipcode, 
+			@RequestParam(required = false) String event_type) {
 		try {
-			
 			
 			Timestamp st = new Timestamp(start_date.getTime());
 			Timestamp et = new Timestamp(end_date.getTime()); 
@@ -105,11 +107,23 @@ public class EventController {
 			
 			List<EventTable> allEvent = eventRepositoryImpl.getAllEvents(); 
 			
-			List<Map> result_events = eventRepositoryImpl.getFilteredEvents(allEvent, st, et); 
+			// Get events within a date range
+			List<Map> result_events_within_date = eventRepositoryImpl.getFilteredEvents(allEvent, st, et); 
+			
+			// Get events within a zipcode range
+			List<Map> result_events_by_zipcode = null; 
+			if (zipcode != null || zipcode.length() != 0) {
+				result_events_by_zipcode = eventRepositoryImpl.getEventByZipcode(result_events_within_date, Integer.parseInt(zipcode)); 
+			} else {
+				result_events_by_zipcode = result_events_within_date; 
+			}
+		
+			// Get events with a event_type
+			List<Map> result_events = eventRepositoryImpl.getEventByEventType(result_events_by_zipcode, event_type); 
 			
 			if (result_events == null || result_events.size() == 0) {
 				return new ResponseEntity<>(
-						"{\"message\" : \"No event within this period\"}", HttpStatus.OK); 
+						"{\"message\" : \"No event found\"}", HttpStatus.OK); 
 			} else {
 				return new ResponseEntity<>(
 						new Gson().toJson(result_events), HttpStatus.OK); 
@@ -117,9 +131,12 @@ public class EventController {
 		} catch (DataFormatException ex) {
 			return new ResponseEntity<>(
 					"{\"message\" : \"Invalid input date\"}", HttpStatus.BAD_REQUEST); 
+		} catch (CannotGetJdbcConnectionException ce) {
+			return new ResponseEntity<>(
+					"{\"message\" : \"Fail to connect database\"}", HttpStatus.INTERNAL_SERVER_ERROR); 
 		} catch (Exception e) {
 			return new ResponseEntity<>(
-					"{\"message\" : \"Unknown error, please contact admin\"}", HttpStatus.INTERNAL_SERVER_ERROR); 
+					"{\"message\" : \"Unknown error, please contact developer\"}", HttpStatus.INTERNAL_SERVER_ERROR); 
 		}
 	}
 	

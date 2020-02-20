@@ -14,10 +14,12 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.enfec.demo.model.Venue;
 
 @Component
+@Transactional
 public class VenueRepositoryImpl implements VenueRepository {
 	@Autowired
 	NamedParameterJdbcTemplate namedParameterJdbcTemplate;
@@ -28,7 +30,7 @@ public class VenueRepositoryImpl implements VenueRepository {
 	@Override
 	public int createVenue(Venue venue) {
 		String CREATE_VENUE = "INSERT INTO `Venues` (`Venue_Name`, `Other_Details`) VALUES (?,?)";
-		String CREATE_VENUE1 = "INSERT INTO `Venue_Address` (`Venue_ID`, `Street1`, `Street2`, `City`, `State`, `Zipcode`) VALUES (?,?,?,?,?,?)";
+		String CREATE_VENUE1 = "INSERT INTO `Venue_Address` (`Venue_ID`, `Street1`, `Street2`, `City`, `State`, `Zipcode`, `Latitude`, `Longitude`) VALUES (?,?,?,?,?,?,?,?)";
 		
 		KeyHolder keyHolder = new GeneratedKeyHolder();
 	    int count = jdbcTemplate.update(
@@ -42,7 +44,7 @@ public class VenueRepositoryImpl implements VenueRepository {
 	    //key is primary key
 
 	    int count1 = jdbcTemplate.update(CREATE_VENUE1, key.longValue(),venue.getStreet1(),venue.getStreet2(),
-	    		venue.getCity(),venue.getState(),venue.getZipcode());
+	    		venue.getCity(),venue.getState(),venue.getZipcode(),venue.getLatitude(),venue.getLongitude());
 	    return count;
 	}
 	
@@ -137,6 +139,8 @@ public class VenueRepositoryImpl implements VenueRepository {
 		param.put("City", venue.getCity() == null || venue.getCity().isEmpty() ? null:venue.getCity());
 		param.put("State", venue.getState() == null || venue.getState().isEmpty() ? null:venue.getState());
 		param.put("Zipcode", venue.getZipcode() != 0 ? venue.getZipcode() : null);
+		param.put("Latitude", venue.getLatitude() != 0 ? venue.getLatitude() : null);
+		param.put("Longitude", venue.getLongitude() != 0 ? venue.getLongitude() : null);
 		return param;
 	}
 }

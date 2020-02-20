@@ -11,6 +11,7 @@
 	<groupId>com.Enfec</groupId>
 	<artifactId>Ref_Event_Types</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+	<packaging>war</packaging>
 	<name>Ref_Event_Types</name>
 	<description>Demo project for Spring Boot</description>
 
@@ -40,7 +41,11 @@
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 		</dependency>
-
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-tomcat</artifactId>
+			<scope>provided</scope>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-jdbc</artifactId>
@@ -83,6 +88,7 @@
 	</dependencies>
 
 	<build>
+		<finalName>refEventTypes-api</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>

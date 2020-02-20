@@ -1,5 +1,5 @@
 #For YML files can only use single line comment with symbol "#"
-#This YML file is commonly used for configuration files and in applications where data is being stored or transmitted.
+#This YML file is commonly used for configuration files and in applications where data is being stored or transmitted. 
 
 
 spring.datasource.url: jdbc:mysql://seralock-db.cwhxcgdndstk.us-east-2.rds.amazonaws.com:3306/evntmgmt_usa

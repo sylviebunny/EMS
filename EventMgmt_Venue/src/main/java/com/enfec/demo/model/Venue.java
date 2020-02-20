@@ -25,4 +25,6 @@ public class Venue {
 	public String City;
 	public String State;
 	public int Zipcode;
+	public double Latitude;
+	public double Longitude;
 }

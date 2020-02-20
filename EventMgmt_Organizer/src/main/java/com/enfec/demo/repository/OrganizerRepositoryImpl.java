@@ -18,6 +18,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.enfec.demo.model.Address;
 import com.enfec.demo.model.AddressRowmapper;
@@ -28,6 +29,7 @@ import com.enfec.demo.model.OrganizerTable;
 
 
 @Component
+@Transactional
 public class OrganizerRepositoryImpl implements OrganizerRepository{
 	//CRUD: Organizer, Address, Contacts 
 

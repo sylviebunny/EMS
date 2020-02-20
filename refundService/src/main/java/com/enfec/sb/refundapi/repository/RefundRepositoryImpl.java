@@ -17,6 +17,7 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.enfec.sb.refundapi.model.COrderRefundRowmapper;
 import com.enfec.sb.refundapi.model.COrderRefundTable;
@@ -24,6 +25,7 @@ import com.enfec.sb.refundapi.model.OOrderRefundRowmapper;
 import com.enfec.sb.refundapi.model.OOrderRefundTable;
 
 @Component
+@Transactional
 public class RefundRepositoryImpl implements RefundRepository {
 	private static final Logger logger = LoggerFactory.getLogger(RefundRepositoryImpl.class);
 

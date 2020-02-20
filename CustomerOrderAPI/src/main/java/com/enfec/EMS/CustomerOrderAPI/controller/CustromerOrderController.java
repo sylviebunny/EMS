@@ -39,9 +39,9 @@ public class CustromerOrderController {
 	public ResponseEntity<String>getCustomerOrderList(@PathVariable String customerOrderID) { 
 			List<CustomerOrderTable> customerList = customerOrderRepositoryImpl.getCustomerOrder(customerOrderID);
 			if (customerList.isEmpty()) {
-				logger.info("No Organizer Order found for: {} ", customerOrderID);
+				logger.info("No Customer Order found for: {} ", customerOrderID);
 				return new ResponseEntity<>(
-						"{\"message\" : \"No Organizer Order found\"}", HttpStatus.OK);
+						"{\"message\" : \"No Customer Order found\"}", HttpStatus.OK);
 			
 			}
 			return new ResponseEntity<>(

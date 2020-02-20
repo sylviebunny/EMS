@@ -14,10 +14,12 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.enfec.demo.model.SeatCategory;
 
 @Component
+@Transactional
 public class SeatCategoryRepositoryImpl implements SeatCategoryRepository {
 	@Autowired
 	NamedParameterJdbcTemplate namedParameterJdbcTemplate;

@@ -31,6 +31,7 @@ public class RefundController {
 	@RequestMapping(value = "/organizer_refund/search/{organizer_refund_id}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> getOrganizerRefundByRefundID(@PathVariable int organizer_refund_id) {
 			
+		try {
 			List<OOrderRefundTable> organizerRefundList = refundRepositoryImpl.getOrganizerRefundByRefundID(organizer_refund_id);
 			
 			if (organizerRefundList == null || organizerRefundList.isEmpty()) {
@@ -41,12 +42,17 @@ public class RefundController {
 						new Gson().toJson((refundRepositoryImpl
 								.getOrganizerRefundByRefundID(organizer_refund_id))), HttpStatus.OK);
 			}
+		} catch (Exception e) {
+			return new ResponseEntity<>(
+					"{\"message\" : \"Unknown error\"}", HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 	
 	// Search organizer's refund by oorder_id 
 	@RequestMapping(value = "/organizer_refund/search/organizer_order_id/{oorder_id}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> getOrganizerRefundByOorder (@PathVariable int oorder_id) {
 			
+		try {
 			List<OOrderRefundTable> organizerRefundList = refundRepositoryImpl.getOrganizerRefundByOorderID(oorder_id);
 			
 			if (organizerRefundList == null || organizerRefundList.isEmpty()) {
@@ -57,12 +63,17 @@ public class RefundController {
 						new Gson().toJson((refundRepositoryImpl
 								.getOrganizerRefundByOorderID(oorder_id))), HttpStatus.OK);
 			}
+		} catch (Exception e) {
+			return new ResponseEntity<>(
+					"{\"message\" : \"Unknown error\"}", HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 	
 	// Create organizer refund by entering oorder_ID and description
 	@RequestMapping(value = "/organizer_refund/create", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> createOrganizerRefund (
 			@RequestBody(required = true) OOrderRefundTable organizerRefundTable) {
+		try {
 			int affectedRow = refundRepositoryImpl.createOrganizerRefund(organizerRefundTable);
 
 			if (affectedRow == 0) {
@@ -73,12 +84,20 @@ public class RefundController {
 				return new ResponseEntity<>(
 						"{\"message\" : \"Organizer refund successfully registered\"}", HttpStatus.OK);
 			}
+		} catch (DataIntegrityViolationException di) {
+			return new ResponseEntity<>(
+					"{\"message\" : \"Invalid input, lack of data\"}", HttpStatus.BAD_REQUEST);
+		} catch (Exception e) {
+			return new ResponseEntity<>(
+					"{\"message\" : \"Unknown error\"}", HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 	
 	// Update organizer refund by specific refund_Id, entering status and description
 	@RequestMapping(value = "/organizer_refund/update", method = RequestMethod.PUT, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> updateOrganizerRefund (
 			@RequestBody(required = true) OOrderRefundTable organizerRefundTable) {
+		try {
 			int affectedRow = refundRepositoryImpl.updateOrganizerRefund(organizerRefundTable);
 
 			if (affectedRow == 0) {
@@ -89,20 +108,32 @@ public class RefundController {
 				return new ResponseEntity<>(
 						"{\"message\" : \"Organizer refund successfully updated\"}", HttpStatus.OK);
 			}
+		} catch (DataIntegrityViolationException di) {
+			return new ResponseEntity<>(
+					"{\"message\" : \"Invalid input, lack of data\"}", HttpStatus.BAD_REQUEST);
+		} catch (Exception e) {
+			return new ResponseEntity<>(
+					"{\"message\" : \"Unknown error\"}", HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 	
 	// Delete organizer refund by refund_id
 	@RequestMapping(value = "/organizer_refund/delete/{organizer_refund_id}", method = RequestMethod.DELETE, produces = "application/json;charset=UTF-8") 
 	public ResponseEntity<String> deleteOrganizerRefund(@PathVariable int organizer_refund_id){
-		int affectedRow = refundRepositoryImpl.deleteOrganizerRefund(organizer_refund_id); 
-		
-		if (affectedRow == Integer.MIN_VALUE) {
-			// Didn't find this event by event_id 
+		try {
+			int affectedRow = refundRepositoryImpl.deleteOrganizerRefund(organizer_refund_id); 
+			
+			if (affectedRow == Integer.MIN_VALUE) {
+				// Didn't find this event by event_id 
+				return new ResponseEntity<> (
+						"{\"message\" : \"Organizer refund not found\"}", HttpStatus.OK);  
+			} else {
+				return new ResponseEntity<> (
+						"{\"message\" : \"Organizer refund successfully deleted\"}", HttpStatus.OK); 
+			}
+		} catch (Exception e) {
 			return new ResponseEntity<> (
-					"{\"message\" : \"Organizer refund not found\"}", HttpStatus.OK);  
-		} else {
-			return new ResponseEntity<> (
-					"{\"message\" : \"Organizer refund successfully deleted\"}", HttpStatus.OK); 
+					"{\"message\" : \"Unknown error\"}", HttpStatus.INTERNAL_SERVER_ERROR);  
 		}
 	}
 	
@@ -115,6 +146,7 @@ public class RefundController {
 	@RequestMapping(value = "/customer_refund/search/{customer_refund_id}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> getCustomerRefundByRefundID(@PathVariable int customer_refund_id) {
 			
+		try {
 			List<COrderRefundTable> customerRefundList = refundRepositoryImpl.getCustomerRefundByCRefundID(customer_refund_id);
 			
 			if (customerRefundList == null || customerRefundList.isEmpty()) {
@@ -125,12 +157,17 @@ public class RefundController {
 						new Gson().toJson((refundRepositoryImpl
 								.getCustomerRefundByCRefundID(customer_refund_id))), HttpStatus.OK);
 			}
+		} catch (Exception e) {
+			return new ResponseEntity<>(
+					"{\"message\" : \"Unknown error\"}", HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 	
 	// Search customer's refund by corder_id 
 	@RequestMapping(value = "/customer_refund/search/customer_order_id/{corder_id}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> getCustomerRefundByCorderID (@PathVariable int corder_id) {
 			
+		try {
 			List<COrderRefundTable> customerRefundList = refundRepositoryImpl.getCustomerRefundByCorderID(corder_id);
 			
 			if (customerRefundList == null || customerRefundList.isEmpty()) {
@@ -141,12 +178,17 @@ public class RefundController {
 						new Gson().toJson((refundRepositoryImpl
 								.getCustomerRefundByCorderID(corder_id))), HttpStatus.OK);
 			}
+		} catch (Exception e) {
+			return new ResponseEntity<>(
+					"{\"message\" : \"Unknown error\"}", HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 	
 	// Create customer refund by entering corder_ID and crefund_description
 	@RequestMapping(value = "/customer_refund/create", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> createCustomerRefund (
 			@RequestBody(required = true) COrderRefundTable customerRefund) {
+		try {
 			int affectedRow = refundRepositoryImpl.createCustomerRefund(customerRefund);
 
 			if (affectedRow == 0) {
@@ -157,12 +199,20 @@ public class RefundController {
 				return new ResponseEntity<>(
 						"{\"message\" : \"Customer refund successfully registered\"}", HttpStatus.OK);
 			}
+		} catch (DataIntegrityViolationException di) {
+			return new ResponseEntity<>(
+					"{\"message\" : \"Invalid input, lack of data\"}", HttpStatus.BAD_REQUEST);
+		} catch (Exception e) {
+			return new ResponseEntity<>(
+					"{\"message\" : \"Unknown error\"}", HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 	
 	// Update customer refund by specific crefund_Id, entering status and description
 	@RequestMapping(value = "/customer_refund/update", method = RequestMethod.PUT, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> updateCustomerRefund (
 			@RequestBody(required = true) COrderRefundTable customerRefund) {
+		try {
 			int affectedRow = refundRepositoryImpl.updateCustomerRefund(customerRefund);
 
 			if (affectedRow == 0) {
@@ -173,20 +223,32 @@ public class RefundController {
 				return new ResponseEntity<>(
 						"{\"message\" : \"Organizer refund successfully updated\"}", HttpStatus.OK);
 			}
+		} catch (DataIntegrityViolationException di) {
+			return new ResponseEntity<>(
+					"{\"message\" : \"Invalid input, lack of data\"}", HttpStatus.BAD_REQUEST);
+		} catch (Exception e) {
+			return new ResponseEntity<>(
+					"{\"message\" : \"Unknown error\"}", HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 	
 	// Delete customer refund by crefund_id
 	@RequestMapping(value = "/customer_refund/delete/{customer_refund_id}", method = RequestMethod.DELETE, produces = "application/json;charset=UTF-8") 
 	public ResponseEntity<String> deleteCustomerRefund(@PathVariable int customer_refund_id){
-		int affectedRow = refundRepositoryImpl.deleteCustomerRefund(customer_refund_id); 
+		try {
+			int affectedRow = refundRepositoryImpl.deleteCustomerRefund(customer_refund_id); 
 		
-		if (affectedRow == Integer.MIN_VALUE) {
-			// Didn't find this event by event_id 
+			if (affectedRow == Integer.MIN_VALUE) {
+				// Didn't find this event by event_id 
+				return new ResponseEntity<> (
+						"{\"message\" : \"Organizer refund not found\"}", HttpStatus.OK);  
+			} else {
+				return new ResponseEntity<> (
+						"{\"message\" : \"Organizer refund successfully deleted\"}", HttpStatus.OK); 
+			}
+		} catch (Exception e) {
 			return new ResponseEntity<> (
-					"{\"message\" : \"Organizer refund not found\"}", HttpStatus.OK);  
-		} else {
-			return new ResponseEntity<> (
-					"{\"message\" : \"Organizer refund successfully deleted\"}", HttpStatus.OK); 
+					"{\"message\" : \"Unknown error\"}", HttpStatus.INTERNAL_SERVER_ERROR); 
 		}
 	}
 	

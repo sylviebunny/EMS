@@ -9,4 +9,4 @@ spring.datasource.driver-class-name: com.mysql.cj.jdbc.Driver
 #60 sec
 spring.datasource.hikari.connection-timeout: 60000
 # max 5
-spring.datasource.hikari.maximum-pool-size: 10
+spring.datasource.hikari.maximum-pool-size: 3

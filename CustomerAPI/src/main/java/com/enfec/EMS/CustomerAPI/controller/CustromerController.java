@@ -2,14 +2,13 @@ package com.enfec.EMS.CustomerAPI.controller;
 
 
 import java.util.List;
-import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -115,7 +114,8 @@ public class CustromerController {
 
 	}
 	
-	@RequestMapping(value = "/Customers/Login", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
+	@CrossOrigin(origins = "http://localhost:4201")
+	@RequestMapping(value = "/Customers/Login", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String>cLogin(@RequestBody(required = true) CustomerTable customerTable) { 
 			boolean isMatch = customerRepositoryImpl.isMatching(customerTable.getEmail(), customerTable.getPsw());
 			if(isMatch) {

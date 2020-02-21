@@ -13,6 +13,8 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.enfec.EMS.CustomerAPI.model.CustomerRowmapper;
 import com.enfec.EMS.CustomerAPI.model.CustomerTable;
 
@@ -20,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Component
+@Transactional
 public class CustomerRepositoryImpl implements CustomerRepository {
 	private static final Logger logger = LoggerFactory.getLogger(CustomerRepositoryImpl.class);
 	

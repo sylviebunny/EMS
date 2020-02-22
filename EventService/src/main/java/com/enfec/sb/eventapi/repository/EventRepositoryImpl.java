@@ -316,6 +316,9 @@ private static final String GET_ALL_VENUE = "SELECT * FROM Venue_Address";
 	 */
 	private final ObjectMapper mapper = new ObjectMapper(); 
 	
+	private final String HOST_NAME = ""; 
+	private final String ACCESS_KEY = ""; 
+	
 	private Map<String, Object> callRapidGetZipCodeInfo(String zipcode) {
 		Map<String, Object> zipInfo = new HashMap<>(); 
 		

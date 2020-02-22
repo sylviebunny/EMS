@@ -116,16 +116,19 @@ public class CustromerController {
 	
 	@CrossOrigin(origins = "http://localhost:4201")
 	@RequestMapping(value = "/Customers/Login", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
-	public ResponseEntity<String>cLogin(@RequestBody(required = true) CustomerTable customerTable) { 
+	public ResponseEntity<String>cLogin(@RequestBody(required = true) CustomerTable customerTable) {
+		try {
 			boolean isMatch = customerRepositoryImpl.isMatching(customerTable.getEmail(), customerTable.getPsw());
 			if(isMatch) {
 				return new ResponseEntity<>(
 						"{\"message\" : \"Customer login success\"}", HttpStatus.OK);
 			}else {
 			return new ResponseEntity<>(
-					"{\"message\" : \"Customer login fail\"}", HttpStatus.OK);
+					"{\"message\" : \"Customer login fail: Email or Password is not correct...\"}", HttpStatus.OK);
 			}
-			
+		}catch (Exception ex){
+			return new ResponseEntity<>(
+					"{\"message\" : \"login fail: need assistance\"}", HttpStatus.OK);
 		}
-	
+	}
 }

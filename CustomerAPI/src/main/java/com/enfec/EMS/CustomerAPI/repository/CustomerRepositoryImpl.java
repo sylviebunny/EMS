@@ -107,6 +107,9 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 	@Override
 	public boolean isMatching(String cEmail, String cPwd){
 		List<CustomerTable> cusPwd = jdbcTemplate.query(SELECT_PWD, new Object[] {cEmail}, new CustomerRowmapper());
+		if(cusPwd.isEmpty()) {
+			return false;
+		}
 		String eCpwd = Base64.getEncoder().encodeToString(cPwd.getBytes());
 		if(cusPwd.get(0).getPsw().equals(eCpwd)) {
 			return true;

@@ -128,7 +128,7 @@ public class CustromerController {
 			}
 		}catch (Exception ex){
 			return new ResponseEntity<>(
-					"{\"message\" : \"login fail: need assistance\"}", HttpStatus.OK);
+					"{\"message\" : \"login fail: need assistance\"}", HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 }

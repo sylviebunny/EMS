@@ -21,6 +21,8 @@ public class SeatController {
 	@Autowired
 	SeatRepositoryImpl SeatRepositoryImpl;
 
+	//For "Seats" table in database
+	//Create seat
 	@RequestMapping(value = "/seat/create", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> createSeat(@RequestBody(required = true) Seat seat) {
 		try {	
@@ -42,6 +44,7 @@ public class SeatController {
 		}
 	}
 	
+	//Get seat info by id
 	@RequestMapping(value = "/seat/search/{Seat_ID}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> getSeatList(@PathVariable("Seat_ID") int Seat_ID) {
 		try {
@@ -61,7 +64,7 @@ public class SeatController {
 		} 
 	}
 
-	//The foreign key information must exist first in the db
+	//Update seat info
 	@RequestMapping(value = "/seat/update", method = RequestMethod.PUT, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> updateSeat(@RequestBody(required = true) Seat seat) {
 		try {	
@@ -74,6 +77,7 @@ public class SeatController {
 						"{\"message\" : \"Seat updated\"}", HttpStatus.OK);
 			}
 		} catch (DataIntegrityViolationException dataIntegrityViolationException) {
+			//The foreign key information must exist first in the db
 			return new ResponseEntity<>("{\"message\" : \"Room_id or category_id not found or Invalid input\"}",
 					HttpStatus.BAD_REQUEST);
 		} catch (Exception exception) {
@@ -83,7 +87,7 @@ public class SeatController {
 		}
 	}
 
-	
+	//Delete seat from database 
 	@RequestMapping(value="/seat/delete/{Seat_ID}",method = RequestMethod.DELETE, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> deleteSeat(@PathVariable("Seat_ID") int id) {
 		try {
@@ -102,7 +106,7 @@ public class SeatController {
 		} 
 	}
 	
-	//Search available seats by room_id
+	//Get available seats by room_id
 	@RequestMapping(value = "/seat/getavailable/{Room_ID}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> getAvailableSeatList(@PathVariable("Room_ID") int Room_ID) {
 		try {
@@ -114,6 +118,26 @@ public class SeatController {
 				return new ResponseEntity<>(
 						new Gson().toJson((SeatRepositoryImpl
 								.getAvailableSeatInfo(Room_ID))), HttpStatus.OK);
+			}
+		} catch (Exception e) {
+			return new ResponseEntity<>(
+					"{\"message\" : \"Exception in getting available seats info, please contact admin\"}",
+					HttpStatus.INTERNAL_SERVER_ERROR);
+		} 
+	}
+	
+	//Get all seats in a specific room by room_id
+	@RequestMapping(value = "/seat/getall/{Room_ID}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
+	public ResponseEntity<String> getAllSeatList(@PathVariable("Room_ID") int Room_ID) {
+		try {
+			List<Seat> seatList = SeatRepositoryImpl.getAllSeatInfo(Room_ID);
+			if (seatList.isEmpty()) {
+				return new ResponseEntity<>(
+						"{\"message\" : \"Room not found or No available seat\"}", HttpStatus.OK);
+			} else {
+				return new ResponseEntity<>(
+						new Gson().toJson((SeatRepositoryImpl
+								.getAllSeatInfo(Room_ID))), HttpStatus.OK);
 			}
 		} catch (Exception e) {
 			return new ResponseEntity<>(

@@ -11,12 +11,12 @@ import lombok.Setter;
 @Setter
 @Component
 public class Seat {
-	public int Seat_ID;
-	public int Room_ID;
-	public int Category_ID;
-	public String Row_Number;
-	public String Col_Number; 
-	public String Availability;
-	public String Category_Name;
-	public double Price;
+	private int seat_id;
+	private int room_id;
+	private int category_id;
+	private String row_number;
+	private String col_number; 
+	private String availability;
+	private String category_name;
+	private double price;
 }

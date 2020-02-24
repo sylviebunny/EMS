@@ -11,6 +11,7 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.enfec.EMS.CustomerOrderAPI.model.CustomerOrderRowmapper;
 import com.enfec.EMS.CustomerOrderAPI.model.CustomerOrderTable;
@@ -22,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Component
+@Transactional
 public class CustomerOrderRepositoryImpl implements CustomerOrderRepository {
 	private static final Logger logger = LoggerFactory.getLogger(CustomerOrderRepositoryImpl.class);
 	

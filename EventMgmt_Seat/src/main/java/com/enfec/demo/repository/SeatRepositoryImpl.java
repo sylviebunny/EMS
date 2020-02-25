@@ -1,6 +1,5 @@
 package com.enfec.demo.repository;
 
-import java.sql.PreparedStatement;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,8 +11,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +19,8 @@ import com.enfec.demo.model.Seat;
 @Component
 @Transactional
 public class SeatRepositoryImpl implements SeatRepository{
+	//Implement CRUD methods for seat
+	
 	@Autowired
 	NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 	
@@ -30,32 +29,18 @@ public class SeatRepositoryImpl implements SeatRepository{
 	
 	@Override
 	public int createSeat(Seat seat) {
-		/*Another way
-		String CREATE_SEAT = "INSERT INTO `Seats` (`Room_ID`, `Category_ID`, `Row_Number`, `Col_Number`, `Availability`) VALUES (:Room_ID,:Category_ID,:Row_Number,:Col_Number,:Availability)";
-		int affectedRow;
-		Map<String, Object> param = SeatMap(seat);
+		String CREATE_SEAT = "INSERT INTO `Seats` (`Room_ID`, `Category_ID`, `Row_Number`, `Col_Number`, `Availability`) VALUES (:room_id,:category_id,:row_number,:col_number,:availability)";
+		Map<String, Object> param = seatMap(seat);
 		SqlParameterSource pramSource = new MapSqlParameterSource(param);
-		affectedRow =namedParameterJdbcTemplate.update(CREATE_SEAT, pramSource);	
-		return affectedRow;*/
-		
-		String CREATE_SEAT = "INSERT INTO `Seats` (`Room_ID`, `Category_ID`, `Row_Number`, `Col_Number`, `Availability`) VALUES (?,?,?,?,?)";
-		KeyHolder keyHolder = new GeneratedKeyHolder();
-	    int count = jdbcTemplate.update(
-	    		connection -> {
-	    			PreparedStatement ps = connection.prepareStatement(CREATE_SEAT, new String[]{"Seat_ID"});
-	                ps.setInt(1, seat.getRoom_ID());
-	                ps.setInt(2, seat.getCategory_ID() );
-	                ps.setString(3, seat.getRow_Number() );
-	                ps.setString(4, seat.getCol_Number());
-	                ps.setString(5, seat.getAvailability());
-	                return ps;
-	              }, keyHolder);
-	    return count;
+		int affectedRow = namedParameterJdbcTemplate.update(CREATE_SEAT, pramSource);	
+		return affectedRow;
 	}
 	
 	@Override
 	public Seat getSeatInfo(int Seat_ID) {
+		//Get seat info from "Seats" and "Seat_Category" tables
 		String SELECT_SEAT = "select * from Seats a join Seat_Category b on a.Category_ID = b.Category_ID where a.Seat_ID = ?";
+		
 		Seat seat;
 		try {
 			seat = jdbcTemplate.queryForObject(SELECT_SEAT, new Object[] { Seat_ID }, 
@@ -66,34 +51,38 @@ public class SeatRepositoryImpl implements SeatRepository{
 		return seat;
 	}
 	
-	
+	//Get available seats in a specific room
 	@Override
 	public List<Seat> getAvailableSeatInfo(int Room_ID) {
 		String SELECT_AVAILABLE_SEATS = "select * FROM Seats a join Seat_Category b on a.Category_ID = b.Category_ID where Room_ID = ? AND Availability = true";
 		return jdbcTemplate.query(SELECT_AVAILABLE_SEATS, new Object[] { Room_ID }, new BeanPropertyRowMapper<Seat>(Seat.class));
 	}
 	
+	//Get all seats in a specific room
+	@Override
+	public List<Seat> getAllSeatInfo(int Room_ID) {
+		String SELECT_ALL_SEATS = "select * FROM Seats a join Seat_Category b on a.Category_ID = b.Category_ID where Room_ID = ?";
+		return jdbcTemplate.query(SELECT_ALL_SEATS, new Object[] { Room_ID }, new BeanPropertyRowMapper<Seat>(Seat.class));
+	}
 	
-//	Update with partial info
+	//Update seat info with partial information	
 	@Override
 	public int updateSeat(Seat seat) {
 		String UPDATE_SEAT_INFO_PREFIX = "UPDATE `Seats` SET "; 
-		String UPDATE_SEAT_INFO_SUFFIX = " WHERE Seat_ID = :Seat_ID";
-		int affectedRow;
+		String UPDATE_SEAT_INFO_SUFFIX = " WHERE Seat_ID = :seat_id";
+
 		Map<String, Object> param = seatMap(seat);
-//		UPDATE `evntmgmt_usa`.`Seats` SET `Category_ID` = '1' WHERE (`Seat_ID` = '2');
 		SqlParameterSource pramSource = new MapSqlParameterSource(param);
 		StringBuilder UPDATE_SEAT_INFO = new StringBuilder();
 		for (String key : param.keySet()) {
-			if(param.get(key) != null && !key.equals("Seat_ID")) {
+			if(param.get(key) != null && !key.equals("seat_id")) {
 				UPDATE_SEAT_INFO.append("`");
 				UPDATE_SEAT_INFO.append(key + "`" +" = :" + key + ",");
 			}
 		}
 		UPDATE_SEAT_INFO = UPDATE_SEAT_INFO.deleteCharAt(UPDATE_SEAT_INFO.length() - 1); 
-		
 		String UPDATE_SEAT = UPDATE_SEAT_INFO_PREFIX + UPDATE_SEAT_INFO + UPDATE_SEAT_INFO_SUFFIX;
-		affectedRow =namedParameterJdbcTemplate.update(UPDATE_SEAT, pramSource);
+		int affectedRow =namedParameterJdbcTemplate.update(UPDATE_SEAT, pramSource);
 		return affectedRow;
 	}	
 	
@@ -103,34 +92,19 @@ public class SeatRepositoryImpl implements SeatRepository{
 		int affectedRow = jdbcTemplate.update(DELETE_SEAT, Seat_ID);
 		return affectedRow;
 	}
-	
-	
-	/*
-	//For create, update with total info
-	private Map<String, Object> SeatMap(Seat seat) {
-		Map<String, Object>param = new HashMap<>();
-		param.put("Room_ID", seat.getRoom_ID() != 0 ? seat.getRoom_ID() : null);
-		param.put("Category_ID", seat.getCategory_ID() != 0 ? seat.getCategory_ID() : null);
-		param.put("Row_Number", seat.getRow_Number().isEmpty() ? null:seat.getRow_Number());
-		param.put("Col_Number", seat.getCol_Number().isEmpty() ? null:seat.getCol_Number());
-		param.put("Availability", seat.isAvailability() ? seat.isAvailability() : false);
-		return param;
-	}*/
 
-	//For update with partial info
+	//For seat create and update
 	private Map<String, Object> seatMap(Seat seat) {
 		Map<String, Object>param = new HashMap<>();
 
-		if (seat.getSeat_ID() != 0) {
-			param.put("Seat_ID", seat.getSeat_ID());
-		} else {
-			throw new NullPointerException("Seat_ID cannot be null");
-		}	
-		param.put("Room_ID", seat.getRoom_ID() != 0 ? seat.getRoom_ID() : null);
-		param.put("Category_ID", seat.getCategory_ID() != 0 ? seat.getCategory_ID() : null);
-		param.put("Row_Number", seat.getRow_Number() == null || seat.getRow_Number().isEmpty() ? null:seat.getRow_Number());
-		param.put("Col_Number", seat.getCol_Number() == null || seat.getCol_Number().isEmpty() ? null:seat.getCol_Number());
-		param.put("Availability", seat.getAvailability() == null || seat.getAvailability().isEmpty() ? null:seat.getAvailability());
+		if (seat.getSeat_id() != 0) {
+			param.put("seat_id", seat.getSeat_id());
+		} 
+		param.put("room_id", seat.getRoom_id() != 0 ? seat.getRoom_id() : null);
+		param.put("category_id", seat.getCategory_id() != 0 ? seat.getCategory_id() : null);
+		param.put("row_number", seat.getRow_number() == null || seat.getRow_number().isEmpty() ? null : seat.getRow_number());
+		param.put("col_number", seat.getCol_number() == null || seat.getCol_number().isEmpty() ? null : seat.getCol_number());
+		param.put("availability", seat.getAvailability() == null || seat.getAvailability().isEmpty() ? null : seat.getAvailability());
 		return param;
 	}
 }

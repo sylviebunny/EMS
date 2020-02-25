@@ -11,11 +11,11 @@
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.enfec.sb</groupId>
-	<artifactId>deviceInfo-api</artifactId>
+	<artifactId>event-api</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>deviceInfo-api</name>
+	<name>event-api</name>
 	<packaging>war</packaging>
-	<description>Fetch and register device info</description>
+	<description>Fetch and register event info</description>
 
 	<properties>
 		<java.version>1.8</java.version>
@@ -69,6 +69,12 @@
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
+		</dependency>
+
+		<dependency>
+		  	<groupId>com.google.googlejavaformat</groupId>
+		  	<artifactId>google-java-format</artifactId>
+		  	<version>1.7</version>
 		</dependency>
 
 		<dependency>

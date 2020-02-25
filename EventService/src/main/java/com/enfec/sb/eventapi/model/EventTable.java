@@ -1,60 +1,149 @@
 package com.enfec.sb.eventapi.model;
 
-import java.sql.Timestamp;
-import java.util.Date;
-import java.util.List;
-
-import org.springframework.stereotype.Component;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
-
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
-
+import org.springframework.stereotype.Component;
 
 @Data
 @Component
-@Getter @Setter
+@Getter
+@Setter
 public class EventTable {
+
+    /**
+     * Event ID
+     */
+	private int event_id;
 	
-	private int event_id; 
-	private int event_status_code; 
-	private int event_type_code; 
-	private String commercial_type; 			// Profitable/Non-profitable/Free...
+	/**
+	 * Event status code
+	 */
+	private int event_status_code;
 	
-	private int organizer_id; 
-	private String event_name; 
+	/**
+	 * Event type code
+	 */
+	private int event_type_code;
 	
+	/**
+	 * Commercial type, 
+	 */
+	private String commercial_type;
+
+	/**
+	 * Organizer ID
+	 */
+	private int organizer_id;
+
+	/**
+	 * Event name
+	 */
+	private String event_name;
+
+	/**
+	 * Start time of the event
+	 */
 	private String event_start_time;
-	private String event_end_time; 
-	private String timezone; 
 	
-	private Integer number_of_participants; 
-	private String derived_days_duration; 
-	private Double event_cost; 
-	private Double discount; 
-	private String comments; 
+	/**
+	 * End time of the event
+	 */
+	private String event_end_time;
 	
-	// Venue and address information 
+	/**
+	 * Time zone
+	 */
+	private String timezone;
+
+	/**
+	 * Number of participants
+	 */
+	private Integer number_of_participants;
+	
+	/**
+	 * Derived days duration
+	 */
+	private String derived_days_duration;
+	
+	/**
+	 * Event cost
+	 */
+	private Double event_cost;
+	
+	/**
+	 * Discount rate
+	 */
+	private Double discount;
+	
+	/**
+	 * Event comments
+	 */
+	private String comments;
+
+	/**
+	 * Venue ID
+	 */
 	private int venue_id;
-	private String venue_name; 
-	private String other_details; 
-	private String street1; 
-	private String street2; 
-	private String city; 
-	private String state; 
-	private Integer zipcode; 
-	private Double latitude; 
-	private Double longitude; 
 	
-	// Event Status
-	private String event_status_description; 
+	/**
+	 * Venue name
+	 */
+	private String venue_name;
 	
-	// Event Type
-	private String event_type_description; 
+	/**
+	 * Other details
+	 */
+	private String other_details;
 	
-	// Organizer Info
-	private String organizer_name; 
+	/**
+	 * street name 1
+	 */
+	private String street1;
 	
+	/**
+	 * street name 2
+	 */
+	private String street2;
+	
+	/**
+	 * City of the event
+	 */
+	private String city;
+	
+	/**
+	 * State of the event
+	 */
+	private String state;
+	
+	/**
+	 * Zip code of the event
+	 */
+	private Integer zipcode;
+	
+	/**
+	 * Latitude of the event's zip code
+	 */
+	private Double latitude;
+	
+	/**
+	 * Longitude of the event's zip code
+	 */
+	private Double longitude;
+
+	/**
+	 * Event status description
+	 */
+	private String event_status_description;
+
+	/**
+	 * Event type description
+	 */
+	private String event_type_description;
+
+	/**
+	 * Organizer name
+	 */
+	private String organizer_name;
+
 }

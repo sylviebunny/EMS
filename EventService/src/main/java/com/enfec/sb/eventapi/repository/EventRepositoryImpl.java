@@ -1,24 +1,25 @@
 package com.enfec.sb.eventapi.repository;
 
+import com.enfec.sb.eventapi.model.EventRowmapper;
+import com.enfec.sb.eventapi.model.EventTable;
+import com.enfec.sb.eventapi.model.EventComparatorByDistance;
+import com.enfec.sb.eventapi.model.EventComparatorByStartTime;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
+import java.rmi.NotBoundException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-
-import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.lang.reflect.*;
-import java.rmi.NotBoundException;
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -26,24 +27,9 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.enfec.sb.eventapi.model.EventRowmapper;
-import com.enfec.sb.eventapi.model.EventTable;
-import com.enfec.sb.eventapi.model.SortByDistance;
-import com.enfec.sb.eventapi.model.SortByStartTime;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
-
 @Component
 @Transactional
 public class EventRepositoryImpl implements EventRepository {
-	private static final Logger logger = LoggerFactory.getLogger(EventRepositoryImpl.class);
 
 	final String REGISTER_EVENT = "INSERT INTO Events(Event_Status_Code, Event_Type_Code, Commercial_Type, Organizer_ID, Venue_ID, "
 			+ "Event_Name, Event_Start_Time, Event_End_Time, Timezone, Number_of_Participants, Derived_Days_Duration, Event_Cost, Discount, Comments) VALUES "
@@ -59,7 +45,7 @@ public class EventRepositoryImpl implements EventRepository {
 			"FROM Events, Venues, Venue_Address, Ref_Event_Status, Ref_Event_Types, Organizers\n" + 
 			"WHERE Events.Venue_ID = Venues.Venue_ID AND Events.Venue_ID = Venue_Address.Venue_ID AND Events.Event_Status_Code = Ref_Event_Status.Event_Status_Code AND Events.Event_Type_Code = Ref_Event_Types.Event_Type_Code AND Organizers.Organizer_ID = Events.Organizer_ID; ";
 
-private static final String GET_ALL_VENUE = "SELECT * FROM Venue_Address";
+	private static final String GET_ALL_VENUE = "SELECT * FROM Venue_Address";
 	
 	@Autowired
 	NamedParameterJdbcTemplate namedParameterJdbcTemplate;
@@ -67,19 +53,8 @@ private static final String GET_ALL_VENUE = "SELECT * FROM Venue_Address";
 	@Autowired
 	JdbcTemplate jdbcTemplate; 
 	
-	/* 
-	 * ---------------------------------- Event GET ----------------------------------
-	 * 
-	 */
-	
-	/*
-	 * 	----------------------------------------------------------------------------------------------------
-	 * 		Get filtered events by typing anything like state/city/commericial_type/event_type/
-	 * 		zipcode/event_name ...
-	 *  ----------------------------------------------------------------------------------------------------
-	 */
 	@Override
-	public List<Map> getFilteredEvents(List<EventTable> allEvent, String str) throws NotBoundException {
+	public List<Map> getFilteredEventsByRefinedZipcode(List<EventTable> allEvent, String str) throws NotBoundException {
 		// Use filter bar, anyone can type anything, like WA/seattle/non-profitable/festival/98002
 		// We should not match str with ID or code information. 
 		
@@ -121,7 +96,7 @@ private static final String GET_ALL_VENUE = "SELECT * FROM Venue_Address";
 				}
 			}
 		}
-		Collections.sort(afterFilter, new SortByStartTime());
+		Collections.sort(afterFilter, new EventComparatorByStartTime());
 		return afterFilter; 
 	}
 	
@@ -165,7 +140,7 @@ private static final String GET_ALL_VENUE = "SELECT * FROM Venue_Address";
 			}
 		}
 		
-		Collections.sort(dateRangeEvents, new SortByStartTime()); 
+		Collections.sort(dateRangeEvents, new EventComparatorByStartTime()); 
 		return dateRangeEvents; 
 	}
 	
@@ -253,10 +228,10 @@ private static final String GET_ALL_VENUE = "SELECT * FROM Venue_Address";
 		
 		// If no event in result list, then print out all events 
 		if (resultList.isEmpty()) {
-			Collections.sort(inputEventList, new SortByDistance());
+			Collections.sort(inputEventList, new EventComparatorByDistance());
 			return inputEventList; 
 		} else {
-			Collections.sort(resultList, new SortByDistance()); 
+			Collections.sort(resultList, new EventComparatorByDistance()); 
 			return resultList;
 		}
 	}

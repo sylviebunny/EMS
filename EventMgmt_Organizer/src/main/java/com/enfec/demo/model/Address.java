@@ -2,6 +2,7 @@ package com.enfec.demo.model;
 
 import org.springframework.stereotype.Component;
 
+import io.swagger.annotations.ApiModel;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;

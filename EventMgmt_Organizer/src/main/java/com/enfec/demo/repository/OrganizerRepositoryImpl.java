@@ -22,7 +22,7 @@ import com.enfec.demo.model.OrganizerTable;
 
 /**
  * Implements CRUD methods for Organizer, Address, Contact; Organizer login
- * @author Sylvia Zhao
+ * @author sylvia zhao
  */
 @Component
 @Transactional
@@ -37,10 +37,9 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 	
     /**
      * Create organizer basic information
-     * 
      * Map organizer table to MySql parameters, and insert into database
      * @param organizerTable: The information that needs to be created
-     * @return affectedRow
+     * @return number of affected rows
      */
 	@Override
 	public int createOrganizer(OrganizerTable organizerTable) {
@@ -55,7 +54,6 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 	
 	 /**
      * Get organizer basic information from database by organizer id
-     * 
      * @param Organizer_ID
      * @return List<OrganizerTable>: all entries that match the request
      */
@@ -68,10 +66,9 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 	
     /**
      * Update organizer basic information
-     * 
      * Map organizer table to MySql parameters, and update database
      * @param organizerTable: The information that needs to be updated. 
-     * @return affectedRow
+     * @return number of affected rows
      */
 	@Override
 	public int updateOrganizer(OrganizerTable organizerTable) {
@@ -95,9 +92,8 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 		
     /**
      * Delete the organizer basic, address, contact information from database by organizer id
-     * 
      * @param Organizer_ID
-     * @return affectedRow
+     * @return number of affected rows
      */
 	@Override
 	public int deleteOrganizer(int Organizer_ID) {
@@ -113,10 +109,9 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 	
 	/**
      * Create organizer address information
-     * 
      * Map organizer address table to MySql parameters, and insert into database
      * @param address: The information that needs to be created
-     * @return affectedRow
+     * @return number of affected rows
      */
 	@Override
 	public int createAddress(Address address) {
@@ -131,7 +126,6 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 	
 	/**
      * Get organizer address information from database by organizer id
-     * 
      * @param Organizer_ID
      * @return List<Address>: all entries that match the request
      */
@@ -144,10 +138,9 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 
 	 /**
      * Update organizer address information
-     * 
      * Map organizer address table to MySql parameters, and update database
      * @param address: The information that needs to be updated. 
-     * @return affectedRow
+     * @return number of affected rows
      */
 	@Override
 	public int updateAddress(Address address) {
@@ -164,10 +157,9 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 	
 	/**
      * Create organizer contact information
-     * 
      * Map organizer contact table to MySql parameters, and insert into database
      * @param organizerContactTable: The information that needs to be created
-     * @return affectedRow
+     * @return number of affected rows
      */
 	@Override
 	public int createOrganizerContact(OrganizerContactTable organizerContactTable) {
@@ -188,8 +180,7 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 	}
 	
 	/**
-     * Get organizer contact information from database by organizer id
-     * 
+     * Get organizer contact information from database by organizer id 
      * @param organizer_id
      * @return List<OrganizerContactTable>: all entries that match the request
      */
@@ -203,10 +194,9 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 	
 	 /**
      * Update organizer contact information
-     * 
      * Map organizer contact table to MySql parameters, and update database
      * @param organizerContactTable: The information that needs to be updated. 
-     * @return affectedRow
+     * @return number of affected rows
      */
 	@Override
 	public int updateOrganizerContact(OrganizerContactTable organizerContactTable) {
@@ -227,10 +217,9 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 	
 	 /**
      * Organizer login: determine if email and password match in database
-     * 
      * @param OEmail: Organizer email which is used to login
 	 * @param oPwd: Organizer input password
-     * @return affectedRow
+     * @return whether oEmail and oPwd match
      */
 	@Override
 	public boolean isMatching(String oEmail, String oPwd){
@@ -251,14 +240,12 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 	
 	
     /**
-     * Map organizer table 
-     * 
-     * Mapping organizer's information variables from JSON body to entity variables
+     * For create and update with Organziers table in database
+     * Mapping organizer information between URL body information and database variable attributes
      * @param organizerTable: organizer's information used for create or update
-     * @return Map<String, Object>
-     */
+     * @return Map<String, Object>: contains variable and it's corresponding information 
+    */
 	private Map<String, Object> OrganizerMap(OrganizerTable organizerTable) {
-		// Mapping organizer's information query's variable to URL POST body
 		Map<String, Object> param = new HashMap<>();
 
 		if (organizerTable.getOrganizer_id() != 0) {
@@ -283,11 +270,10 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 	}
 	
 	/**
-     * Map organizer address table 
-     * 
-     * Mapping organizer address's information variables from JSON body to entity variables
+	 *For create and update with Address table in database
+     * Mapping organizer address information between URL body information and database variable attributes
      * @param address: organizer address's information used for create or update
-     * @return Map<String, Object>
+     * @return Map<String, Object>: contains variable and it's corresponding information 
      */
 	private Map<String, Object> AddressMap(Address address) {
 		Map<String, Object>param = new HashMap<>();
@@ -305,11 +291,10 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 	}
 	
 	/**
-     * Map organizer contact table 
-     * 
-     * Mapping organizer contact's information variables from JSON body to entity variables
+	 *For create and update with Contacts table in database
+     * Mapping organizer contact information between URL body information and database variable attributes
      * @param organizerContactTable: organizer contact's information used for create or update
-     * @return Map<String, Object>
+     * @return Map<String, Object>: contains variable and it's corresponding information 
      */
 	private Map<String, Object> getOrganizerContactMap(OrganizerContactTable organizerContactTable) {
 		Map<String, Object> contactMap = new HashMap<>(); 

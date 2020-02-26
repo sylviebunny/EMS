@@ -143,6 +143,37 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 		}
 		
 	}
+	
+	@Override
+	public boolean hasRegistered(String customerEmail){
+		List<CustomerTable> hasRegis = jdbcTemplate.query(VALID_CUSTOMER, new Object[] {customerEmail}, new CustomerRowmapper());
+		if(hasRegis.isEmpty() || hasRegis.get(0).getEmail().isEmpty()) {
+			logger.info("not register before: {}", customerEmail);
+			return false;
+		}else {
+			logger.info("registed already");
+			return true;
+		}
+		
+	}
+	
+	@Override
+	public void sendGreetMail(String to, String subject, String body) {
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper;
+        
+        try {
+			helper = new MimeMessageHelper(message, true);
+			helper.setSubject(subject);
+	        helper.setTo(to);
+	        helper.setText(body, true);// true indicate html
+	        mailSender.send(message);
+		} catch (MessagingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+          
+    }
 		
 	
 	/*
@@ -197,7 +228,7 @@ public class CustomerRepositoryImpl implements CustomerRepository {
     private JavaMailSender mailSender;
 	
 	@Override
-	public void sendMail(String to, String subject, String body, String CToken) {
+	public void sendPwdMail(String to, String subject, String body, String CToken) {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper;
         

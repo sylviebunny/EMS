@@ -49,17 +49,37 @@ public class CustromerController {
 	public ResponseEntity<String>customerRegister(
 			@RequestBody(required = true) CustomerTable customerTable){
 		try {
-			int affectedRow = customerRepositoryImpl.registerCustomer(customerTable);
-			if(affectedRow == 0) {
-				logger.info("Customer not registered customer_name: {}", customerTable.getName());
+			if(customerRepositoryImpl.hasRegistered(customerTable.getEmail())) {
 				return new ResponseEntity<String>(
-						"{\"message\" : \"Customer not registered\"}",
+						"{\"message\" : \"Customer registered already, Please log in\"}",
 						HttpStatus.OK);
 			}else {
-				logger.info("Custoer registered customer_name: {}", customerTable.getName());
-				return new ResponseEntity<String>("{\"message\": \"Customer registered\"}", HttpStatus.OK);
+				int affectedRow = customerRepositoryImpl.registerCustomer(customerTable);
+				if(affectedRow == 0) {
+					logger.info("Customer not registered customer_name: {}", customerTable.getName());
+					return new ResponseEntity<String>(
+							"{\"message\" : \"Customer not registered\"}",
+							HttpStatus.OK);
+				}else {
+					logger.info("Custoer registered customer_name: {}", customerTable.getName());
+					
+					customerRepositoryImpl.sendGreetMail(customerTable.getEmail(), 
+							"Welcome to EMS", 
+							"<p>Dear</p>"+
+							"<p><b>"+ customerTable.getName()+ "</b></p>"+
+							"<p>Welcome to join the EMS. Your account is all set!</p>"+ 
+							"<p>This is a system generated mail. Please do not reply to this email ID. If you have a query or need any clarification you may:</p>" + 
+							"<p>(1) Call our 24-hour Customer Care or\r\n</p>" + 
+							"<p>(2) Email Us support@enfec.com\r\n</p>" + 
+							
+							"<p>For any problem please contact us at 24*7 Hrs. Customer Support at 18001231234 (TBD) or mail us at support@enfec.com\r\n" + 
+							"Thank you for using our Event Management System\r\n</p>");
+					logger.info("Greeting send to the eamil address: {}", customerTable.getEmail());
+					
+					return new ResponseEntity<String>("{\"message\": \"Customer registered and Greeting send to the eamil\"}", HttpStatus.OK);
+				}
 			}
-		
+			
 		}catch(DataIntegrityViolationException dataIntegrityViolationException){
 			logger.error("Invalid Customer id:{}", customerTable.getId());
 			return new ResponseEntity<String>(
@@ -155,7 +175,7 @@ public class CustromerController {
 					customerRepositoryImpl.saveTokenInfo(cEmail, cToken, expireDate);
 					
 				}
-				customerRepositoryImpl.sendMail(cEmail, 
+				customerRepositoryImpl.sendPwdMail(cEmail, 
 						"Reset Password", 
 						"<p>This is a system generated mail. Please do not reply to this email ID. If you have a query or need any clarification you may:</p>" + 
 						"<p>(1) Call our 24-hour Customer Care or\r\n</p>" + 

@@ -8,7 +8,7 @@ import java.util.Map;
 
 /**
  * Event repository class
- * @author heidihuo
+ * @author heidi huo
  *
  */
 public interface EventRepository {
@@ -63,7 +63,14 @@ public interface EventRepository {
      * Gets all events
      * @return result event list
      */
-	public List<EventTable> getAllEvents(); 
+	public List<EventTable> getAllEvents();
+
+    /**
+     * Gets an event based on event_id
+     * @param event_id
+     * @return a list of event, which should have only one element; or an empty list if no such event_id in database
+     */
+    public List<EventTable> getEventByID(int event_id); 
 
 
 	

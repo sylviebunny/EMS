@@ -18,14 +18,26 @@ import com.enfec.demo.model.OrganizerTable;
 import com.enfec.demo.repository.OrganizerRepositoryImpl;
 import com.google.gson.Gson;
 
+/**
+ * This is controller class for organizer APIs
+ * @author Sylvia Zhao
+ */
 @RestController
 public class OrganizerController {
+	
 	@Autowired
 	OrganizerRepositoryImpl OrganizerRepositoryImpl;
 
-	//For "Organizers" table
+	/**
+	 * Create or register an organizer user and put basic information into database
+	 * 
+	 * @param organizerTable. Contains organizer_name,email_address,password,other_details;
+	 * email_address and password cannot be null
+	 * @return ResponseEntity with message
+	 */
 	@RequestMapping(value = "/organizer/create", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
-	public ResponseEntity<String> createOrganizer(@RequestBody(required = true) OrganizerTable organizerTable) {
+	public ResponseEntity<String> createOrganizer(
+			@RequestBody(required = true) OrganizerTable organizerTable) {
 		try {	
 			int affectedRow = OrganizerRepositoryImpl.createOrganizer(organizerTable);
 			if (affectedRow == 0) {
@@ -45,12 +57,19 @@ public class OrganizerController {
 					HttpStatus.INTERNAL_SERVER_ERROR);
 			//lack of required info or server error
 		}
-	}
-	
+	}	
+
+	/**
+	 * Get organizer basic information from database by organizer id
+	 * 
+	 * @param Organizer_ID
+	 * @return ResponseEntity with message and data
+	 */
 	@RequestMapping(value = "/organizer/search/{Organizer_ID}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> getOrganizerList(@PathVariable int Organizer_ID) {
 		try {	
-			List<OrganizerTable> organizerList = OrganizerRepositoryImpl.getOrganizerInfo(Organizer_ID);
+			List<OrganizerTable> organizerList = 
+					OrganizerRepositoryImpl.getOrganizerInfo(Organizer_ID);
 			if (organizerList.isEmpty()) {
 				return new ResponseEntity<>(
 						"{\"message\" : \"No organizer found\"}", HttpStatus.OK);
@@ -66,8 +85,15 @@ public class OrganizerController {
 		} 
 	}
 
+	/**
+	 * Update organizer basic information, can update partial info
+	 * 
+	 * @param OrganizerTable. Organizer_id cannot be null and must exist in database
+	 * @return ResponseEntity with message
+	 */
 	@RequestMapping(value = "/organizer/update", method = RequestMethod.PUT, produces = "application/json;charset=UTF-8")
-	public ResponseEntity<String> updateOrganizer(@RequestBody(required = true) OrganizerTable OrganizerTable) {
+	public ResponseEntity<String> updateOrganizer(
+			@RequestBody(required = true) OrganizerTable OrganizerTable) {
 		try {	
 		int affectedRow = OrganizerRepositoryImpl.updateOrganizer(OrganizerTable);
 			if (affectedRow == 0) {
@@ -87,10 +113,16 @@ public class OrganizerController {
 		}
 	}
 
-	@RequestMapping(value="/organizer/delete/{Organizer_ID}",method = RequestMethod.DELETE, produces = "application/json;charset=UTF-8")
-	public ResponseEntity<String> deleteOrganizer(@PathVariable("Organizer_ID") int id) {
+	/**
+	 * Delete organizer basic, address, contact information from database by organizer id
+	 * 
+	 * @param Organizer_ID
+	 * @return ResponseEntity with message
+	 */
+	@RequestMapping(value="/organizer/delete/{Organizer_ID}", method = RequestMethod.DELETE, produces = "application/json;charset=UTF-8")
+	public ResponseEntity<String> deleteOrganizer(@PathVariable int Organizer_ID) {
 		try {
-			int affectedRow = OrganizerRepositoryImpl.deleteOrganizer(id);
+			int affectedRow = OrganizerRepositoryImpl.deleteOrganizer(Organizer_ID);
 			if(affectedRow > 0 )  {
 				return new ResponseEntity<>(
 						"{\"message\" : \"Organizer deleted\"}", HttpStatus.OK);
@@ -105,21 +137,45 @@ public class OrganizerController {
 		} 
 	}
 	
-	@RequestMapping(value = "/organizer/login", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
-	public ResponseEntity<String>oLogin(@RequestBody(required = true) OrganizerTable organizerTable) { 
-		boolean isMatch = OrganizerRepositoryImpl.isMatching(organizerTable.getEmail_Address(), organizerTable.getPassword());
-		if(isMatch) {
+	/**
+	 * Organizer login
+	 * 
+	 * @param organizerTable. Contains organizer email_address and password, cannot be null
+	 * @return ResponseEntity with login result message
+	 */
+	@RequestMapping(value = "/organizer/login", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+	public ResponseEntity<String> oLogin(
+			@RequestBody(required = true) OrganizerTable organizerTable) { 
+		try {
+			boolean isMatch = 
+					OrganizerRepositoryImpl.isMatching(organizerTable.getEmail_address(), organizerTable.getPassword());
+			if(isMatch) {
+				return new ResponseEntity<>(
+						"{\"message\" : \"Organizer login successfully\"}", HttpStatus.OK);
+			}else {
+				return new ResponseEntity<>(
+						"{\"message\" : \"Organizer login failed: Email or Password is not correct...\"}", 
+						HttpStatus.OK);
+			}	
+		} catch (DataIntegrityViolationException dataIntegrityViolationException) {
+			return new ResponseEntity<>("{\"message\" : \"Invalid input\"}",
+					HttpStatus.BAD_REQUEST);
+		} catch (Exception e) {
 			return new ResponseEntity<>(
-					"{\"message\" : \"Organizer login successfully\"}", HttpStatus.OK);
-		}else {
-			return new ResponseEntity<>(
-					"{\"message\" : \"Organizer login failed\"}", HttpStatus.OK);
-		}		
+					"{\"message\" : \"Exception in organizer login, please contact admin\"}",
+					HttpStatus.INTERNAL_SERVER_ERROR);
+		} 
 	}
 	
-	//For Organizer's "Address" table
+	/**
+	 * Create an organizer address and put the information into database
+	 * 
+	 * @param address. Organizer_id cannot be null
+	 * @return ResponseEntity with message
+	 */
 	@RequestMapping(value = "/organizer/address/create", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
-	public ResponseEntity<String> createAddress(@RequestBody(required = true) Address address) {
+	public ResponseEntity<String> createAddress(
+			@RequestBody(required = true) Address address) {
 		try {	
 			int affectedRow = OrganizerRepositoryImpl.createAddress(address);
 			if (affectedRow == 0) {
@@ -139,6 +195,12 @@ public class OrganizerController {
 		}
 	}
 	
+	/**
+	 * Get organizer's address information from database by organizer_id
+	 * 
+	 * @param Organizer_ID.
+	 * @return ResponseEntity with message and data
+	 */
 	@RequestMapping(value = "/organizer/address/search/{Organizer_ID}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> getAddressList(@PathVariable int Organizer_ID) {
 		try {
@@ -158,6 +220,12 @@ public class OrganizerController {
 		} 
 	}
 	
+	
+	/**
+	 * Update organizer's address
+	 * @param address. Organizer_id and address_id cannot be null
+	 * @return ResponseEntity with message
+	 */
 	@RequestMapping(value = "/organizer/address/update", method = RequestMethod.PUT, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> updateAddress(@RequestBody(required = true) Address address) {
 		try {	
@@ -179,9 +247,13 @@ public class OrganizerController {
 		}
 	}
 	
-	
-	//For Organizer's "Contacts" table
-	// This method for creating contact information of organizer
+	/**
+	 * Create an organizer contact and connect with organizer address, 
+	 * put the information into database
+	 * 
+	 * @param organizerContactTable. Organizer_id and address_id cannot be null
+	 * @return ResponseEntity with message
+	 */
 	@RequestMapping(value = "/organizer/contact/create", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> registerOrganizerInfo(
 			@RequestBody(required = true) OrganizerContactTable organizerContactTable) {
@@ -190,7 +262,6 @@ public class OrganizerController {
 					.createOrganizerContact(organizerContactTable);
 
 			if (affectedRow == -1) {
-				// Generate Runtime Exception 
 				return new ResponseEntity<>(
 						"{\"message\" : \"Input organizer_id or address_id not found\"}",
 						HttpStatus.OK);
@@ -207,11 +278,17 @@ public class OrganizerController {
 					HttpStatus.BAD_REQUEST);
 		} catch (Exception exception) {
 			return new ResponseEntity<>(
-					"{\"message\" : \"Exception in creating organizer contact info, please contact admin\"}",
+				"{\"message\" : \"Exception in creating organizer contact info, please contact admin\"}",
 					HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 	
+	/**
+	 * Get organizer's contact info from database by organizer id
+	 * 
+	 * @param Organizer_ID
+	 * @return ResponseEntity with message and data
+	 */
 	@RequestMapping(value = "/organizer/contact/search/{Organizer_ID}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> getOrganizerContactList(@PathVariable int Organizer_ID) {
 		try {
@@ -232,7 +309,12 @@ public class OrganizerController {
 		} 
 	}
 	
-	// This method for creating contact information of organizer
+	/**
+	 * Update organizer's contact information
+	 * 
+	 * @param organizerContactTable. Contact_id, organizer_id and address_id cannot be null
+	 * @return ResponseEntity with message
+	 */
 	@RequestMapping(value = "/organizer/contact/update", method = RequestMethod.PUT, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> updateOrganizerInfo(
 			@RequestBody(required = true) OrganizerContactTable organizerContactTable) {
@@ -247,7 +329,8 @@ public class OrganizerController {
 						HttpStatus.OK);
 			} else {
 				return new ResponseEntity<>(
-						"{\"message\" : \"Organizer contact successfully updated\"}", HttpStatus.OK);
+						"{\"message\" : \"Organizer contact successfully updated\"}", 
+						HttpStatus.OK);
 			}
 		} catch (DataIntegrityViolationException dataIntegrityViolationException) {
 			return new ResponseEntity<>("{\"message\" : \"Invalid input\"}",

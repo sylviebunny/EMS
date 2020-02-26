@@ -11,12 +11,12 @@ import lombok.Setter;
 @Setter
 @Component
 public class Address {
-	public int Address_ID; 
-	public String Street1;
-	public String Street2;
-	public String City;
-	public String State;
-	public int Zipcode;
-	public String Other_Details;
-	public int Organizer_ID;
+	private int address_id; 
+	private String street1;
+	private String street2;
+	private String city;
+	private String state;
+	private int zipcode;
+	private String other_details;
+	private int organizer_id;
 }

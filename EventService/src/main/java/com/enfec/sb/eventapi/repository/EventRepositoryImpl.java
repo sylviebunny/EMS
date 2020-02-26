@@ -27,24 +27,44 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Event repository implementation class
+ * @author heidi huo
+ *
+ */
 @Component
 @Transactional
 public class EventRepositoryImpl implements EventRepository {
 
-	final String REGISTER_EVENT = "INSERT INTO Events(Event_Status_Code, Event_Type_Code, Commercial_Type, Organizer_ID, Venue_ID, "
+    /**
+     * {@value #REGISTER_EVENT} Query for event registration 
+     */
+	private static final String REGISTER_EVENT = "INSERT INTO Events(Event_Status_Code, Event_Type_Code, Commercial_Type, Organizer_ID, Venue_ID, "
 			+ "Event_Name, Event_Start_Time, Event_End_Time, Timezone, Number_of_Participants, Derived_Days_Duration, Event_Cost, Discount, Comments) VALUES "
 			+ "(:event_status_code, :event_type_code, :commercial_type, :organizer_id, "
 			+ ":venue_id, :event_name, :event_start_time, :event_end_time, :timezone, :number_of_participants, :derived_days_duration, :event_cost, :discount, :comments)";
 	
-	String UPDATE_EVENT_INFO_PREFIX = "UPDATE Events SET "; 
-	String UPDATE_EVENT_INFO_SUFFIX = " WHERE Event_ID = :event_id AND Organizer_ID =:organizer_id";
+    /**
+     * {@value #UPDATE_EVENT_INFO} Query prefix and suffix for updating an event
+     */
+	private static final String UPDATE_EVENT_INFO_PREFIX = "UPDATE Events SET "; 
+	private static final String UPDATE_EVENT_INFO_SUFFIX = " WHERE Event_ID = :event_id AND Organizer_ID =:organizer_id";
 	
+	/**
+	 * {@value #DELETE_EVENT} Query for deleting event
+	 */
 	private static final String DELETE_EVENT = "DELETE FROM Events WHERE Event_ID =?";
 
+	/**
+	 * {@value #GET_ALL_EVENT} Query for collecting all event information 
+	 */
 	private static final String GET_ALL_EVENT = "SELECT Event_ID, Events.Event_Status_Code, Events.Event_Type_Code, Commercial_Type, Events.Organizer_ID, Events.Venue_ID, Event_Name, Event_Start_Time, Event_End_Time, Timezone, Number_of_Participants, Derived_Days_Duration, Event_Cost, Discount, Comments, Venue_Name, Venues.Other_Details, Street1, Street2, City, State, Zipcode, Latitude, Longitude, Event_Status_Description, Event_Type_Description, Organizer_Name\n" + 
 			"FROM Events, Venues, Venue_Address, Ref_Event_Status, Ref_Event_Types, Organizers\n" + 
 			"WHERE Events.Venue_ID = Venues.Venue_ID AND Events.Venue_ID = Venue_Address.Venue_ID AND Events.Event_Status_Code = Ref_Event_Status.Event_Status_Code AND Events.Event_Type_Code = Ref_Event_Types.Event_Type_Code AND Organizers.Organizer_ID = Events.Organizer_ID; ";
 
+	/**
+	 * {@value #GET_ALL_VENUE} Query for collecting all venue address information 
+	 */
 	private static final String GET_ALL_VENUE = "SELECT * FROM Venue_Address";
 	
 	@Autowired
@@ -53,38 +73,38 @@ public class EventRepositoryImpl implements EventRepository {
 	@Autowired
 	JdbcTemplate jdbcTemplate; 
 	
+	/**
+	 * Use filter bar, anyone can type anything, like WA/seattle/non-profitable/festival/98002. 
+	 * Should not match str with ID or code information. 
+	 * {@inheritDoc}
+	 * @throws NotBoundException when input zipcode is not a valid zipcode
+	 */
 	@Override
 	public List<Map> getFilteredEventsByRefinedZipcode(List<EventTable> allEvent, String str) throws NotBoundException {
-		// Use filter bar, anyone can type anything, like WA/seattle/non-profitable/festival/98002
-		// We should not match str with ID or code information. 
-		
-		// Convert EventTable to Map
-		List<Map> allEventMap = new ArrayList<>(); 
+	
+		List<Map> allEventMap = new ArrayList<>();    // Convert EventTable to Map
 		for (EventTable et: allEvent) {
 			allEventMap.add(eventMap(et, et.getEvent_id())); 
 		} 
 		
-		// str can be null, if it's null, then print out allEvents
-		if (str == null || str.isEmpty()) {
+		if (str == null || str.isEmpty()) {   // str can be null, if it's null, then print out allEvents
+		    Collections.sort(allEventMap, new EventComparatorByStartTime()); 
 			return allEventMap; 
 		}
 		
-		// If str is a valid zipcode, then we need to get the events mapping from zipcode to location info
-		Integer zipcode = getZipcode(str); 
-		if (zipcode != null) {
-			try {
+		Integer zipcode = getZipcode(str);    
+		if (zipcode != null) {           
+			try { 
 				return getEventByZipcode(allEventMap, zipcode); 
 			} catch (NotBoundException nbe) {
-				throw nbe; 
+				throw nbe;          // This is not a valid zipcode on file 
 			}
 		}
 		
 		List<Map> afterFilter = new ArrayList<>(); 
 		
-		// We don't match str with IDs
 		final HashSet<String> ignoreKeys = getIgnoreKeys(); 
 		
-		// Iterate through whole events map and find events that fit into str
 		for (Map<String,Object> eachEvent: allEventMap) {
 			for (String key: eachEvent.keySet()) {
 				if (!ignoreKeys.contains(key) && eachEvent.get(key) != null) {
@@ -96,10 +116,14 @@ public class EventRepositoryImpl implements EventRepository {
 				}
 			}
 		}
-		Collections.sort(afterFilter, new EventComparatorByStartTime());
+		Collections.sort(afterFilter, new EventComparatorByStartTime());      // Sort events based on start time
 		return afterFilter; 
 	}
 	
+	/**
+	 * Keys that don't need to search 
+	 * @return A set of key name
+	 */
 	private HashSet<String> getIgnoreKeys() {
 		
 		HashSet<String> ignoreKeys = new HashSet<>(); 
@@ -113,37 +137,35 @@ public class EventRepositoryImpl implements EventRepository {
 		return ignoreKeys; 
 	}
 	
-	/*
-	 * 	----------------------------------------------------------------------------------------------------
-	 * 				Get all the events within a date range, combining with other criteria
-	 *  ----------------------------------------------------------------------------------------------------
-	 */
-	/*
-	 * 	Get all events within a date range 
+	/**
+	 * {@inheritDoc}
+	 * <pre>start_date - start date, inclusive</pre>
+	 * <pre>end_date - end date, inclusive</pre>
 	 */
 	@Override
 	public List<Map> getFilteredEvents(List<EventTable> allEvent, Timestamp start_date, Timestamp end_date) {
-		// Convert EventTable to Map
 		List<Map> allEventMap = new ArrayList<>(); 
 		for (EventTable et: allEvent) {
 			allEventMap.add(eventMap(et, et.getEvent_id())); 
 		} 
 		
-		
 		List<Map> dateRangeEvents = new ArrayList<>();
 		for (Map eachEvent: allEventMap) {
 			Timestamp eventStartTime = Timestamp.valueOf((String)eachEvent.get("event_start_time")); 
 			Timestamp eventEndTime = Timestamp.valueOf((String)eachEvent.get("event_end_time"));
-			if (eventStartTime.after(start_date) && eventStartTime.before(end_date)) {
-				// the event that is within the date period
+			if (eventStartTime.after(start_date) && eventStartTime.before(end_date) || 
+			        eventStartTime.equals(start_date) || eventStartTime.equals(end_date)) {
 				dateRangeEvents.add(eachEvent); 
 			}
 		}
 		
-		Collections.sort(dateRangeEvents, new EventComparatorByStartTime()); 
+		Collections.sort(dateRangeEvents, new EventComparatorByStartTime());  // Sort based on start time
 		return dateRangeEvents; 
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public List<Map> getEventByEventType(List<Map> inputEvents, String event_type) {
 		if (event_type == null || event_type.length() == 0) {
@@ -152,7 +174,6 @@ public class EventRepositoryImpl implements EventRepository {
 		
 		List<Map> resultEvents = new ArrayList<>();
 		
-		// Get all events that matches this type
 		for (Map eachEvent: inputEvents) {
 			String currType = eachEvent.get("event_type_description").toString(); 
 			if (currType.toLowerCase().contains(event_type.toLowerCase())) {
@@ -162,13 +183,11 @@ public class EventRepositoryImpl implements EventRepository {
 		return resultEvents; 
 	}
 	
-	/*
-	 * 	----------------------------------------------------------------------------------------------------
-	 * 				Get an event based on event_id
-	 *  ----------------------------------------------------------------------------------------------------
+	/**
+	 *  {@inheritDoc}
 	 */
+	@Override
 	public List<EventTable> getEventByID(int event_id) {
-		// Implementation for GET event by EVENT_ID
 		List<EventTable> allEvents = getAllEvents(); 
 		
 		List<EventTable> resultEvent = new ArrayList<>(); 
@@ -182,24 +201,20 @@ public class EventRepositoryImpl implements EventRepository {
 		return resultEvent; 
 	}
 	
-	/*
-	 * 	----------------------------------------------------------------------------------------------------
-	 * 				zip code related functions
-	 *  ----------------------------------------------------------------------------------------------------
-	 */
-	/*
-	 * 		Based on given zipcode, get all events within a distance. 
+	/**
+	 * Based on given zipcode, get all events within distance (50 miles)
+	 * <p>Reorganize all List<Map> from nearest to farthest based on given zipcode.</p>
+	 * @param inputEventList
+	 * @param zipcode
+	 * @return a list of events that match such criteria
+	 * @throws NotBoundException if input zipcode is not a valid zipcode
 	 */
 	public List<Map> getEventByZipcode(List<Map> inputEventList, int zipcode) throws NotBoundException {
-		// Reorganize all List<Map> from nearest to farthest based on given zipcode. 
+	 
+		int inserted_row = storeZipcodeInfo();    // Update venue_address for collecting specific location for each event's zipcode   
 		
-		// Check venue_address table, and call RapidAPI for filling out all zipcode information. 
-		int inserted_row = storeZipcodeInfo(); 
-		
-		// Get zipcode info for given zipcode
 		Map<String, Object> mapedGivenZipcode = callRapidGetZipCodeInfo(String.valueOf(zipcode)); 
-		// mapedGivenZipcode can be null, like 10000, it is not a valid zipcode
-		if (mapedGivenZipcode == null) {
+		if (mapedGivenZipcode == null) {      // Input zipcode is not a valid zipcode stored in database
 			throw new NotBoundException(); 
 		}
 		double givenLat = (double)mapedGivenZipcode.get("lat"); 
@@ -212,8 +227,7 @@ public class EventRepositoryImpl implements EventRepository {
 			Double currLng = (Double)eachEvent.get("longitude"); 
 			if (currLat != null && currLng != null && currLat != 0.0 && currLng != 0.0) {
 				double distance = getDistance(givenLat, givenLng, currLat, currLng);
-				// Add distance info to current event's map
-				eachEvent.put("distance_between", distance); 
+				eachEvent.put("distance_between", distance);    // Put distance into result list
 			}
 		}
 		
@@ -221,14 +235,13 @@ public class EventRepositoryImpl implements EventRepository {
 		List<Map> resultList = new ArrayList<>(); 
 		for (Map eachEvent: inputEventList) {
 			Object currDis = eachEvent.get("distance_between"); 
-			if (currDis != null && (double)currDis < 50.0) {
+			if (currDis != null && (double)currDis <= 50.0) {
 				resultList.add(eachEvent); 
 			}
 		}
 		
-		// If no event in result list, then print out all events 
 		if (resultList.isEmpty()) {
-			Collections.sort(inputEventList, new EventComparatorByDistance());
+		    Collections.sort(inputEventList, new EventComparatorByDistance()); // If no event in result list, then print out all events 
 			return inputEventList; 
 		} else {
 			Collections.sort(resultList, new EventComparatorByDistance()); 
@@ -236,14 +249,20 @@ public class EventRepositoryImpl implements EventRepository {
 		}
 	}
 
+	/**
+	 * Calculate distance between two geographical coordinates
+	 * @param coordinate1's latitude
+	 * @param coordinate1's longitude
+	 * @param coordinate2's latitude
+	 * @param coordinate2's longitude
+	 * @return distance between two coordinates in mile 
+	 */
 	private double getDistance(double givenLat, double givenLng, double currLat, double currLng) {
-		// Get distance between two coordinates (latitude, longitude)
 		givenLng = Math.toRadians(givenLng); 
         currLng = Math.toRadians(currLng); 
         givenLat = Math.toRadians(givenLat); 
         currLat = Math.toRadians(currLat); 
   
-        // Haversine formula  
         double dlon = currLng - givenLng;  
         double dlat = currLat - givenLat; 
         double a = Math.pow(Math.sin(dlat / 2), 2) 
@@ -254,18 +273,20 @@ public class EventRepositoryImpl implements EventRepository {
   
         // Radius of earth in kilometers. Use 3956 for miles, 6371 for kilometers. 
         double r = 3956; 
-  
-        // calculate the result 
+
         return(c * r); 
 	}
 	
+	/**
+	 * {@value #FILL_ZIPCODE_INFO} Query for filling out coordinates information in venue_address table
+	 */
 	private static final String FILL_ZIPCODE_INFO = "UPDATE Venue_Address SET Latitude =:lat,Longitude =:lng WHERE Zipcode =:zip_code";
-	/* 
-	 *  	Store zipcodes information in Venue_Address table after calling public API. 
+	
+	/**
+	 * Get zipcode coordinates information with calling public API and store them in database
+	 * @return affected row
 	 */
 	private int storeZipcodeInfo() {
-		// Get all venue_address's zipcodes, call public APIs get latitude and longitude, then store in 
-		// venue_address table 
 		List<EventTable> allVenue = jdbcTemplate.query(GET_ALL_VENUE, new EventRowmapper());
 		
 		int count_affected_row = 0; 
@@ -273,11 +294,9 @@ public class EventRepositoryImpl implements EventRepository {
 		for (EventTable eachVenue: allVenue) {
 			if (eachVenue.getZipcode() != null && eachVenue.getZipcode() != 0) {
 				if (eachVenue.getLatitude() == 0.0 || eachVenue.getLongitude() == 0.0) {
-					
-					// Don't have zipcode information, so need to call public API to get current zip code info 
+					 
 					Map<String, Object> zipInfo = callRapidGetZipCodeInfo(eachVenue.getZipcode().toString());
 					
-					// Store zipcode info into database
 					SqlParameterSource pramSource = new MapSqlParameterSource(zipInfo);
 					count_affected_row += namedParameterJdbcTemplate.update(FILL_ZIPCODE_INFO, pramSource);
 				}
@@ -286,14 +305,19 @@ public class EventRepositoryImpl implements EventRepository {
 		return count_affected_row;
 	}
 	
-	/*
-	 * 		For a given zipcode, call API to get latitude and zipcode information. 
-	 */
 	private final ObjectMapper mapper = new ObjectMapper(); 
 	
+	/**
+	 * Private token information for calling third party API
+	 */
 	private final String HOST_NAME = ""; 
 	private final String ACCESS_KEY = ""; 
 	
+	/**
+	 * Call third API to get zipcode information and convert JSON body to map
+	 * @param zipcode
+	 * @return mapped zipcode information 
+	 */
 	private Map<String, Object> callRapidGetZipCodeInfo(String zipcode) {
 		Map<String, Object> zipInfo = new HashMap<>(); 
 		
@@ -308,7 +332,6 @@ public class EventRepositoryImpl implements EventRepository {
 					.asString();
 			
 			try {
-				// Parse from JSON to Map<String, Object>
 				zipInfo = mapper.readValue(response.getBody(), new TypeReference<HashMap<String,Object>>(){});
 			} catch (JsonMappingException e) {
 				e.printStackTrace();
@@ -321,11 +344,12 @@ public class EventRepositoryImpl implements EventRepository {
 		return (Map<String, Object>) zipInfo.get(zipcode); 
 	}
 	
-	/*
-	 * 		Check if a string is a valid zipcode and get zipcode in int type
+	/**
+	 * Check if a string is a valid zipcode and convert it to int type
+	 * @param str
+	 * @return zipcode in int type or null if input is not a valid 5-digit zipcode
 	 */
 	private Integer getZipcode(String str) {
-		// Check if str is a 5-digit zipcode. 
 		if (str != null && str.length() != 5) {
 			return null; 
 		}
@@ -340,25 +364,20 @@ public class EventRepositoryImpl implements EventRepository {
 		return zipcode; 
 	}
 
-	/*
-	 * 	----------------------------------------------------------------------------------------------------
-	 * 				Get all the event related information and store them in List<EventTable>
-	 *  ----------------------------------------------------------------------------------------------------
+	/**
+	 * {@inheritDoc}
+	 * with including completed event location information 
 	 */
 	@Override
 	public List<EventTable> getAllEvents() {
-		// Get all related event information
 		return jdbcTemplate.query(GET_ALL_EVENT, new EventRowmapper()); 
 	}
 	
-	/* 
-	 * ---------------------------------- Event POST ----------------------------------
-	 * 
+	/**
+	 * {@inheritDoc}
 	 */
-	
 	@Override
 	public int createEvent (EventTable eventTable) {
-		// Create an event
 		int affectedRow;
 		Map<String, Object> param = eventMap(eventTable, Integer.MIN_VALUE);
 		
@@ -368,48 +387,40 @@ public class EventRepositoryImpl implements EventRepository {
 		return affectedRow; 
 	}
 	
-	/* 
-	 * ---------------------------------- Event UPDATE ----------------------------------
-	 * 
+	/**
+	 * Update an event by matching event_id and organizer_id
+	 * {@inheritDoc}
 	 */
-	
 	@Override
 	public int updateEvent(EventTable eventTable) {
-		// Update an event by matching event_id and organizer_id
 		int affectedRow;
 		Map<String, Object> param = eventMap(eventTable, eventTable.getEvent_id());
 		
 		SqlParameterSource pramSource = new MapSqlParameterSource(param);
 		
-		// Decide which part we need to update
-		StringBuilder UPDATE_EVENT_INFO = new StringBuilder();
+		StringBuilder UPDATE_EVENT_INFO = new StringBuilder();            // Decide which part we need to update
 		for (String key : param.keySet()) {
-			if (param.get(key) != null && !key.equals("organizer_id") && !key.equals("event_id"))
-			{
+			if (param.get(key) != null && !key.equals("organizer_id") && !key.equals("event_id")) {
 				UPDATE_EVENT_INFO.append(key + "=:" + key + ",");
 			}
 		}
-		// remove the last comma
-		UPDATE_EVENT_INFO = UPDATE_EVENT_INFO.deleteCharAt(UPDATE_EVENT_INFO.length() - 1); 
+		
+		UPDATE_EVENT_INFO = UPDATE_EVENT_INFO.deleteCharAt(UPDATE_EVENT_INFO.length() - 1);       // remove the last comma
 		
 		String UPDATE_EVENT = UPDATE_EVENT_INFO_PREFIX + UPDATE_EVENT_INFO + UPDATE_EVENT_INFO_SUFFIX;
 		affectedRow =namedParameterJdbcTemplate.update(UPDATE_EVENT, pramSource);
 		
 		return affectedRow;
-
 	}
 	
-	/* 
-	 * ---------------------------------- Event DELETE ----------------------------------
-	 * 
+	/**
+	 * {@inheritDoc}
 	 */
 	@Override
 	public int deleteEvent(int event_id) {
-		// Delete an event by event_id
-		List<EventTable> et = getEventByID(event_id); 
+		List<EventTable> et = getEventByID(event_id); // Check if event exists in database
 		
-		if (et == null || et.size() == 0) {
-			// Didn't find this event; 
+		if (et == null || et.size() == 0) {   // Given event id is not in database
 			return Integer.MIN_VALUE; 
 		} else {
 			int affectedRow = jdbcTemplate.update(DELETE_EVENT, event_id);
@@ -417,16 +428,16 @@ public class EventRepositoryImpl implements EventRepository {
 		}
 	}
 	
-	/* 
-	 * ---------------------------------- Event mapping ----------------------------------
-	 * 
+	/**
+	 * Map event's information between URL body information and database variable attributes
+	 * @param eventTable
+	 * @param event_id
+	 * @return Map contains variable and it's corresponding information 
 	 */
 	private Map<String, Object> eventMap(EventTable eventTable, Integer event_id) {
-		// Mapping event's information query's variable to URL POST body
 		Map<String, Object>param = new HashMap<>();
 		
-		if (event_id != null && event_id != Integer.MIN_VALUE) {
-			// Means we need to update event 
+		if (event_id != null && event_id != Integer.MIN_VALUE) { // Means we need to update event 
 			param.put("event_id", event_id); 
 		}
 		

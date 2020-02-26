@@ -32,7 +32,7 @@ public class EventController {
 
 	/**
 	 * Get API for events with given event ID
-	 * @param event_id the specified event ID
+	 * @param event_id specific event ID
 	 * @return response entity
 	 */
 	@RequestMapping(value = "/event/search", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
@@ -52,8 +52,8 @@ public class EventController {
 
 	/**
 	 * Get API for events whose city, zipcode, event name, event type contains specified content 
-	 * @param word key word to be searched by
-	 * @return
+	 * @param word - key word to be searched by
+	 * @return response entity
 	 */
 	@RequestMapping(value = "/event/search/{word}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> getEventListByFilterBar(@PathVariable(required = false) String word) {
@@ -92,17 +92,14 @@ public class EventController {
 
 			Timestamp st = new Timestamp(start_date.getTime());
 			Timestamp et = new Timestamp(end_date.getTime());
-			// Check if enter the right date range
 			if (st == null || et == null || et.before(st)) {
 				throw new DataFormatException();
 			}
 
 			List<EventTable> allEvent = eventRepositoryImpl.getAllEvents();
 
-			// Get events within a date range
 			List<Map> result_events_within_date = eventRepositoryImpl.getFilteredEvents(allEvent, st, et);
-
-			// Get events within a zipcode range
+			
 			List<Map> result_events_by_zipcode = null;
 			if (zipcode != null && zipcode.length() != 0) {
 				result_events_by_zipcode = eventRepositoryImpl.getEventByZipcode(result_events_within_date,
@@ -110,9 +107,8 @@ public class EventController {
 			} else {
 				result_events_by_zipcode = result_events_within_date;
 			}
-
-			// Get events with a event_type
-			List<Map> result_events = eventRepositoryImpl.getEventByEventType(result_events_by_zipcode, event_type);
+			
+			List<Map> result_events = eventRepositoryImpl.getEventByEventType(result_events_by_zipcode, event_type);  // Get events with specific type
 
 			if (result_events == null || result_events.size() == 0) {
 				return new ResponseEntity<>("{\"message\" : \"No event found\"}", HttpStatus.OK);

@@ -2,20 +2,13 @@ package com.enfec.sb.refundapi.model;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Base64;
-
 import org.springframework.jdbc.core.RowMapper;
 
 
 public class OOrderRefundRowmapper implements RowMapper<OOrderRefundTable> {
     
     /**
-     * Map each MySql column's content to organizer refund table
-     * 
-     * @param ResultSet
-     * @param rowNum
-     * @throws SQLException when column doesn't exist in my database 
-     * @return OrganizerRefundTable
+     * {@inheritDoc}
      */
     @Override
     public OOrderRefundTable mapRow(ResultSet rs, int rowNum) throws SQLException {

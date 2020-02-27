@@ -7,12 +7,7 @@ import org.springframework.jdbc.core.RowMapper;
 public class COrderRefundRowmapper implements RowMapper<COrderRefundTable> {
 
     /**
-     * Map each MySql column's content to customer refund table
-     * 
-     * @param ResultSet
-     * @param rowNum
-     * @throws SQLException when column doesn't exist in my database 
-     * @return CustomerRefundTable
+     * {@inheritDoc}
      */
     @Override
     public COrderRefundTable mapRow(ResultSet rs, int rowNum) throws SQLException {

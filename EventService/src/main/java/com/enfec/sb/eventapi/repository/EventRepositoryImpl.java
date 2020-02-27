@@ -310,8 +310,8 @@ public class EventRepositoryImpl implements EventRepository {
 	/**
 	 * Private token information for calling third party API
 	 */
-	private final String HOST_NAME = ""; 
-	private final String ACCESS_KEY = ""; 
+    private final String HOST_NAME = ""; 
+    private final String ACCESS_KEY = ""; 
 	
 	/**
 	 * Call third API to get zipcode information and convert JSON body to map

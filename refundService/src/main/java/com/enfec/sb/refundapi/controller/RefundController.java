@@ -31,7 +31,6 @@ public class RefundController {
      * Get organizer refund information from database by organizer refund id
      * 
      * @param organizer_refund_id. Cannot be null and must be positive
-     * @throws Exception when unknown error showed
      * @return ResponseEntity with message and data 
      */
     @RequestMapping(value = "/organizer_refund/search/{organizer_refund_id}",
@@ -60,7 +59,6 @@ public class RefundController {
      * Get organizer refund information from database by organizer order id
      * 
      * @param organizer_order_id. Cannot be null and must be positive
-     * @throws Exception when unknown error showed
      * @return ResponseEntity with message and data 
      */
     @RequestMapping(value = "/organizer_refund/search/organizer_order_id/{oorder_id}",
@@ -90,7 +88,6 @@ public class RefundController {
      * 
      * @param organizerRefundTable. Organizer_order_id Cannot be null and must exist in database; 
      * Description can be null 
-     * @throws DataIntegrityViolationException when organizer_order_id does not exist in database
      * @return ResponseEntity with message
      */
     @RequestMapping(value = "/organizer_refund/create", method = RequestMethod.POST,
@@ -122,8 +119,6 @@ public class RefundController {
      * 
      * @param organizerRefundTable. Organizer_refund_id Cannot be null and must exist in database; 
      * Description can be null; Organizer refund status can be null 
-     * @throws DataIntegrityViolationException when organizer_refund_id does not exist in database
-     * Exception when unknown error showed. 
      * @return ResponseEntity with message
      */
     @RequestMapping(value = "/organizer_refund/update", method = RequestMethod.PUT,
@@ -153,7 +148,6 @@ public class RefundController {
      * Delete organizer refund
      * 
      * @param organizer_refund_id. Cannot be null and must be positive
-     * @throws Exception when unknown error showed. 
      * @return ResponseEntity with message
      */
     @RequestMapping(value = "/organizer_refund/delete/{organizer_refund_id}",
@@ -180,7 +174,6 @@ public class RefundController {
      * Get customer refund
      * 
      * @param customer_refund_id. Cannot be null and must be positive
-     * @throws Exception when unknown error showed. 
      * @return ResponseEntity with message and data
      */
     @RequestMapping(value = "/customer_refund/search/{customer_refund_id}",
@@ -210,7 +203,6 @@ public class RefundController {
      * Get customer refund
      * 
      * @param customer_order_id. Cannot be null and must be positive
-     * @throws Exception when unknown error showed. 
      * @return ResponseEntity with message and data
      */
     @RequestMapping(value = "/customer_refund/search/customer_order_id/{corder_id}",
@@ -241,8 +233,6 @@ public class RefundController {
      * 
      * @param CustomerRefundTable. Customer_order_id cannot be null and must exist in database; 
      * Customer_description can be null. 
-     * @throws DataIntegrityViolationException when customer_order_id does not exist in database. 
-     * Exception when unknown error showed. 
      * @return ResponseEntity with message
      */
     @RequestMapping(value = "/customer_refund/create", method = RequestMethod.POST,
@@ -274,8 +264,6 @@ public class RefundController {
      * 
      * @param CustomerRefundTable. Customer_refund_id cannot be null and must exist in database; 
      * Customer_description can be null; Customer_refund_status can be null. 
-     * @throws DataIntegrityViolationException when customer_refund_id does not exist in database. 
-     * Exception when unknown error showed. 
      * @return ResponseEntity with message
      */
     @RequestMapping(value = "/customer_refund/update", method = RequestMethod.PUT,
@@ -304,8 +292,7 @@ public class RefundController {
     /**
      * Delete an organizer refund
      * 
-     * @param customer_refund_id. Cannot be null and must be positive
-     * @throws Exception when unknown error showed. 
+     * @param customer_refund_id. Cannot be null and must be positive 
      * @return ResponseEntity with message
      */
     @RequestMapping(value = "/customer_refund/delete/{customer_refund_id}",

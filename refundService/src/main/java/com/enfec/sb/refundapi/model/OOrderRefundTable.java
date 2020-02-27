@@ -12,10 +12,29 @@ import org.springframework.stereotype.Component;
 @Setter
 public class OOrderRefundTable {
 
+    /**
+     * Organizer refund id
+     */
     private int refund_id;
+    
+    /**
+     * Organizer order id
+     */
     private int oorder_id;
+    
+    /**
+     * Organizer refund description
+     */
     private String description;
+    
+    /**
+     * Organizer refund updated time
+     */
     private Timestamp refund_updated_time;
+    
+    /**
+     * Organizer refund status
+     */
     private String refund_status;
 
 }

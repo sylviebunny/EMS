@@ -2,15 +2,21 @@ package com.enfec.demo.model;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
 import org.springframework.jdbc.core.RowMapper;
 
-
 public class OrganizerContactRowmapper implements RowMapper<OrganizerContactTable>{
-	
+	/**
+     * Map each MySql column's content to organizer contact table
+     * 
+     * @param rs: ResultSet
+     * @param rowNum
+     * @throws SQLException when column doesn't exist in database 
+     * @return OrganizerContactTable
+     */
 	@Override
 	public OrganizerContactTable mapRow(ResultSet rs, int rowNum) throws SQLException {
 		OrganizerContactTable organizerContactTable = new OrganizerContactTable();
+		organizerContactTable.setContact_id(rs.getInt("Contact_ID"));
 		organizerContactTable.setOrganizer_id(rs.getInt("Organizer_ID"));
 		organizerContactTable.setContact_name((rs.getString("Contact_Name")));
 		organizerContactTable.setTelephone((rs.getString("Telephone")));

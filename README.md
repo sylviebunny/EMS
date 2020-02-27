@@ -1,11 +1,22 @@
 # Enfec-EMS
-### Version 0.0.1
-Create Organizer service for basic CRUD implementation. 
+This is an event management system created by Enfec back-end developers. The whole system covers 3 user types: customer/organizer/admin. Customer can use this website to search any ongoing events, choose seats and place tickets orders; Organizer can place venue orders and post event information; Admin can help both organizers and customers resolve user issues. 
 
-### Version 0.0.2
-Update Organizer service and improve all CRUD APIs with connecting Organizer table to Contacts and Address table. 
+## Event Service
 
-Separate services creations to Organizer, Event, Room, Seat, Customer, Organizer_Order, Customer_Order, Refund
++ **../event/search?event_id=1**\
+       Search event by event_id, this should be only accessed by admin.  
 
-Heidi: For eventService, already implemented searchEventByOptions/createEvent/updateEvent/deleteEvent. 
-       Issue: TIMESTAMP conversion between JSON and Mysql/ searchByEventTime
++ **../event/search/{anything}**\
+       Search events by anything exclude id information, this should be used for filtered bar. 
+       
++ **../event/search/by_date?start_date=2020-07-01&end_date=2020-08-01&zipcode=98061&event_type=concert**\
+       Search events within a date range with zipcode or event_type 
+
++ **../event/create**\
+       Create an event by organizer or admin
+
++ **../event/update**\
+       Update an event by organizer or admin 
+       
++ **../event/delete/{Event_ID}**\
+       Delete an event by organizer or admin

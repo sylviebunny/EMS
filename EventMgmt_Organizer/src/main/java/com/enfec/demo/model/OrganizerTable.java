@@ -2,20 +2,21 @@ package com.enfec.demo.model;
 
 import org.springframework.stereotype.Component;
 
+import io.swagger.annotations.ApiModel;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
 
 @Data
+@Component
 @Getter
 @Setter
-@Component
+@ApiModel
 public class OrganizerTable {
-
-	public int Organizer_ID;
-	public String Organizer_Name; 
-	public String Email_Address;
-	public String Password;
-	public String Other_Details;
+	private int organizer_id;
+	private String organizer_name; 
+	private String email_address;
+	private String password;
+	private String other_details;
 }

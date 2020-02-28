@@ -5,20 +5,23 @@ import java.sql.SQLException;
 
 import org.springframework.jdbc.core.RowMapper;
 
-/**
- * Organizer address Rowmapper
- * @author sylvia zhao
- */
-public class AddressRowmapper implements RowMapper<Address>{
-	
+/************************************************
+*
+* Author: Sylvia Zhao
+* Assignment: Organizer address Rowmapper for 'Address' table
+* Class: AddressRowmapper
+*
+************************************************/
+public class AddressRowmapper implements RowMapper<Address> {
+
 	/**
-     * Map each MySql column's content to organizer address table
-     * 
-     * @param rs: ResultSet
-     * @param rowNum
-     * @throws SQLException when column doesn't exist in database 
-     * @return Address
-     */
+	 * Map each MySql column's content to organizer address table
+	 * 
+	 * @param rs: ResultSet
+	 * @param rowNum
+	 * @throws SQLException when column doesn't exist in database
+	 * @return Address
+	 */
 	@Override
 	public Address mapRow(ResultSet rs, int rowNum) throws SQLException {
 		Address address = new Address();

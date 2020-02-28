@@ -11,21 +11,24 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
-/**
- * API for organizer
- * @author sylvia zhao
- */
+/************************************************
+*
+* Author: Sylvia Zhao
+* Assignment: Organizer API
+* Class: EventMgmtOrganizerApplication
+*
+************************************************/
 @SpringBootApplication
 @EnableSwagger2
-public class EventMgmtApplication extends SpringBootServletInitializer {
+public class EventMgmtOrganizerApplication extends SpringBootServletInitializer {
 
 	@Override
     protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-        return application.sources(EventMgmtApplication.class);
+        return application.sources(EventMgmtOrganizerApplication.class);
     }
 	
 	public static void main(String[] args) {
-		SpringApplication.run(EventMgmtApplication.class, args);
+		SpringApplication.run(EventMgmtOrganizerApplication.class, args);
 	}
 
 	@Bean

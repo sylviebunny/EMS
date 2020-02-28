@@ -6,7 +6,13 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-
+/************************************************
+*
+* Author: Sylvia Zhao
+* Assignment: Web configuration
+* Class: WebConfig
+*
+************************************************/
 @Configuration
 @EnableWebMvc
 public class WebConfig implements WebMvcConfigurer {

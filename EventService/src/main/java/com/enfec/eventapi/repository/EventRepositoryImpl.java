@@ -87,7 +87,7 @@ public class EventRepositoryImpl implements EventRepository {
 			allEventMap.add(eventMap(et, et.getEvent_id())); 
 		} 
 		
-		if (str == null || str.isEmpty()) {   // str can be null, if it's null, then print out allEvents
+		if (str == null || str.isEmpty()) {   // For empty filtered bar, print out allEvents
 		    Collections.sort(allEventMap, new EventComparatorByStartTime()); 
 			return allEventMap; 
 		}
@@ -309,8 +309,8 @@ public class EventRepositoryImpl implements EventRepository {
 	/**
 	 * Private token information for calling third party API
 	 */
-    private final String HOST_NAME = "redline-redline-zipcode.p.rapidapi.com"; 
-    private final String ACCESS_KEY = "58142ab02fmsh8f7533fdeadef97p188c6ejsnb3d5d912460e"; 
+    private final String HOST_NAME = ""; 
+    private final String ACCESS_KEY = ""; 
 	
 	/**
 	 * Call third API to get zipcode information and convert JSON body to map

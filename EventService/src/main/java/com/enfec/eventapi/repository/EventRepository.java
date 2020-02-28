@@ -40,7 +40,7 @@ public interface EventRepository {
 	 * @return result event list
 	 * @throws NotBoundException
 	 */
-	public List<Map> getFilteredEventsByRefinedZipcode(List<EventTable> allEvent, String str) throws NotBoundException;
+    public List<Map> getFilteredEventsByRefinedZipcode(List<EventTable> allEvent, String str) throws NotBoundException;
 	
 	/**
 	 * Gets event list by start and end date

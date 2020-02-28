@@ -7,7 +7,7 @@
 	</configSuffixes>
 	<enableImports><![CDATA[false]]></enableImports>
 	<configs>
-		<config>java:com.enfec.sb.refundapi.RefundApiApplication</config>
+		<config>java:com.enfec.refundapi.RefundApiApplication</config>
 	</configs>
 	<autoconfigs>
 	</autoconfigs>

@@ -10,7 +10,7 @@
 		<version>2.2.1.RELEASE</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.enfec.sb</groupId>
+	<groupId>com.enfec</groupId>
 	<artifactId>event-api</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>event-api</name>

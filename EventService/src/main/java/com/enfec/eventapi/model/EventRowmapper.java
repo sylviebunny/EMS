@@ -5,11 +5,13 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import org.springframework.jdbc.core.RowMapper;
 
-/**
- * Event row mapper for event table
- * @author heidi huo
- *
- */
+/************************************************
+*
+* Author: Heidi Huo
+* Assignment: Event row mapper for event table
+* Class: EventRowmapper
+*
+************************************************/
 public class EventRowmapper implements RowMapper<EventTable> {
 
     /**

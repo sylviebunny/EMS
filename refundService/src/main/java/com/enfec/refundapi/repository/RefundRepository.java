@@ -3,6 +3,13 @@ package com.enfec.refundapi.repository;
 import com.enfec.refundapi.model.COrderRefundTable;
 import com.enfec.refundapi.model.OOrderRefundTable;
 
+/************************************************
+*
+* Author: Heidi Huo
+* Assignment: Refund repository interface
+* Interface: RefundRepository
+*
+************************************************/
 public interface RefundRepository {
 
     /**
@@ -22,14 +29,14 @@ public interface RefundRepository {
     /**
      * Gets an organizer's refund information by organizer refund id
      * @param refund_id - organizer refund_id
-     * @return Object
+     * @return all entries that match organizer refund id
      */
     public Object getOrganizerRefundByRefundID(int refund_id);
 
     /**
      * Gets an organizer's refund information by organizer order id
      * @param oorder_id - organizer order id
-     * @return Object
+     * @return all entries that match organizer order id
      */
     public Object getOrganizerRefundByOorderID(int oorder_id);
 
@@ -57,14 +64,14 @@ public interface RefundRepository {
     /**
      * Gets customer refund by customer refund id
      * @param customer_refund_id - customer refund id
-     * @return Object
+     * @return all entries that match customer refund id
      */
     public Object getCustomerRefundByCRefundID(int refund_id);
 
     /**
      * Gets customer refund by customer order id
      * @param corder_id - customer order id
-     * @return Object
+     * @return all entries that match customer order id
      */
     public Object getCustomerRefundByCorderID(int corder_id);
 

@@ -10,9 +10,13 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
-/**
- * API Application initializer for refund
- */
+/************************************************
+*
+* Author: Heidi Huo
+* Assignment: API Application initializer for refund
+* Class: RefundApiApplication 
+*
+************************************************/
 @SpringBootApplication
 @EnableSwagger2
 public class RefundApiApplication extends SpringBootServletInitializer {

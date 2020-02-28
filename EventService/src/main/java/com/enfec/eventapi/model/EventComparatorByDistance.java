@@ -4,11 +4,13 @@ import java.sql.SQLException;
 import java.util.Comparator;
 import java.util.Map;
 
-/**
- * Comparator to compare events based on their distances to a certain point
- * @author heidihuo
- *
- */
+/************************************************
+*
+* Author: Heidi Huo
+* Assignment: Comparator to compare events based on their distances to a certain point
+* Class: EventComparatorByDistance
+*
+************************************************/
 public class EventComparatorByDistance implements Comparator<Map> {
 
     /**

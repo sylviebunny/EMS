@@ -6,11 +6,13 @@ import java.util.List;
 import java.util.Map;
 import com.enfec.eventapi.model.EventTable;
 
-/**
- * Event repository class
- * @author heidi huo
- *
- */
+/************************************************
+*
+* Author: Heidi Huo
+* Assignment: Event repository interface
+* Interface: EventRepository
+*
+************************************************/
 public interface EventRepository {
 	/**
 	 * Creates an event in database
@@ -28,7 +30,7 @@ public interface EventRepository {
 	
 	/**
 	 * Deletes an event in database
-	 * @param event_id event id to delete
+	 * @param event_id event id to be deleted 
 	 * @return number of affected rows
 	 */
 	public int deleteEvent(int event_id);
@@ -52,7 +54,7 @@ public interface EventRepository {
 	public List<Map> getFilteredEvents(List<EventTable> allEvent, Timestamp start_date, Timestamp end_date);
 	
 	/**
-	 * Gets event list by event type
+	 * Gets a list of {@link EventTable} by event type
 	 * @param inputEvents events to be searched
 	 * @param event_type specified event type
 	 * @return result event list
@@ -68,7 +70,7 @@ public interface EventRepository {
     /**
      * Gets an event based on event_id
      * @param event_id
-     * @return a list of event, which should have only one element; or an empty list if no such event_id in database
+     * @return a list of {@link EventTable}, which should have only one element; or an empty list if no such event_id in database
      */
     public List<EventTable> getEventByID(int event_id); 
 

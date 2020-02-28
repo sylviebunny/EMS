@@ -2,6 +2,7 @@ com\enfec\EMS\CustomerAPI\model\CustomerTokenTable.class
 com\enfec\EMS\CustomerAPI\CustomerApiApplication.class
 com\enfec\EMS\CustomerAPI\model\CustomerRowmapper.class
 com\enfec\EMS\CustomerAPI\repository\CustomerRepository.class
+com\enfec\EMS\CustomerAPI\security\SecurityConfig.class
 com\enfec\EMS\CustomerAPI\model\CustomerTable.class
 com\enfec\EMS\CustomerAPI\controller\CustromerController.class
 com\enfec\EMS\CustomerAPI\model\CustomerTokenRowmapper.class

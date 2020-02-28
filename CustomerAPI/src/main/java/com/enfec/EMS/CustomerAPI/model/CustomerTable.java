@@ -6,6 +6,12 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+/************************************************
+* Author: Chad Chai
+* Assignment: Customer information to map 'Customers' table in database
+* Class: CustomerTable 
+************************************************/
+
 @Data
 @Component
 @Getter

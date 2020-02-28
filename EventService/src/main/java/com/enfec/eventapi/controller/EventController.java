@@ -23,6 +23,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+/************************************************
+*
+* Author: Heidi Huo
+* Assignment: Event Controller
+* Class: EventController
+*
+************************************************/
 @CrossOrigin
 @RestController
 public class EventController {

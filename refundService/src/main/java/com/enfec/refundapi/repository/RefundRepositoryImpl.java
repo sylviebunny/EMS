@@ -17,41 +17,75 @@ import com.enfec.refundapi.model.COrderRefundTable;
 import com.enfec.refundapi.model.OOrderRefundRowmapper;
 import com.enfec.refundapi.model.OOrderRefundTable;
 
-/**
- * @author heidi huo
- * 
- */
+/************************************************
+*
+* Author: Heidi Huo
+* Assignment: Refund repository implementation class
+* Class: RefundRepositoryImpl
+*
+************************************************/
 @Component
 @Transactional
 public class RefundRepositoryImpl implements RefundRepository {
+    
+    /**
+     * {@value #DELETE_ORGANIZER_REFUND} Query for deleting an organizer refund
+     */
     private static final String DELETE_ORGANIZER_REFUND = "DELETE FROM Refund WHERE Refund_ID =?";
 
+    /**
+     * {@value #SELECT_ORGANIZER_REFUND} Query for selecting an organizer refund by organizer refund id
+     */
     private static final String SELECT_ORGANIZER_REFUND = "SELECT * FROM Refund WHERE Refund_ID =?";
 
+    /**
+     * {@value #CREATE_ORGANIZER_REFUND} Query for creating an organizer refund
+     */
     private static final String CREATE_ORGANIZER_REFUND =
             "INSERT INTO Refund (OOrder_ID, Description, Refund_Updated_Time, Refund_Status)"
                     + "VALUES(:oorder_id, :description, :refund_updated_time, :refund_status)";
 
+    /**
+     * {@value #UPDATE_ORGANIZER_REFUND} Query for updating an organizer refund
+     */
     private static final String UPDATE_ORGANIZER_REFUND =
             "UPDATE evntmgmt_usa.Refund SET Refund.Refund_Status = :refund_status, "
                     + "Refund.Description = :description, Refund_Updated_Time = :refund_updated_time WHERE Refund.Refund_ID = :refund_id;";
 
+    /**
+     * {@value #SELECT_ORGANIZER_REFUND_BY_OORDER_ID} Query for selecting an organizer refund by organizer order id
+     */
     private static final String SELECT_ORGANIZER_REFUND_BY_OORDER_ID =
             "SELECT * FROM Refund WHERE OOrder_ID =?";
 
+    /**
+     * {@value #CREATE_CUSTOMER_REFUND} Query for creating a customer refund
+     */
     private static final String CREATE_CUSTOMER_REFUND =
             "INSERT INTO Customer_Refund (COrder_ID, CRefund_Description, CRefund_Updated_Time, CRefund_Status)"
                     + "VALUES(:corder_id, :crefund_description, :crefund_updated_time, :crefund_status)";
 
+    /**
+     * {@value #DELETE_CUSTOMER_REFUND} Query for deleting a customer refund
+     */
     private static final String DELETE_CUSTOMER_REFUND =
             "DELETE FROM Customer_Refund WHERE CRefund_ID =?";
 
+    /**
+     * {@value #SELECT_CUSTOMER_REFUND_BY_CREFUND_ID} Query for selecting a customer refund by customer refund id
+     */
     private static final String SELECT_CUSTOMER_REFUND_BY_CREFUND_ID =
             "SELECT * FROM Customer_Refund WHERE CRefund_ID =?";
 
+    /**
+     * {@value #SELECT_CUSTOMER_REFUND_BY_CORDER_ID} Query for selecting a customer refund by customer order id
+     */
     private static final String SELECT_CUSTOMER_REFUND_BY_CORDER_ID =
             "SELECT * FROM Customer_Refund WHERE COrder_ID =?";
 
+    /**
+     * {@value #UPDATE_CUSTOMER_REFUND} Query for updating a customer refund
+     */
     private static final String UPDATE_CUSTOMER_REFUND =
             "UPDATE Customer_Refund SET CRefund_Status = :crefund_status, "
                     + "CRefund_Description = :crefund_description, CRefund_Updated_Time = :crefund_updated_time WHERE CRefund_ID = :crefund_id;";
@@ -63,10 +97,7 @@ public class RefundRepositoryImpl implements RefundRepository {
     JdbcTemplate jdbcTemplate;
     
     /**
-     * Get organizer refund information from database by organizer refund id
-     * 
-     * @param refund_id: organizer_refund_id, cannot be null and must be positive
-     * @return List<OOrderRefundTable>: all entries that match refund_id
+     * {@inheritDoc}
      */
     @Override
     public List<OOrderRefundTable> getOrganizerRefundByRefundID(int refund_id) {
@@ -75,10 +106,7 @@ public class RefundRepositoryImpl implements RefundRepository {
     }
 
     /**
-     * Get organizer refund information from database by organizer order id
-     * 
-     * @param oorder_id: organizer_order_id, cannot be null and must be positive
-     * @return List<OOrderRefundTable>: all entries that match oorder_id
+     * {@inheritDoc}
      */
     @Override
     public List<OOrderRefundTable> getOrganizerRefundByOorderID(int oorder_id) {
@@ -87,11 +115,7 @@ public class RefundRepositoryImpl implements RefundRepository {
     }
 
     /**
-     * Create organizer refund information
-     * 
-     * Map organizer refund table to MySql information content, and insert into MySql
-     * @param OOrderRefundTable: Organizer_refund_table
-     * @return int: affectedRow
+     * {@inheritDoc}
      */
     @Override
     public int createOrganizerRefund(OOrderRefundTable organizerRefundTable) {
@@ -105,14 +129,7 @@ public class RefundRepositoryImpl implements RefundRepository {
     }
 
     /**
-     * Update organizer refund information
-     * 
-     * Map organizer refund table to MySql information content, and update database
-     * @param OOrderRefundTable: Organizer_refund_table
-     * @return int: affectedRow
-     */
-    /**
-     *
+     * {@inheritDoc}
      */
     @Override
     public int updateOrganizerRefund(OOrderRefundTable organizerRefundTable) {
@@ -128,11 +145,7 @@ public class RefundRepositoryImpl implements RefundRepository {
     }
 
     /**
-     * Delete an organizer refund record
-     * 
-     * Search if current refund_id exists in database, if exist then delete 
-     * @param int: refund_id
-     * @return int: affectedRow
+     * {@inheritDoc}
      */
     @Override
     public int deleteOrganizerRefund(int refund_id) {
@@ -184,11 +197,7 @@ public class RefundRepositoryImpl implements RefundRepository {
     }
 
     /**
-     * Create customer refund information
-     * 
-     * Map customer refund table to MySql information content, and insert into MySql
-     * @param COrderRefundTable: Customer refund information
-     * @return int: affectedRow
+     * {@inheritDoc}
      */
     @Override
     public int createCustomerRefund(COrderRefundTable customerRefundTable) {
@@ -238,11 +247,7 @@ public class RefundRepositoryImpl implements RefundRepository {
     }
 
     /**
-     * Delete a customer refund record
-     * 
-     * Search if current crefund_id exists in database, if exist then delete 
-     * @param int: crefund_id
-     * @return int: affectedRow
+     * {@inheritDoc}
      */
     @Override
     public int deleteCustomerRefund(int crefund_id) {
@@ -257,10 +262,7 @@ public class RefundRepositoryImpl implements RefundRepository {
     }
 
     /**
-     * Get customer refund information from database by customer refund id
-     * 
-     * @param crefund_id: customer_refund_id, cannot be null and must be positive
-     * @return List<COrderRefundTable>: all entries that match crefund_id
+     * {@inheritDoc}
      */
     @Override
     public List<COrderRefundTable> getCustomerRefundByCRefundID(int crefund_id) {
@@ -269,10 +271,7 @@ public class RefundRepositoryImpl implements RefundRepository {
     }
 
     /**
-     * Get customer refund information from database by customer order id
-     * 
-     * @param corder_id: customer_order_id, cannot be null and must be positive
-     * @return List<COrderRefundTable>: all entries that match corder_id
+     * {@inheritDoc}
      */
     @Override
     public List<COrderRefundTable> getCustomerRefundByCorderID(int corder_id) {
@@ -281,11 +280,7 @@ public class RefundRepositoryImpl implements RefundRepository {
     }
 
     /**
-     * Update customer refund information
-     * 
-     * Map customer refund table to MySql information content, and update database
-     * @param COrderRefundTable: Customer_refund_table
-     * @return int: affectedRow
+     * {@inheritDoc}
      */
     @Override
     public int updateCustomerRefund(COrderRefundTable customerRefundTable) {

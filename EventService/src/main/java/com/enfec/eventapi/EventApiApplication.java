@@ -10,11 +10,13 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
-/**
- * Event API application initializer
- * @author heidi huo
- *
- */
+/************************************************
+*
+* Author: Heidi Huo
+* Assignment: Event API application initializer
+* Class: EventApiApplication
+*
+************************************************/
 @SpringBootApplication
 @EnableSwagger2
 public class EventApiApplication extends SpringBootServletInitializer {

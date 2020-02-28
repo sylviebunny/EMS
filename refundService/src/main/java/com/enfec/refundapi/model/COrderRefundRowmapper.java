@@ -4,6 +4,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import org.springframework.jdbc.core.RowMapper;
 
+/************************************************
+*
+* Author: Heidi Huo
+* Assignment: Customer order refund row mapper
+* Class: COrderRefundRowmapper
+*
+************************************************/
 public class COrderRefundRowmapper implements RowMapper<COrderRefundTable> {
 
     /**

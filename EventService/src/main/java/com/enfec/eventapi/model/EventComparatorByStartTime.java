@@ -5,11 +5,13 @@ import java.sql.Timestamp;
 import java.util.Comparator;
 import java.util.Map;
 
-/**
- * Comparator to compare events based on their start time
- * @author heidi huo
- *
- */
+/************************************************
+*
+* Author: Heidi Huo
+* Assignment: Comparator to compare events based on their start time
+* Class: EventComparatorByStartTime
+*
+************************************************/
 public class EventComparatorByStartTime implements Comparator<Map> {
 
     /**

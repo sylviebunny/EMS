@@ -6,9 +6,13 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-/**
- * Web configuration for CORS policy
- */
+/************************************************
+*
+* Author: Heidi Huo
+* Assignment: Web configuration for CORS policy
+* Class: WebConfig
+*
+************************************************/
 @Configuration
 @EnableWebMvc
 public class WebConfig implements WebMvcConfigurer {
@@ -28,6 +32,9 @@ public class WebConfig implements WebMvcConfigurer {
 
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/static/**").addResourceLocations("classpath:/static/");

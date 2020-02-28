@@ -27,11 +27,13 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Event repository implementation class
- * @author heidi huo
- *
- */
+/************************************************
+*
+* Author: Heidi Huo
+* Assignment: Event repository implementation class
+* Class: EventRepositoryImpl
+*
+************************************************/
 @Component
 @Transactional
 public class EventRepositoryImpl implements EventRepository {

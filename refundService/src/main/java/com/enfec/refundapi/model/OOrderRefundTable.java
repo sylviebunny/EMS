@@ -6,6 +6,13 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.stereotype.Component;
 
+/************************************************
+*
+* Author: Heidi Huo
+* Assignment: Organizer order refund table
+* Class: OOrderRefundRowmapper
+*
+************************************************/
 @Data
 @Component
 @Getter

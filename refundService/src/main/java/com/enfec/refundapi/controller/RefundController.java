@@ -16,10 +16,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * This is controller class for refund APIs
- * @author Heidi Huo
- */
+/************************************************
+*
+* Author: Heidi Huo
+* Assignment: Controller class for refund APIs
+* Class: RefundController
+*
+************************************************/
 @CrossOrigin
 @RestController
 public class RefundController {
@@ -87,7 +90,6 @@ public class RefundController {
      * Create an organizer refund and put information to database
      * 
      * @param organizerRefundTable. Organizer_order_id Cannot be null and must exist in database; 
-     * Description can be null 
      * @return ResponseEntity with message
      */
     @RequestMapping(value = "/organizer_refund/create", method = RequestMethod.POST,
@@ -118,7 +120,6 @@ public class RefundController {
      * Update organizer refund information 
      * 
      * @param organizerRefundTable. Organizer_refund_id Cannot be null and must exist in database; 
-     * Description can be null; Organizer refund status can be null 
      * @return ResponseEntity with message
      */
     @RequestMapping(value = "/organizer_refund/update", method = RequestMethod.PUT,
@@ -232,7 +233,6 @@ public class RefundController {
      * Create an organizer refund and insert information into database
      * 
      * @param CustomerRefundTable. Customer_order_id cannot be null and must exist in database; 
-     * Customer_description can be null. 
      * @return ResponseEntity with message
      */
     @RequestMapping(value = "/customer_refund/create", method = RequestMethod.POST,
@@ -262,8 +262,7 @@ public class RefundController {
     /**
      * Update an organizer refund information
      * 
-     * @param CustomerRefundTable. Customer_refund_id cannot be null and must exist in database; 
-     * Customer_description can be null; Customer_refund_status can be null. 
+     * @param CustomerRefundTable. Customer_refund_id cannot be null and must exist in database;  
      * @return ResponseEntity with message
      */
     @RequestMapping(value = "/customer_refund/update", method = RequestMethod.PUT,

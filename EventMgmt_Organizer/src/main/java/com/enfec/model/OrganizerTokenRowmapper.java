@@ -1,4 +1,4 @@
-package com.enfec.demo.model;
+package com.enfec.model;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

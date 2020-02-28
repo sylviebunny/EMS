@@ -1,26 +1,30 @@
 package com.enfec.controller;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.enfec.model.Address;
 import com.enfec.model.OrganizerContactTable;
 import com.enfec.model.OrganizerTable;
 import com.enfec.repository.OrganizerRepositoryImpl;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.Gson;
 
 /**
  * This is controller class for organizer APIs
- * @author Sylvia Zhao
+ * @author sylvia zhao
  */
 @RestController
 public class OrganizerController {
@@ -30,7 +34,7 @@ public class OrganizerController {
 
 	
 	/**
-	 * Create or register an organizer user and put basic information into database
+	 * Create or register an organizer user, send email to user and put basic information into database
 	 * 
 	 * @param organizerTable. Contains organizer basic information; email_address and password cannot be null
 	 * @return ResponseEntity with message
@@ -39,15 +43,40 @@ public class OrganizerController {
 	public ResponseEntity<String> createOrganizer(
 			@RequestBody(required = true) OrganizerTable organizerTable) {
 		
-		try {	
-			int affectedRow = OrganizerRepositoryImpl.createOrganizer(organizerTable);
-			if (affectedRow == 0) {
-				return new ResponseEntity<>(
-						"{\"message\" : \"Organizer not registered\"}", HttpStatus.OK);
-			} else {
-				return new ResponseEntity<>(
-						"{\"message\" : \"Organizer registered\"}", HttpStatus.OK);
-			}
+		try {
+			if(OrganizerRepositoryImpl.hasRegistered(organizerTable.getEmail_address())) {
+				return new ResponseEntity<String>(
+						"{\"message\" : \"Organizer registered already, please log in\"}",
+						HttpStatus.OK);
+			}else {
+				int affectedRow = OrganizerRepositoryImpl.createOrganizer(organizerTable);
+				if (affectedRow == 0) {
+					return new ResponseEntity<>(
+							"{\"message\" : \"Organizer not registered\"}", HttpStatus.OK);
+				} else {
+					String oEmail = organizerTable.getEmail_address();
+					String oToken = OrganizerRepositoryImpl.generateToken();
+					Timestamp expireDate = new Timestamp(System.currentTimeMillis());
+					OrganizerRepositoryImpl.saveTokenInfo(oEmail, oToken, expireDate);
+					OrganizerRepositoryImpl.sendGreetMail(organizerTable.getEmail_address(), 
+							"Welcome to EMS", 
+							"<p>Dear</p>"+
+							"<p><b>"+ organizerTable.getOrganizer_name()+ "</b></p>"+
+							"<p>Welcome to join the EMS. Your account is all set!</p>"+ 
+							"<p><a href = 'http://evntmgmt-alb-295694066.us-east-2.elb.amazonaws.com:8080/organizer-api/registrationConfirm?oToken="+oToken+"'>Please click this link to Active your account</a></p>" +
+							
+							"<p>This is a system generated mail. Please do not reply to this email ID. If you have a query or need any clarification you may:</p>" + 
+							"<p>(1) Call our 24-hour Customer Care or\r\n</p>" + 
+							"<p>(2) Email Us support@enfec.com\r\n</p>" + 
+							
+							"<p>For any problem please contact us at 24*7 Hrs. Customer Support at 18001231234 (TBD) or mail us at support@enfec.com\r\n" + 
+							"Thank you for using our Event Management System\r\n</p>",
+							oToken);
+				
+					return new ResponseEntity<>(
+							"{\"message\" : \"Organizer registered\"}", HttpStatus.OK);
+				}
+			}		
 		} catch (DataIntegrityViolationException dataIntegrityViolationException) {
 			//input type incorrect
 			return new ResponseEntity<>("{\"message\" : \"Invalid input\"}",
@@ -56,10 +85,75 @@ public class OrganizerController {
 			//lack of required info or server error
 			return new ResponseEntity<>(
 					"{\"message\" : \"Exception in creating organizer info, please contact admin\"}",
-					HttpStatus.INTERNAL_SERVER_ERROR);	
+					HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-	}	
+	}
 
+	@RequestMapping(value = "/registrationConfirm", method = RequestMethod.GET, produces = MediaType.TEXT_PLAIN_VALUE)
+	public ResponseEntity<String> confirmRegistration(@RequestParam("oToken") String oToken) {
+	    if(OrganizerRepositoryImpl.validToken(oToken)) {
+	    	return new ResponseEntity<String>(
+					"{\"message\": \"Organizer account actived\"}", HttpStatus.OK);
+	    } else {
+	    	return new ResponseEntity<String>(
+					"{\"message\": \"Organizer account active failed\"}", HttpStatus.BAD_REQUEST);
+	    }
+	}
+	
+	
+	/*
+	 * Customer forget password section
+	 * 
+	 */
+	@RequestMapping(value = "/forget_password", method = RequestMethod.POST, produces = "applications/json;charset=UTF-8")
+	public ResponseEntity<String>forgetPassword(
+			@RequestBody(required = true) OrganizerTable organizerTable){
+		
+			if(OrganizerRepositoryImpl.isValidOrganizer(organizerTable.getEmail_address())) {
+				String oEmail = organizerTable.getEmail_address();
+				String oToken = OrganizerRepositoryImpl.generateToken();
+				Timestamp expireDate = new Timestamp(System.currentTimeMillis());
+				if(OrganizerRepositoryImpl.hasForgetenPWD(oEmail)) {
+					OrganizerRepositoryImpl.updateToken(oEmail, oToken, expireDate);
+				} else {
+					OrganizerRepositoryImpl.saveTokenInfo(oEmail, oToken, expireDate);
+				}
+				
+				OrganizerRepositoryImpl.sendPwdMail(oEmail, 
+						"Reset Password", 
+						"<p>This is a system generated mail. Please do not reply to this email ID. If you have a query or need any clarification you may:</p>" + 
+						"<p>(1) Call our 24-hour Customer Care or\r\n</p>" + 
+						"<p>(2) Email Us support@enfec.com\r\n</p>" + 
+						"<p>Your One Time Password (OTP) for First Time Registration or Forgot Password recovery on Event Management System is: \r\n</p>" + 
+						"<p><b>"+ oToken +"</b></p>"+
+						"<p><a href = 'http://evntmgmt-alb-295694066.us-east-2.elb.amazonaws.com:8080/organizer-api/reset_password'>Please click this link to Reset Password</a></p>" +
+						"<p>For any problem please contact us at 24*7 Hrs. Customer Support at 18001231234 (TBD) or mail us at support@enfec.com\r\n" + 
+						"Thank you for using our Event Management System\r\n</p>", 
+						oToken);
+				return new ResponseEntity<String>(
+						"{\"message\" : \"Send reset link and OTP to the organizer email address\"}",
+						HttpStatus.OK);
+			} else {
+				return new ResponseEntity<String>("{\"message\": \"Organizer not found, invalid Email address\"}", HttpStatus.OK);
+			}
+	}
+		
+
+	@RequestMapping(value = "/reset_password", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+	public ResponseEntity<String>get(@RequestBody(required = true) ObjectNode json) { 
+			String orgToken = json.get("organizerToken").textValue();
+			if (OrganizerRepositoryImpl.validToken(orgToken)) {
+				String organizerEmail = OrganizerRepositoryImpl.findEmailByToken(orgToken).get(0).getOrganizerEmail();	
+				String newPassword = json.get("newPassword").textValue();
+				OrganizerRepositoryImpl.updatePassword(organizerEmail, newPassword);
+				return new ResponseEntity<>(
+						"{\"message\" : \"Password reset successfully!\"}", HttpStatus.OK);
+			}
+			
+			return new ResponseEntity<>(
+					"{\"message\" : \"Token expired. Please re-reset password.\"}", HttpStatus.OK);
+	}
+	
 	/**
 	 * Get organizer basic information from database by organizer id
 	 * 

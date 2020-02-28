@@ -36,7 +36,7 @@ import com.enfec.model.OrganizerTokenTable;
 * Assignment: Implement CRUD methods for organizer, address and contacts
 * Author: Chad Chai
 * Assignment: Organizer login, password handling
-* Class: RoomRepositoryImpl
+* Class: OrganizerRepositoryImpl
 *
 ************************************************/
 @Component

@@ -1,16 +1,24 @@
 package com.enfec.demo.repository;
 
+import java.sql.Timestamp;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +27,8 @@ import com.enfec.demo.model.OrganizerContactRowmapper;
 import com.enfec.demo.model.OrganizerContactTable;
 import com.enfec.demo.model.OrganizerRowmapper;
 import com.enfec.demo.model.OrganizerTable;
+import com.enfec.demo.model.OrganizerTokenRowmapper;
+import com.enfec.demo.model.OrganizerTokenTable;
 
 /**
  * Implements CRUD methods for Organizer, Address, Contact; Organizer login
@@ -27,6 +37,18 @@ import com.enfec.demo.model.OrganizerTable;
 @Component
 @Transactional
 public class OrganizerRepositoryImpl implements OrganizerRepository {
+	private static final Logger logger = LoggerFactory.getLogger(OrganizerRepositoryImpl.class);
+	
+	
+	
+	//Customer Token SQL
+	final String VALID_ORGANIZER = "SELECT * FROM Organizers WHERE Email_Address=?";
+	final String CREATE_TOKEN = "INSERT INTO Organizer_Token(OEmail, OToken, OTExpire) VALUE (:organizerEmail, :organizerToken, :organizerExpiryDate)";
+	final String FIND_EMAIL_BY_TOKEN = "SELECT * FROM Organizer_Token WHERE OToken=?";
+	final String VALID_TOKEN = "SELECT * FROM Organizer_Token WHERE OToken=?";
+	final String UPDATE_PASSWORD = "UPDATE Organizers SET Password =:password WHERE Email_Address =:email_address";
+	final String HAS_FORGET_PWD = "SELECT * FROM Organizer_Token WHERE OEmail=?";
+	final String UPDATE_TOKEN = "UPDATE Organizer_Token SET OToken =:organizerToken, OTExpire =:organizerExpiryDate WHERE OEmail =:organizerEmail";
 	
 	@Autowired
 	NamedParameterJdbcTemplate namedParameterJdbcTemplate;
@@ -309,4 +331,186 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 				null : organizerContactTable.getWeb_site_address()); 
 		return contactMap; 
 	}
+	
+	
+	@Override
+	public boolean hasRegistered(String organizerEmail){
+		List<OrganizerTable> hasRegis = jdbcTemplate.query(VALID_ORGANIZER, new Object[] {organizerEmail}, new OrganizerRowmapper());
+		if(hasRegis.isEmpty() || hasRegis.get(0).getEmail_address().isEmpty()) {
+			logger.info("not register before: {}", organizerEmail);
+			return false;
+		}else {
+			logger.info("registed already");
+			return true;
+		}
+		
+	}
+	
+	@Override
+	public void sendGreetMail(String to, String subject, String body, String CToken) {
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper;
+        
+        try {
+			helper = new MimeMessageHelper(message, true);
+			helper.setSubject(subject);
+	        helper.setTo(to);
+	        helper.setText(body, true);// true indicate html
+	        mailSender.send(message);
+		} catch (MessagingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+          
+    }
+	
+	
+	//Customer Token Map
+	private Map<String, Object>OrganizerTokenMap(OrganizerTokenTable organizerTokenTable){
+		Map<String, Object>ofgpwdMap = new HashMap<>();
+		ofgpwdMap.put("organizerTokenID", organizerTokenTable.getOrganizerTokenID());
+		ofgpwdMap.put("organizerEmail", organizerTokenTable.getOrganizerEmail());
+		ofgpwdMap.put("organizerToken", organizerTokenTable.getOrganizerToken());
+		ofgpwdMap.put("organizerExpiryDate", organizerTokenTable.getOrganizerExpiryDate());
+
+		return ofgpwdMap;
+	}
+	
+	
+	@Override
+	public boolean isValidOrganizer(String organizerEmail){
+		List<OrganizerTable> orgEmail = jdbcTemplate.query(VALID_ORGANIZER, new Object[] {organizerEmail}, new OrganizerRowmapper());
+		if(orgEmail.isEmpty() || orgEmail.get(0).getEmail_address().isEmpty()) {
+			logger.info("not valid organizer email: {}", organizerEmail);
+			return false;
+		}else {
+			logger.info("Valid organizer email");
+			return true;
+		}
+		
+	}
+	
+	
+	@Override
+	public boolean hasForgetenPWD(String organizerEmail){
+		List<OrganizerTokenTable> fgorgEmail = jdbcTemplate.query(HAS_FORGET_PWD, new Object[] {organizerEmail}, new OrganizerTokenRowmapper());
+		if(fgorgEmail.isEmpty() || fgorgEmail.get(0).getOrganizerEmail().isEmpty()) {
+			logger.info("has not forgetten before");
+			return false;
+		}else {
+			logger.info("has forgetten before");
+			return true;
+		}
+		
+	}
+	
+	@Override
+	public int saveTokenInfo(String organizerEmail, String organizerToken, Timestamp organizerExpiryDate) {
+		int affectedRow;
+		
+		OrganizerTokenTable ot = new OrganizerTokenTable(); 
+		ot.setOrganizerEmail(organizerEmail);
+		ot.setOrganizerToken(organizerToken);
+		ot.setOrganizerExpiryDate(organizerExpiryDate);
+		Map<String, Object>resMap = OrganizerTokenMap(ot);
+		SqlParameterSource parameterSource = new MapSqlParameterSource(resMap);
+		logger.info("Create Reset Token info: {}", parameterSource);
+		affectedRow = namedParameterJdbcTemplate.update(CREATE_TOKEN, parameterSource);
+		return affectedRow;
+	}
+	
+	
+	@Autowired
+    private JavaMailSender mailSender;
+	
+	@Override
+	public void sendPwdMail(String to, String subject, String body, String OToken) {
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper;
+        
+        try {
+			helper = new MimeMessageHelper(message, true);
+			helper.setSubject(subject);
+	        helper.setTo(to);
+	        helper.setText(body, true);// true indicate html
+	        mailSender.send(message);
+		} catch (MessagingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+          
+    }
+	
+	@Override
+	public String generateToken() {
+		String AlphaNumericString = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" + "0123456789" + "abcdefghijklmnopqrstuvxyz";
+		StringBuilder token = new StringBuilder(20);
+		for (int i = 0; i < 20; i++) {
+			 int sequence = (int)(AlphaNumericString.length() * Math.random()); 
+			 token.append(AlphaNumericString.charAt(sequence));
+			}
+
+		return token.toString();
+		
+		}
+	
+	@Override
+	public boolean validToken(String OToken) {
+		List<OrganizerTokenTable> orgToken = jdbcTemplate.query(VALID_TOKEN, new Object[] {OToken}, new OrganizerTokenRowmapper());
+		if(orgToken.isEmpty() || orgToken.get(0).getOrganizerExpiryDate().equals(null)) {
+			return false;
+		}else {
+			Timestamp ot = new Timestamp(System.currentTimeMillis()-OrganizerTokenTable.getTokenExpiration());
+			if(orgToken.get(0).getOrganizerExpiryDate().before(ot)) {
+				return false;
+			}else {
+				return true;
+			}
+		}
+	}
+	
+	@Override
+	public List<OrganizerTokenTable> findEmailByToken(String OToken) {
+		return jdbcTemplate.query(FIND_EMAIL_BY_TOKEN, new Object[] {OToken}, new OrganizerTokenRowmapper());
+	}
+	
+	
+	@Override
+	public int updatePassword(String oEmail, String newpwd) {
+		int affectedRow;
+		OrganizerTable organizerTable = new OrganizerTable();
+		
+		organizerTable.setEmail_address(oEmail);
+		logger.info(oEmail);
+		organizerTable.setPassword(newpwd);
+		logger.info(newpwd);
+		Map<String, Object>updatePwdMap = OrganizerMap(organizerTable);
+		SqlParameterSource parameterSource = new MapSqlParameterSource(updatePwdMap);
+		logger.info("Update organizer info:{}", parameterSource);
+		affectedRow = namedParameterJdbcTemplate.update(UPDATE_PASSWORD, parameterSource);
+		
+		return affectedRow;
+		
+	}
+	
+	@Override
+	public int updateToken(String oEmail, String oToken, Timestamp expireDate) {
+		int affectedRow;
+		OrganizerTokenTable ott = new OrganizerTokenTable();
+		
+		ott.setOrganizerEmail(oEmail);
+		logger.info(oEmail);
+		ott.setOrganizerToken(oToken);
+		logger.info(oToken);
+		ott.setOrganizerExpiryDate(expireDate);
+		logger.info(expireDate.toString());
+
+		Map<String, Object>updateTokenMap = OrganizerTokenMap(ott);
+		SqlParameterSource parameterSource = new MapSqlParameterSource(updateTokenMap);
+		logger.info("Update organizer token info:{}", parameterSource);
+		affectedRow = namedParameterJdbcTemplate.update(UPDATE_TOKEN, parameterSource);
+		
+		return affectedRow;
+	}
+	
 }

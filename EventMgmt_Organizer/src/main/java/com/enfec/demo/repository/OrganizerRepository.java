@@ -1,5 +1,7 @@
 package com.enfec.demo.repository;
 
+import java.sql.Timestamp;
+
 import com.enfec.demo.model.Address;
 import com.enfec.demo.model.OrganizerContactTable;
 import com.enfec.demo.model.OrganizerTable;
@@ -20,4 +22,20 @@ public interface OrganizerRepository {
 	public int updateOrganizerContact(OrganizerContactTable organizerContactTable); 
 	
 	public boolean isMatching(String OEmail, String oPwd);
+	
+	//ADD NEW
+	public boolean hasRegistered(String organizerEmail);
+	public void sendGreetMail(String to, String subject, String body, String oToken);
+	
+	//Organizer forget password section
+	
+	public boolean isValidOrganizer(String organizerEmail);
+	public boolean hasForgetenPWD(String organizerEmail);
+	public int saveTokenInfo( String oEmail, String oToken, Timestamp oExpiryDate);
+	public void sendPwdMail(String to, String subject, String body, String oToken);
+	public String generateToken();
+	public boolean validToken(String oToken);
+	public int updatePassword(String oEmail, String newpwd);
+	public Object findEmailByToken(String oToken);
+	public int updateToken(String oEmail, String oToken, Timestamp expireDate);
 }

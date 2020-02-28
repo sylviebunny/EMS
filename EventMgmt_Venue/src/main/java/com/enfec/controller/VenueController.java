@@ -1,4 +1,4 @@
-package com.enfec.demo.controller;
+package com.enfec.controller;
 
 import java.util.List;
 
@@ -12,16 +12,28 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.enfec.demo.model.Venue;
-import com.enfec.demo.repository.VenueRepositoryImpl;
+import com.enfec.model.Venue;
+import com.enfec.repository.VenueRepositoryImpl;
 import com.google.gson.Gson;
 
+/**
+ * This is controller class for venue APIs
+ * @author Sylvia Zhao
+ */
 @RestController
 public class VenueController {
+	
 	@Autowired
 	VenueRepositoryImpl VenueRepositoryImpl;
 
-	
+	//For "Venues" and "Venue_Address" table in database
+	//Create venue
+	/**
+	 * Create a venue and put its information into database
+	 * 
+	 * @param venue. Contains information in "Venues" and "Venue_Address" table in database
+	 * @return ResponseEntity with message
+	 */
 	@RequestMapping(value = "/venue/create", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> createVenue(@RequestBody(required = true) Venue venue) {
 		try {
@@ -44,6 +56,12 @@ public class VenueController {
 		}
 	}
 	
+	/**
+	 * Get venue basic and address information from database by venue id
+	 * 
+	 * @param Venue_ID
+	 * @return ResponseEntity with message and data
+	 */
 	@RequestMapping(value = "/venue/search/{Venue_ID}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> getVenueList(@PathVariable("Venue_ID") int Venue_ID) {
 		try {		
@@ -63,7 +81,36 @@ public class VenueController {
 		} 
 	}
 
-	//The foreign key information must exist first in the db
+	/**
+	 * Get all venues' basic and address information from database
+	 * 
+	 * @return ResponseEntity with message and data
+	 */
+	@RequestMapping(value = "/venue/searchall", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
+	public ResponseEntity<String> getAllVenueList() {
+		try {		
+			List<Venue> venueList = VenueRepositoryImpl.getAllVenueInfo();
+			if (venueList.isEmpty()) {
+				return new ResponseEntity<>(
+						"{\"message\" : \"No venue found\"}", HttpStatus.OK);
+			} else {
+				return new ResponseEntity<>(
+						new Gson().toJson((VenueRepositoryImpl
+								.getAllVenueInfo())), HttpStatus.OK);
+			}
+		} catch (Exception e) {
+			return new ResponseEntity<>(
+					"{\"message\" : \"Exception in getting venue info, please contact admin\"}",
+					HttpStatus.INTERNAL_SERVER_ERROR);
+		} 
+	}
+	
+	/**
+	 * Update venue information, can update partial info
+	 * 
+	 * @param venue. Venue_id cannot be null and must exist in database
+	 * @return ResponseEntity with message
+	 */
 	@RequestMapping(value = "/venue/update", method = RequestMethod.PUT, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> updateVenue(@RequestBody(required = true) Venue venue) {
 		try {	
@@ -86,7 +133,12 @@ public class VenueController {
 		}
 	}
 
-	
+	/**
+	 * Delete a venue and its address from database by venue id
+	 * 
+	 * @param id: Venue_ID
+	 * @return ResponseEntity with message
+	 */
 	@RequestMapping(value="/venue/delete/{Venue_ID}",method = RequestMethod.DELETE, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> deleteVenue(@PathVariable("Venue_ID") int id) {
 		try {

@@ -1,4 +1,4 @@
-package com.enfec.demo;
+package com.enfec;
 
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;

@@ -5,6 +5,11 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+/************************************************
+* Author: Chad Chai
+* Assignment: Discount information to map 'Discounts' table in database
+* Class: DiscountTable 
+************************************************/
 @Data
 @Component
 @Getter

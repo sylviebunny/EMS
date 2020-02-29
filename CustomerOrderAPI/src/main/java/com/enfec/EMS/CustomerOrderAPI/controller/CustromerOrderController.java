@@ -21,10 +21,11 @@ import com.enfec.EMS.CustomerOrderAPI.model.TicketTable;
 import com.enfec.EMS.CustomerOrderAPI.repository.CustomerOrderRepositoryImpl;
 import com.google.gson.Gson;
 
-
-
-
-
+/************************************************
+* Author: Chad Chai
+* Assignment: Customer Order Controller
+* Class: CustomerOrderController
+************************************************/
 @RestController
 public class CustromerOrderController {
 	private static final Logger logger = LoggerFactory.getLogger(CustromerOrderController.class);
@@ -33,8 +34,11 @@ public class CustromerOrderController {
 	CustomerOrderRepositoryImpl customerOrderRepositoryImpl;
 	
 	
-	//Customer Order Functions
-	//Get customer order
+	/**
+	 * Get customer order basic information from database by customer order id
+	 * @param customerOrderId
+	 * @return ResponseEntity with message and data
+	 */
 	@RequestMapping(value = "/CustomerOrder/{customerOrderID}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String>getCustomerOrderList(@PathVariable String customerOrderID) { 
 			List<CustomerOrderTable> customerList = customerOrderRepositoryImpl.getCustomerOrder(customerOrderID);
@@ -49,7 +53,11 @@ public class CustromerOrderController {
 		}
 	
 	
-	//Create customer order
+	/**
+	 * Create or register a customer order, put basic information into database
+	 * @param customerTable. Contains customer order basic information;
+	 * @return ResponseEntity with message
+	 */
 	@RequestMapping(value = "/CustomerOrder/Create", method = RequestMethod.POST, produces = "applications/json; charset=UTF-8")
 	public ResponseEntity<String>createCustomerOrder(
 			@RequestBody(required = true) CustomerOrderTable customerOrderTable){
@@ -79,7 +87,11 @@ public class CustromerOrderController {
 	}
 	
 	
-	//Delete Customer Order
+	/**
+	 * Delete customer order basic info from database by customer order id
+	 * @param customerOrderID
+	 * @return ResponseEntity with message
+	 */
 	@RequestMapping(value = "/CustomerOrder/Delete/{customerOrderID}", method = RequestMethod.DELETE, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> deleteCusotmerOrder(
 			@PathVariable String customerOrderID) {
@@ -93,13 +105,15 @@ public class CustromerOrderController {
 					"{\"message\" : \"Customer Order deleted\"}", HttpStatus.OK);
 			}
 			
-
 	}
 	
 
 	
-	//Ticket Functions
-	//Get ticket
+	/**
+	 * Get ticket basic information from database by ticket id
+	 * @param ticketID
+	 * @return ResponseEntity with message and data
+	 */
 	@RequestMapping(value = "/Ticket/{ticketID}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String>getTicketList(@PathVariable String ticketID) { 
 			List<TicketTable> ticketList = customerOrderRepositoryImpl.getTicket(ticketID);
@@ -113,7 +127,12 @@ public class CustromerOrderController {
 					new Gson().toJson((customerOrderRepositoryImpl.getTicket(ticketID))), HttpStatus.OK);
 		}
 	
-	//Get ticket by Order
+
+	/**
+	 * Get ticket basic information from database by customer id
+	 * @param customerOrderID
+	 * @return ResponseEntity with message and data
+	 */
 	@RequestMapping(value = "/TicketByOrder/{customerOrderID}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String>getTicketByOrderList(@PathVariable String customerOrderID) { 
 			List<TicketTable> ticketByOrderList = customerOrderRepositoryImpl.getTicketByOrder(customerOrderID);
@@ -129,7 +148,11 @@ public class CustromerOrderController {
 	
 	
 	
-	//Create ticket
+	/**
+	 * Create a ticket, put basic information into database
+	 * @param ticketTable. Contains ticket basic information;
+	 * @return ResponseEntity with message
+	 */
 	@RequestMapping(value = "/Ticket/Create", method = RequestMethod.POST, produces = "applications/json; charset=UTF-8")
 	public ResponseEntity<String>createTicket(
 			@RequestBody(required = true) TicketTable ticketTable){
@@ -159,7 +182,11 @@ public class CustromerOrderController {
 	}
 		
 		
-	//Update ticket
+	/**
+	 * Update ticket basic information
+	 * @param TicketTable. 
+	 * @return ResponseEntity with message
+	 */
 	@RequestMapping(value = "/Ticket/Update", method = RequestMethod.PUT, produces = "applications/json; charset=UTF-8")
 	public ResponseEntity<String>updateTicket(
 			@RequestBody(required = true) TicketTable ticketTable){
@@ -188,8 +215,12 @@ public class CustromerOrderController {
 		}
 	}
 		
-		
-	//Delete ticket
+	
+	/**
+	 * Delete ticket basic info from database by ticket id
+	 * @param ticketID
+	 * @return ResponseEntity with message
+	 */
 	@RequestMapping(value = "/Ticket/Delete/{ticketID}", method = RequestMethod.DELETE, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> deleteTicket(
 			@PathVariable String ticketID) {
@@ -207,9 +238,11 @@ public class CustromerOrderController {
 	}
 	
 	
-	
-	//Discount Functions
-	//Get discount
+	/**
+	 * Get discount basic information from database by discount id
+	 * @param discountID
+	 * @return ResponseEntity with message and data
+	 */
 	@RequestMapping(value = "/Discount/{discountID}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String>getDiscountList(@PathVariable String discountID) { 
 			List<DiscountTable> discouontList = customerOrderRepositoryImpl.getDiscount(discountID);
@@ -224,7 +257,11 @@ public class CustromerOrderController {
 		}
 	
 	
-	//Create discount
+	/**
+	 * Create a discount, put discount information into database
+	 * @param discountTable. Contains discount basic information;
+	 * @return ResponseEntity with message
+	 */
 	@RequestMapping(value = "/Discount/Create", method = RequestMethod.POST, produces = "applications/json; charset=UTF-8")
 	public ResponseEntity<String>createDiscount(
 			@RequestBody(required = true) DiscountTable discountTable){
@@ -254,7 +291,11 @@ public class CustromerOrderController {
 	}
 			
 			
-	//Update Discount
+	/**
+	 * Update discount basic information, can update partial info
+	 * @param DiscountTable.
+	 * @return ResponseEntity with message
+	 */
 	@RequestMapping(value = "/Discount/Update", method = RequestMethod.PUT, produces = "applications/json; charset=UTF-8")
 	public ResponseEntity<String>updateDiscount(
 			@RequestBody(required = true) DiscountTable discountTable){
@@ -283,7 +324,12 @@ public class CustromerOrderController {
 		}
 	}
 		
-	//Delete discount
+
+	/**
+	 * Delete discount basic info from database by discount id
+	 * @param discountID
+	 * @return ResponseEntity with message
+	 */
 	@RequestMapping(value = "/Discount/Delete/{discountID}", method = RequestMethod.DELETE, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> deleteDiscount(@PathVariable String discountID) {
 

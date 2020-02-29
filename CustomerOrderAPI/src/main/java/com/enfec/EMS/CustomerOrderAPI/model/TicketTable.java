@@ -5,6 +5,11 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+/************************************************
+* Author: Chad Chai
+* Assignment: Ticket information to map 'Tickets' table in database
+* Class: TicketTable 
+************************************************/
 @Data
 @Component
 @Getter

@@ -5,8 +5,20 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import org.springframework.jdbc.core.RowMapper;
 
+/************************************************
+* Author: Chad Chai
+* Assignment: Ticket Rowmapper for 'Tickets' table
+* Class: TicketRowmapper
+************************************************/
 
 public class TicketRowmapper implements RowMapper<TicketTable>  {
+	/**
+     * Map each MySql column's content to ticket table
+     * @param rs: ResultSet
+     * @param rowNum
+     * @throws SQLException when column doesn't exist in database 
+     * @return TicketTable
+     */
 	@Override
 	public TicketTable mapRow(ResultSet rs, int rowNum) throws SQLException{
 		TicketTable ticketTable = new TicketTable();
@@ -52,6 +64,13 @@ public class TicketRowmapper implements RowMapper<TicketTable>  {
 		return ticketTable;
 	}
 	
+	
+	/**
+     * To check if the column in ResultSet is empty
+     * @param rs: ResultSet
+     * @param colulmnName
+     * @return whether the column is empty or not
+     */
 	public static boolean hasColumn(ResultSet rs, String columnName) throws SQLException {
 	    ResultSetMetaData rsmd = rs.getMetaData();
 	    int columns = rsmd.getColumnCount();

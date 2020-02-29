@@ -10,6 +10,11 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+/************************************************
+* Author: Chad Chai
+* Assignment: Customer Order information to map 'Customer_Orders' table in database
+* Class: CustomerOrderTable 
+************************************************/
 @Data
 @Component
 @Getter

@@ -246,30 +246,6 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 	}
 
 	/**
-	 * Organizer login: determine if email and password match in database
-	 * 
-	 * @param OEmail: Organizer email which is used to login
-	 * @param oPwd: Organizer input password
-	 * @return whether oEmail and oPwd match
-	 */
-	@Override
-	public boolean isMatching(String oEmail, String oPwd) {
-		String SELECT_OPWD = "select * FROM Organizers where Email_Address = ?";
-		List<OrganizerTable> orgPwd = jdbcTemplate.query(SELECT_OPWD, new Object[] { oEmail },
-				new OrganizerRowmapper());
-
-		if (orgPwd.isEmpty()) {
-			return false;
-		}
-		String eCpwd = Base64.getEncoder().encodeToString(oPwd.getBytes());
-		if (orgPwd.get(0).getPassword().equals(eCpwd)) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	/**
 	 * For create and update with 'Organizers' table in database 
 	 * Mapping organizer information between URL body information and database variable attributes
 	 * 
@@ -341,6 +317,36 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 		return contactMap;
 	}
 
+	/**
+	 * Organizer login: determine if email and password match in database
+	 * 
+	 * @param OEmail: Organizer email which is used to login
+	 * @param oPwd: Organizer input password
+	 * @return whether oEmail and oPwd match or not
+	 */
+	@Override
+	public boolean isMatching(String oEmail, String oPwd) {
+		String SELECT_OPWD = "select * FROM Organizers where Email_Address = ?";
+		List<OrganizerTable> orgPwd = jdbcTemplate.query(SELECT_OPWD, new Object[] { oEmail },
+				new OrganizerRowmapper());
+
+		if (orgPwd.isEmpty()) {
+			return false;
+		}
+		String eCpwd = Base64.getEncoder().encodeToString(oPwd.getBytes());
+		if (orgPwd.get(0).getPassword().equals(eCpwd)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	/**
+     * Organizer register: determine if the email exist in database
+     * 
+     * @param organizerEmail: organizer email which is used to register as a new organizer
+     * @return whether the organizerEmail exist in database or not.
+     */
 	@Override
 	public boolean hasRegistered(String organizerEmail) {
 		String VALID_ORGANIZER = "SELECT * FROM Organizers WHERE Email_Address=?";
@@ -353,8 +359,17 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 		}
 	}
 
+	/**
+     * Organizer register: send register confirmation email to organizer
+     * 
+     * @param to: the email address of the organizer
+     * @param subject: the subject of the confirmation email
+     * @param body: the detail of confirmation email
+     * @param oToken: the OTP for confirmation email
+     * @return null
+     */
 	@Override
-	public void sendGreetMail(String to, String subject, String body, String CToken) {
+	public void sendGreetMail(String to, String subject, String body, String oToken) {
 		MimeMessage message = mailSender.createMimeMessage();
 		MimeMessageHelper helper;
 		try {
@@ -385,6 +400,12 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 		return ofgpwdMap;
 	}
 
+	/**
+     * Organizer forget password: determine if email is in organizer table
+     * 
+     * @param organizerEmail: organizer email which is used to get back password
+     * @return whether the email address is in the organizer table or not
+     */
 	@Override
 	public boolean isValidOrganizer(String organizerEmail) {
 		String VALID_ORGANIZER = "SELECT * FROM Organizers WHERE Email_Address=?";
@@ -397,6 +418,12 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 		}
 	}
 
+	/**
+     * Organizer forget password: determine if email is in organizer token table
+     * 
+     * @param organizerEmail: organizer email which is used to get back password
+     * @return whether the email address is in the organizer token table or not
+     */
 	@Override
 	public boolean hasForgetenPWD(String organizerEmail) {
 		String HAS_FORGET_PWD = "SELECT * FROM Organizer_Token WHERE OEmail=?";
@@ -410,6 +437,15 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 
 	}
 
+	/**
+     * Create organizer basic information
+     * Map organizerTokenTable to MySql parameters and insert into database
+     * 
+     * @param organizerEmail: the email address of the customer
+     * @param organizerToken: the random generated OTP 
+     * @param organizerExpiryDate: the expire time of the cToken
+     * @return number of affected rows
+     */
 	@Override
 	public int saveTokenInfo(String organizerEmail, String organizerToken, Timestamp organizerExpiryDate) {
 		String CREATE_TOKEN = "INSERT INTO Organizer_Token(OEmail, OToken, OTExpire) VALUE (:organizerEmail, :organizerToken, :organizerExpiryDate)";
@@ -428,6 +464,14 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 	@Autowired
 	private JavaMailSender mailSender;
 
+	/**
+     * Organizer reset password: send reset password link to organizer email
+     * @param to: the email address of the organizer
+     * @param subject: the subject of the reset password email
+     * @param body: the detail of reset password email
+     * @param OToken: the OTP for reset password
+     * @return null
+     */
 	@Override
 	public void sendPwdMail(String to, String subject, String body, String OToken) {
 		MimeMessage message = mailSender.createMimeMessage();
@@ -444,6 +488,9 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 		}
 	}
 
+	/**
+     * Generate a random string as token
+     */
 	@Override
 	public String generateToken() {
 		String AlphaNumericString = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" + "0123456789" + "abcdefghijklmnopqrstuvxyz";
@@ -456,6 +503,12 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 		return token.toString();
 	}
 
+	/**
+     * Verify token: determine if the token is correct and not expire
+     * 
+     * @param OToken: organizer token 
+     * @return whether the organizer token is in the token table and expired or not
+     */
 	@Override
 	public boolean validToken(String OToken) {
 		String VALID_TOKEN = "SELECT * FROM Organizer_Token WHERE OToken=?";
@@ -474,12 +527,26 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 		}
 	}
 
+	/**
+     * Get organizer basic information from database by organizer token
+     * 
+     * @param OToken
+     * @return List<OrganizerTokenTable>: all entries that match the request
+     */
 	@Override
 	public List<OrganizerTokenTable> findEmailByToken(String OToken) {
 		String FIND_EMAIL_BY_TOKEN = "SELECT * FROM Organizer_Token WHERE OToken=?";
 		return jdbcTemplate.query(FIND_EMAIL_BY_TOKEN, new Object[] { OToken }, new OrganizerTokenRowmapper());
 	}
 
+	/**
+     * Update organizer password: save the new password to organizer table
+     * Map organizer table to MySql parameters, and update database
+     * 
+     * @param oEmail: the email address of the organizer
+     * @param newpwd: the random generated OTP 
+     * @return affected row
+     */
 	@Override
 	public int updatePassword(String oEmail, String newpwd) {
 		String UPDATE_PASSWORD = "UPDATE Organizers SET Password =:password WHERE Email_Address =:email_address";
@@ -494,6 +561,15 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 		return affectedRow;
 	}
 
+	/**
+     * Update organizer token table if organizer token is expired
+     * Map organizer token table to MySql parameters, and update database
+     * 
+     * @param oEmail: the email address of the organizer
+     * @param oToken: the random generated OTP 
+     * @param expiryDate: the expire time of the oToken
+     * @return affected row
+     */
 	@Override
 	public int updateToken(String oEmail, String oToken, Timestamp expireDate) {
 		String UPDATE_TOKEN = "UPDATE Organizer_Token SET OToken =:organizerToken, OTExpire =:organizerExpiryDate WHERE OEmail =:organizerEmail";

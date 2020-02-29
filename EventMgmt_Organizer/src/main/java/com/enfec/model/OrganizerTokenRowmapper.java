@@ -4,8 +4,20 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import org.springframework.jdbc.core.RowMapper;
 
-
-public class OrganizerTokenRowmapper implements RowMapper<OrganizerTokenTable>{
+/************************************************
+* Author: Chad Chai
+* Assignment: Organizer Token Rowmapper for 'Organizer_Token' table
+* Class: OrganizerTokenRowmapper
+************************************************/
+public class OrganizerTokenRowmapper implements RowMapper<OrganizerTokenTable> {
+	/**
+     * Map each MySql column's content to organizer token table
+     * 
+     * @param rs: ResultSet
+     * @param rowNum
+     * @throws SQLException when column doesn't exist in database 
+     * @return OrganizerTokenTable
+     */
 	@Override
 	public OrganizerTokenTable mapRow(ResultSet rs, int rowNum) throws SQLException{
 		OrganizerTokenTable oTokenTable = new OrganizerTokenTable();

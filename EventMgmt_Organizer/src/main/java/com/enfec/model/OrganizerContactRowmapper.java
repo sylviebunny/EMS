@@ -16,7 +16,7 @@ public class OrganizerContactRowmapper implements RowMapper<OrganizerContactTabl
 	/**
 	 * Map each MySql column's content to organizer contact table
 	 * 
-	 * @param rs:    ResultSet
+	 * @param rs: ResultSet
 	 * @param rowNum
 	 * @throws SQLException when column doesn't exist in database
 	 * @return OrganizerContactTable

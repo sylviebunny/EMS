@@ -100,31 +100,103 @@ public interface OrganizerRepository {
 	 * 
 	 * @param OEmail: Organizer email which is used to login
 	 * @param oPwd: Organizer input password
-	 * @return whether oEmail and oPwd match
+	 * @return whether oEmail and oPwd match or not
 	 */
 	public boolean isMatching(String OEmail, String oPwd);
 	
-
+	/**
+	 * Organizer register: determine if the email exist in database
+	 * 
+	 * @param organizerEmail: organizer email which is used to register as a new organizer
+	 * @return whether the organizerEmail exist in database or not.
+	 */
 	public boolean hasRegistered(String organizerEmail);
 
+	/**
+     * Organizer register: send register confirmation email to organizer
+     * 
+     * @param to: the email address of the organizer
+     * @param subject: the subject of the confirmation email
+     * @param body: the detail of confirmation email
+     * @param oToken: the OTP for confirmation email
+     * @return null
+     */
 	public void sendGreetMail(String to, String subject, String body, String oToken);
 
-	// Organizer forget password section
+	/**
+     * Organizer forget password: determine if email is in organizer table
+     * 
+     * @param organizerEmail: organizer email which is used to get back password
+     * @return whether the email address is in the organizer table or not
+     */
 	public boolean isValidOrganizer(String organizerEmail);
 
+	/**
+     * Organizer forget password: determine if email is in organizer token table
+     * 
+     * @param organizerEmail: organizer email which is used to get back password
+     * @return whether the email address is in the organizer token table or not
+     */
 	public boolean hasForgetenPWD(String organizerEmail);
 
+	/**
+     * Save Token info: save the organizer token info to organizer token table
+     * 
+     * @param oEmail: the email address of the organizer
+     * @param oToken: the random generated OTP 
+     * @param oExpiryDate: the expire time of the cToken
+     * @return affected row
+     */
 	public int saveTokenInfo(String oEmail, String oToken, Timestamp oExpiryDate);
 
+	/**
+     * Organizer reset password: send reset password link to organizer email
+     * 
+     * @param to: the email address of the organizer
+     * @param subject: the subject of the reset password email
+     * @param body: the detail of reset password email
+     * @param oToken: the OTP for reset password
+     * @return null
+     */
 	public void sendPwdMail(String to, String subject, String body, String oToken);
 
+	/**
+     * Generate a random string as token
+     */
 	public String generateToken();
 
+	/**
+     * Verify token: determine if the token is correct and not expire
+     * 
+     * @param oToken: customer token 
+     * @return whether the organizer token is in the token table and expire or not
+     */
 	public boolean validToken(String oToken);
 
+	/**
+     * Update organizer password: save the new password to organizer table
+     * 
+     * @param oEmail: the email address of the organizer
+     * @param newpwd: the random generated OTP 
+     * @return affected row
+     */
 	public int updatePassword(String oEmail, String newpwd);
 
+	/**
+	 * Get the organizer's email information using organizer token
+	 * 
+	 * @param oToken: the OTP for organizer to reset password
+	 * @return Object
+	 */
 	public Object findEmailByToken(String oToken);
 
+	/**
+     * Update organizer token table if organizer token is expired
+     * 
+     * @param oEmail: the email address of the organizer
+     * @param oToken: the random generated OTP 
+     * @param expiryDate: the expire time of the oToken
+     * @return affected row
+     */
 	public int updateToken(String oEmail, String oToken, Timestamp expireDate);
 }

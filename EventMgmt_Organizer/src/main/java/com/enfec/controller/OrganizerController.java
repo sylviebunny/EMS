@@ -390,6 +390,12 @@ public class OrganizerController {
 		}
 	}
 	
+	/**
+	 * Active the organizer user account, check if the token is valid or not
+	 * 
+	 * @param oToken. Directly get from the URL
+	 * @return ResponseEntity with message
+	 */
 	@RequestMapping(value = "/registrationConfirm", method = RequestMethod.GET, produces = MediaType.TEXT_PLAIN_VALUE)
 	public ResponseEntity<String> confirmRegistration(@RequestParam("oToken") String oToken) {
 	    if (OrganizerRepositoryImpl.validToken(oToken)) {
@@ -402,12 +408,12 @@ public class OrganizerController {
 	    	}
 	    }
 	
-	
-	/*
-	 * Customer forget password section
+	/**
+	 * Organizer forget password
 	 * 
+	 * @param organizerTable. Organizer email cannot be null and must exist in database
+	 * @return ResponseEntity with forget password result message
 	 */
-	
 	@RequestMapping(value = "/forget_password", method = RequestMethod.POST, produces = "applications/json;charset=UTF-8")
 	public ResponseEntity<String>forgetPassword(
 			@RequestBody(required = true) OrganizerTable organizerTable){
@@ -445,7 +451,12 @@ public class OrganizerController {
 		
 	}
 		
-
+	/**
+	 * Organizer reset password
+	 * 
+	 * @param json. the ObjectNode include two parameters: organizerToken and newPassword
+	 * @return ResponseEntity with reset password result message
+	 */
 	@RequestMapping(value = "/reset_password", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String>get(@RequestBody(required = true) ObjectNode json) { 
 			String orgToken = json.get("organizerToken").textValue();

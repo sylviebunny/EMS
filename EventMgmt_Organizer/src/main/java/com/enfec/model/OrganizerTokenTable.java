@@ -10,6 +10,11 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+/************************************************
+* Author: Chad Chai
+* Assignment: Organizer token information to map 'Organizer_Token' table in database
+* Class: OrganizerTokenTable 
+************************************************/
 @Data
 @Component
 @Getter

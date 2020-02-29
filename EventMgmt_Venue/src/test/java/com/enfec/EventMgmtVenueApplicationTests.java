@@ -1,4 +1,4 @@
-package com.enfec.demo;
+package com.enfec;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

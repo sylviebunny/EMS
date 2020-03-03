@@ -12,10 +12,18 @@ import com.enfec.EMS.CustomerOrderAPI.model.TicketTable;
 public interface CustomerOrderRepository {
 	/**
 	 * Get the customer order basic information by customer order id
-	 * @param customerOrderId: customer order id number
+	 * @param customerOrderID: customer order id number
 	 * @return Object
 	 */
 	public Object getCustomerOrder(String customerOrderID);
+	
+	
+	/**
+	 * Get the customer order basic information by customer id
+	 * @param customerID: customer id number
+	 * @return Object
+	 */
+	public Object getCustomerOrderByCID(String customerID);
 	
 	
 	/**

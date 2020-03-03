@@ -36,7 +36,7 @@ public class CustromerOrderController {
 	
 	/**
 	 * Get customer order basic information from database by customer order id
-	 * @param customerOrderId
+	 * @param customerOrderID
 	 * @return ResponseEntity with message and data
 	 */
 	@RequestMapping(value = "/CustomerOrder/{customerOrderID}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
@@ -50,6 +50,25 @@ public class CustromerOrderController {
 			}
 			return new ResponseEntity<>(
 					new Gson().toJson((customerOrderRepositoryImpl.getCustomerOrder(customerOrderID))), HttpStatus.OK);
+		}
+	
+	
+	/**
+	 * Get customer order basic information from database by customer id
+	 * @param customerID
+	 * @return ResponseEntity with message and data
+	 */
+	@RequestMapping(value = "/CustomerOrderByCID/{customerID}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
+	public ResponseEntity<String>getOrderList(@PathVariable String customerID) { 
+			List<CustomerOrderTable> customerOrderList = customerOrderRepositoryImpl.getCustomerOrderByCID(customerID);
+			if (customerOrderList.isEmpty()) {
+				logger.info("No Customer Order found for: {} ", customerID);
+				return new ResponseEntity<>(
+						"{\"message\" : \"No Customer Order found\"}", HttpStatus.OK);
+			
+			}
+			return new ResponseEntity<>(
+					new Gson().toJson((customerOrderRepositoryImpl.getCustomerOrderByCID(customerID))), HttpStatus.OK);
 		}
 	
 	

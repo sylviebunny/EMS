@@ -36,6 +36,7 @@ public class CustomerOrderRepositoryImpl implements CustomerOrderRepository {
      */
 	//Customer Order SQL
 	final String SELECT_CUSTOMER_ORDER = "SELECT COrder_ID, Customer_ID, OrderCreateTime FROM Customer_Orders WHERE COrder_ID=?";
+	final String SELECT_CUSTOMER_ORDER_BY_CID = "SELECT COrder_ID, Customer_ID, OrderCreateTime FROM Customer_Orders WHERE Customer_ID=?";
 	final String CREATE_CUSTOMER_ORDER = "INSERT INTO Customer_Orders(Customer_ID) VALUES (:customerID)";
 	final String DELETE_CUSTOMER_ORDER = "DELETE FROM Customer_Orders WHERE COrder_ID =?";
 	
@@ -133,6 +134,17 @@ public class CustomerOrderRepositoryImpl implements CustomerOrderRepository {
 	@Override
 	public List<CustomerOrderTable>getCustomerOrder(String customerOrderID){
 		return jdbcTemplate.query(SELECT_CUSTOMER_ORDER, new Object[] {customerOrderID}, new CustomerOrderRowmapper());
+	}
+	
+	
+	/**
+     * Get Customer Order basic information from database by customer id
+     * @param customerOrderID
+     * @return List<CustomerOrderTable>: all entries that match the request
+     */
+	@Override
+	public List<CustomerOrderTable>getCustomerOrderByCID(String customerID){
+		return jdbcTemplate.query(SELECT_CUSTOMER_ORDER_BY_CID, new Object[] {customerID}, new CustomerOrderRowmapper());
 	}
 	
 	

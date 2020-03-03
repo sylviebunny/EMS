@@ -19,6 +19,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -38,6 +40,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class EventRepositoryImpl implements EventRepository {
 
+    private static final Logger logger = LoggerFactory.getLogger(EventRepositoryImpl.class); 
+    
     /**
      * {@value #REGISTER_EVENT} Query for event registration 
      */
@@ -47,7 +51,7 @@ public class EventRepositoryImpl implements EventRepository {
 			+ ":venue_id, :event_name, :event_start_time, :event_end_time, :timezone, :number_of_participants, :derived_days_duration, :event_cost, :discount, :comments)";
 	
     /**
-     * {@value #UPDATE_EVENT_INFO} Query prefix and suffix for updating an event
+     * Query prefix and suffix for updating an event
      */
 	private static final String UPDATE_EVENT_INFO_PREFIX = "UPDATE Events SET "; 
 	private static final String UPDATE_EVENT_INFO_SUFFIX = " WHERE Event_ID = :event_id AND Organizer_ID =:organizer_id";
@@ -89,17 +93,20 @@ public class EventRepositoryImpl implements EventRepository {
 			allEventMap.add(eventMap(et, et.getEvent_id())); 
 		} 
 		
-		if (str == null || str.isEmpty()) {   // For empty filtered bar, print out allEvents
+		if (str == null || str.isEmpty()) {   // For empty filter, print out allEvents
 		    Collections.sort(allEventMap, new EventComparatorByStartTime()); 
+		    logger.info("Enter empty filter");
 			return allEventMap; 
 		}
 		
 		Integer zipcode = getZipcode(str);    
 		if (zipcode != null) {           
 			try { 
+			    logger.info("Enter a zipcode");
 				return getEventByZipcode(allEventMap, zipcode); 
 			} catch (NotBoundException nbe) {
-				throw nbe;          // This is not a valid zipcode on file 
+			    logger.warn("Input zipcode is not valid");
+				throw nbe;
 			}
 		}
 		
@@ -118,7 +125,8 @@ public class EventRepositoryImpl implements EventRepository {
 				}
 			}
 		}
-		Collections.sort(afterFilter, new EventComparatorByStartTime());      // Sort events based on start time
+		Collections.sort(afterFilter, new EventComparatorByStartTime());  
+		logger.info("Get {} filtered events", afterFilter.size());
 		return afterFilter; 
 	}
 	
@@ -160,7 +168,8 @@ public class EventRepositoryImpl implements EventRepository {
 			}
 		}
 		
-		Collections.sort(dateRangeEvents, new EventComparatorByStartTime());  // Sort based on start time
+		Collections.sort(dateRangeEvents, new EventComparatorByStartTime());
+		logger.info("Filtered {} events within a date range", dateRangeEvents.size());
 		return dateRangeEvents; 
 	}
 	
@@ -181,6 +190,7 @@ public class EventRepositoryImpl implements EventRepository {
 				resultEvents.add(eachEvent); 
 			}
 		}
+		logger.info("Get {} filtered events based on event type", resultEvents.size());
 		return resultEvents; 
 	}
 	
@@ -199,6 +209,7 @@ public class EventRepositoryImpl implements EventRepository {
 				resultEvent.add(eachEvent); 
 			}
 		}
+		logger.info("Get" + resultEvent.size() + "event based on event_id: " + event_id);
 		return resultEvent; 
 	}
 	
@@ -243,9 +254,11 @@ public class EventRepositoryImpl implements EventRepository {
 		
 		if (resultList.isEmpty()) {
 		    Collections.sort(inputEventList, new EventComparatorByDistance()); // If no event in result list, then print out all events 
+		    logger.info("Based on given input zipcode, no events found within 50 miles, so list all events");
 			return inputEventList; 
 		} else {
 			Collections.sort(resultList, new EventComparatorByDistance()); 
+			logger.info("Based on given input zipcode, {} events found within 50 miles", resultList.size());
 			return resultList;
 		}
 	}
@@ -298,11 +311,13 @@ public class EventRepositoryImpl implements EventRepository {
 					 
 					Map<String, Object> zipInfo = callRapidGetZipCodeInfo(eachVenue.getZipcode().toString());
 					
-					SqlParameterSource pramSource = new MapSqlParameterSource(zipInfo);
-					count_affected_row += namedParameterJdbcTemplate.update(FILL_ZIPCODE_INFO, pramSource);
+					SqlParameterSource paramSource = new MapSqlParameterSource(zipInfo);
+					logger.info("Store zipcode info into database: {}", paramSource);
+					count_affected_row += namedParameterJdbcTemplate.update(FILL_ZIPCODE_INFO, paramSource);
 				}
 			}
 		}
+		logger.info("{} rows have been filled out", count_affected_row);
 		return count_affected_row;
 	}
 	
@@ -325,13 +340,17 @@ public class EventRepositoryImpl implements EventRepository {
 		StringBuilder URLlink = new StringBuilder("https://redline-redline-zipcode.p.rapidapi.com/rest/multi-info.json/"); 
 		URLlink.append(zipcode); 
 		URLlink.append("/degrees"); 
+		logger.info("Call rapid API, URL is: ", URLlink);
 		
 		try {
+		    if (HOST_NAME == null || ACCESS_KEY == null) {
+		        logger.warn("Didn't fill out third party's host name or access key");
+		    }
 			HttpResponse<String> response = Unirest.get(URLlink.toString())
 					.header("x-rapidapi-host", HOST_NAME)
 					.header("x-rapidapi-key", ACCESS_KEY)
 					.asString();
-			
+			logger.info("Information after calling third party API: {}", response);
 			try {
 				zipInfo = mapper.readValue(response.getBody(), new TypeReference<HashMap<String,Object>>(){});
 			} catch (JsonMappingException e) {
@@ -362,6 +381,7 @@ public class EventRepositoryImpl implements EventRepository {
 			}
 			zipcode = zipcode * 10 + (str.charAt(i) - '0'); 
 		}
+		logger.info("Input is a zipcode: {}", str);
 		return zipcode; 
 	}
 
@@ -371,6 +391,7 @@ public class EventRepositoryImpl implements EventRepository {
 	 */
 	@Override
 	public List<EventTable> getAllEvents() {
+	    logger.info("Connect with database to get all events");
 		return jdbcTemplate.query(GET_ALL_EVENT, new EventRowmapper()); 
 	}
 	
@@ -379,11 +400,11 @@ public class EventRepositoryImpl implements EventRepository {
 	 */
 	@Override
 	public int createEvent (EventTable eventTable) {
-		int affectedRow;
 		Map<String, Object> param = eventMap(eventTable, Integer.MIN_VALUE);
 		
-		SqlParameterSource pramSource = new MapSqlParameterSource(param);
-		affectedRow = namedParameterJdbcTemplate.update(REGISTER_EVENT, pramSource);
+		SqlParameterSource paramSource = new MapSqlParameterSource(param);
+		logger.info("Create event info: {}",paramSource);
+		int affectedRow = namedParameterJdbcTemplate.update(REGISTER_EVENT, paramSource);
 		
 		return affectedRow; 
 	}
@@ -394,11 +415,10 @@ public class EventRepositoryImpl implements EventRepository {
 	 */
 	@Override
 	public int updateEvent(EventTable eventTable) {
-		int affectedRow;
 		Map<String, Object> param = eventMap(eventTable, eventTable.getEvent_id());
 		
-		SqlParameterSource pramSource = new MapSqlParameterSource(param);
-		
+		SqlParameterSource paramSource = new MapSqlParameterSource(param);
+		logger.info("Update event info: {}", paramSource);
 		StringBuilder UPDATE_EVENT_INFO = new StringBuilder();            // Decide which part we need to update
 		for (String key : param.keySet()) {
 			if (param.get(key) != null && !key.equals("organizer_id") && !key.equals("event_id")) {
@@ -409,7 +429,7 @@ public class EventRepositoryImpl implements EventRepository {
 		UPDATE_EVENT_INFO = UPDATE_EVENT_INFO.deleteCharAt(UPDATE_EVENT_INFO.length() - 1);       // remove the last comma
 		
 		String UPDATE_EVENT = UPDATE_EVENT_INFO_PREFIX + UPDATE_EVENT_INFO + UPDATE_EVENT_INFO_SUFFIX;
-		affectedRow =namedParameterJdbcTemplate.update(UPDATE_EVENT, pramSource);
+		int affectedRow =namedParameterJdbcTemplate.update(UPDATE_EVENT, paramSource);
 		
 		return affectedRow;
 	}
@@ -420,8 +440,9 @@ public class EventRepositoryImpl implements EventRepository {
 	@Override
 	public int deleteEvent(int event_id) {
 		List<EventTable> et = getEventByID(event_id); // Check if event exists in database
-		
-		if (et == null || et.size() == 0) {   // Given event id is not in database
+		logger.info("Input event id: {}", event_id);
+		if (et == null || et.size() == 0) {   // Input event id is not in database
+		    logger.info("Event doesn't exist in database");
 			return Integer.MIN_VALUE; 
 		} else {
 			int affectedRow = jdbcTemplate.update(DELETE_EVENT, event_id);
@@ -516,6 +537,7 @@ public class EventRepositoryImpl implements EventRepository {
 		param.put("organizer_name", eventTable.getOrganizer_name() == null || eventTable.getOrganizer_name().isEmpty() ? 
 				null :eventTable.getOrganizer_name());
 		
+		logger.info("Event map created: {}", param);
 		return param;
 	}
 	

@@ -5,6 +5,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -27,6 +29,8 @@ import com.enfec.refundapi.model.OOrderRefundTable;
 @Component
 @Transactional
 public class RefundRepositoryImpl implements RefundRepository {
+    
+    private static final Logger logger = LoggerFactory.getLogger(RefundRepositoryImpl.class); 
     
     /**
      * {@value #DELETE_ORGANIZER_REFUND} Query for deleting an organizer refund
@@ -101,6 +105,8 @@ public class RefundRepositoryImpl implements RefundRepository {
      */
     @Override
     public List<OOrderRefundTable> getOrganizerRefundByRefundID(int refund_id) {
+        logger.info("Connect to database to search organizer refund");
+        logger.info("organizer refund id: {}", refund_id);
         return jdbcTemplate.query(SELECT_ORGANIZER_REFUND, new Object[] {refund_id},
                 new OOrderRefundRowmapper());
     }
@@ -110,6 +116,7 @@ public class RefundRepositoryImpl implements RefundRepository {
      */
     @Override
     public List<OOrderRefundTable> getOrganizerRefundByOorderID(int oorder_id) {
+        logger.info("Connect to database to get organizer refund by organizer order id: {}", oorder_id);
         return jdbcTemplate.query(SELECT_ORGANIZER_REFUND_BY_OORDER_ID, new Object[] {oorder_id},
                 new OOrderRefundRowmapper());
     }
@@ -119,11 +126,11 @@ public class RefundRepositoryImpl implements RefundRepository {
      */
     @Override
     public int createOrganizerRefund(OOrderRefundTable organizerRefundTable) {
-        int affectedRow;
         Map<String, Object> param = getOrganizerRefundMap(organizerRefundTable, Integer.MIN_VALUE);
 
-        SqlParameterSource pramSource = new MapSqlParameterSource(param);
-        affectedRow = namedParameterJdbcTemplate.update(CREATE_ORGANIZER_REFUND, pramSource);
+        SqlParameterSource paramSource = new MapSqlParameterSource(param);
+        logger.info("Create organizer refund: {}", paramSource);
+        int affectedRow = namedParameterJdbcTemplate.update(CREATE_ORGANIZER_REFUND, paramSource);
 
         return affectedRow;
     }
@@ -133,12 +140,12 @@ public class RefundRepositoryImpl implements RefundRepository {
      */
     @Override
     public int updateOrganizerRefund(OOrderRefundTable organizerRefundTable) {
-        int affectedRow;
         Map<String, Object> param =
                 getOrganizerRefundMap(organizerRefundTable, organizerRefundTable.getRefund_id());
 
-        SqlParameterSource pramSource = new MapSqlParameterSource(param);
-        affectedRow = namedParameterJdbcTemplate.update(UPDATE_ORGANIZER_REFUND, pramSource);
+        SqlParameterSource paramSource = new MapSqlParameterSource(param);
+        logger.info("Update organizer refund: {}", paramSource);
+        int affectedRow = namedParameterJdbcTemplate.update(UPDATE_ORGANIZER_REFUND, paramSource);
 
         return affectedRow;
 
@@ -152,8 +159,10 @@ public class RefundRepositoryImpl implements RefundRepository {
         List<OOrderRefundTable> et = getOrganizerRefundByRefundID(refund_id);
 
         if (et == null) {       // Didn't find this organizer refund;
+            logger.info("Get 0 organizer refund by organizer refund id: {}", refund_id);
             return Integer.MIN_VALUE;
         } else {
+            logger.info("Get organizer refund by organizer refund id: {}", refund_id);
             int affectedRow = jdbcTemplate.update(DELETE_ORGANIZER_REFUND, refund_id);
             return affectedRow;
         }
@@ -169,8 +178,7 @@ public class RefundRepositoryImpl implements RefundRepository {
      * wise it's for updating
      * @return Map<String, Object>
      */
-    private Map<String, Object> getOrganizerRefundMap(OOrderRefundTable organizerRefund,
-            Integer refund_id) {
+    private Map<String, Object> getOrganizerRefundMap(OOrderRefundTable organizerRefund, Integer refund_id) {
         Map<String, Object> param = new HashMap<>();
 
         if (refund_id != null && refund_id != Integer.MIN_VALUE) { // Means we need to update an organizer refund
@@ -193,6 +201,7 @@ public class RefundRepositoryImpl implements RefundRepository {
                 organizerRefund.getRefund_status() == null ? new String("Created")
                         : organizerRefund.getRefund_status());  // Default status is created
 
+        logger.info("Organizer refund map created: {}", param);
         return param;
     }
 
@@ -201,12 +210,10 @@ public class RefundRepositoryImpl implements RefundRepository {
      */
     @Override
     public int createCustomerRefund(COrderRefundTable customerRefundTable) {
-        int affectedRow;
         Map<String, Object> param = getCustomerRefundMap(customerRefundTable, Integer.MIN_VALUE);
-
-        SqlParameterSource pramSource = new MapSqlParameterSource(param);
-        affectedRow = namedParameterJdbcTemplate.update(CREATE_CUSTOMER_REFUND, pramSource);
-
+        SqlParameterSource paramSource = new MapSqlParameterSource(param);
+        logger.info("Create customer refund: {}", paramSource);
+        int affectedRow = namedParameterJdbcTemplate.update(CREATE_CUSTOMER_REFUND, paramSource); 
         return affectedRow;
     }
 
@@ -242,7 +249,7 @@ public class RefundRepositoryImpl implements RefundRepository {
         param.put("crefund_status",
                 customerRefund.getCrefund_status() == null ? new String("Created")
                         : customerRefund.getCrefund_status());  // Default status is created
-
+        logger.info("Customer refund map created: {}", param);
         return param;
     }
 
@@ -253,9 +260,11 @@ public class RefundRepositoryImpl implements RefundRepository {
     public int deleteCustomerRefund(int crefund_id) {
         List<COrderRefundTable> et = getCustomerRefundByCRefundID(crefund_id);
 
-        if (et == null) {       // Didn't find this customer refund;
+        if (et == null) {
+            logger.info("Customer refund doesn't exist based on customer refund id: {}", crefund_id);
             return Integer.MIN_VALUE;
         } else {
+            logger.info("Customer refund found by customer refund id: {}", crefund_id);
             int affectedRow = jdbcTemplate.update(DELETE_CUSTOMER_REFUND, crefund_id);
             return affectedRow;
         }
@@ -266,6 +275,7 @@ public class RefundRepositoryImpl implements RefundRepository {
      */
     @Override
     public List<COrderRefundTable> getCustomerRefundByCRefundID(int crefund_id) {
+        logger.info("Connect to database and get customer refund by customer refund id: {}", crefund_id);
         return jdbcTemplate.query(SELECT_CUSTOMER_REFUND_BY_CREFUND_ID, new Object[] {crefund_id},
                 new COrderRefundRowmapper());
     }
@@ -275,6 +285,7 @@ public class RefundRepositoryImpl implements RefundRepository {
      */
     @Override
     public List<COrderRefundTable> getCustomerRefundByCorderID(int corder_id) {
+        logger.info("Connect to database and get customer refund by customer order id: {}", corder_id);
         return jdbcTemplate.query(SELECT_CUSTOMER_REFUND_BY_CORDER_ID, new Object[] {corder_id},
                 new COrderRefundRowmapper());
     }
@@ -284,13 +295,10 @@ public class RefundRepositoryImpl implements RefundRepository {
      */
     @Override
     public int updateCustomerRefund(COrderRefundTable customerRefundTable) {
-        int affectedRow;
-        Map<String, Object> param =
-                getCustomerRefundMap(customerRefundTable, customerRefundTable.getCrefund_id());
-
-        SqlParameterSource pramSource = new MapSqlParameterSource(param);
-        affectedRow = namedParameterJdbcTemplate.update(UPDATE_CUSTOMER_REFUND, pramSource);
-
+        Map<String, Object> param = getCustomerRefundMap(customerRefundTable, customerRefundTable.getCrefund_id());
+        SqlParameterSource paramSource = new MapSqlParameterSource(param);
+        logger.info("Update customer refund info: ", paramSource); 
+        int affectedRow = namedParameterJdbcTemplate.update(UPDATE_CUSTOMER_REFUND, paramSource);
         return affectedRow;
     }
 

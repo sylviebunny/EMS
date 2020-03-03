@@ -11,6 +11,11 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
+/************************************************
+* Author: Chad Chai
+* Assignment: Customer Application
+* Class: CustomerApiApplication
+************************************************/
 @SpringBootApplication
 @EnableSwagger2
 public class CustomerApiApplication extends SpringBootServletInitializer {

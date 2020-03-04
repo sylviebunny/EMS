@@ -48,7 +48,6 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 	final String UPDATE_CUSTOMER_INFO_PREFIX = "UPDATE Customers SET ";
 	final String UPDATE_CUSTOMER_INFO_SUFFIX = " WHERE Customer_ID =:id";
 	
-	//final String UPDATE_CUSTOMER =  User_name =:name, Email_Address =:email, CPassword =:psw, Phone =:phone 
 	final String DELETE_CUSTOMER = "DELETE FROM Customers WHERE Customer_ID =?";
 	final String SELECT_PWD = "SELECT Customer_ID, User_Name, Email_Address, CPassword, Phone FROM Customers WHERE Email_Address =?";
 

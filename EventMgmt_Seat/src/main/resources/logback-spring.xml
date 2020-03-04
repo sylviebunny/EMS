@@ -15,11 +15,11 @@
 
 		<appender name="FILE-ROLLING"
 			class="ch.qos.logback.core.rolling.RollingFileAppender">
-			<file>propertiesApi.log</file>
+			<file>seatApi.log</file>
 
 			<rollingPolicy
 				class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-				<fileNamePattern>logs/archived/app.%d{yyyy-MM-dd}.%i.log
+				<fileNamePattern>logs/archived/seatApi.%d{yyyy-MM-dd}.%i.log
 				</fileNamePattern>
 				<!-- each archived file, size max 10MB -->
 				<maxFileSize>10MB</maxFileSize>

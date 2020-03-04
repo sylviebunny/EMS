@@ -24,15 +24,15 @@ public class WebConfig implements WebMvcConfigurer {
 	@Override
     public void addCorsMappings(CorsRegistry registry) {
 
-        registry.addMapping("/**").allowedOrigins("*").allowedMethods("GET", "POST", "OPTIONS", "PUT")
+		registry.addMapping("/**").allowedOrigins("*").allowedMethods("GET", "POST", "OPTIONS", "PUT", "DELETE")
 
-                .allowedHeaders("Content-Type", "X-Requested-With", "accept", "Origin", "Access-Control-Request-Method",
+			.allowedHeaders("Content-Type", "X-Requested-With", "accept", "Origin", "Access-Control-Request-Method",
 
-                        "Access-Control-Request-Headers")
+				"Access-Control-Request-Headers", "X-Auth-Token")
 
-                .exposedHeaders("Access-Control-Allow-Origin", "Access-Control-Allow-Credentials")
+			.exposedHeaders("Access-Control-Allow-Origin", "Access-Control-Allow-Credentials")
 
-                .allowCredentials(true).maxAge(3600);
+			.allowCredentials(true).maxAge(3600);
     }
 	
 	/**
@@ -41,11 +41,8 @@ public class WebConfig implements WebMvcConfigurer {
 	 */
 	@Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/static/**").addResourceLocations("classpath:/static/");
-        registry.addResourceHandler("swagger-ui.html")
-                .addResourceLocations("classpath:/META-INF/resources/");
-
-        registry.addResourceHandler("/webjars/**")
-                .addResourceLocations("classpath:/META-INF/resources/webjars/");    
+		registry.addResourceHandler("/static/**").addResourceLocations("classpath:/static/");
+		registry.addResourceHandler("swagger-ui.html").addResourceLocations("classpath:/META-INF/resources/");
+		registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");  
    }
 }

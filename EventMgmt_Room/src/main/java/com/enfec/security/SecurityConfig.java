@@ -20,10 +20,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
 	protected void configure(HttpSecurity http) throws Exception {
     	http
-        .csrf().disable()
-        .authorizeRequests().anyRequest().authenticated()
+    	.csrf().disable()
+        .antMatcher("/**")
+        .authorizeRequests().and()
+        .httpBasic()
         .and()
-        .httpBasic();
+        .authorizeRequests().anyRequest().authenticated().and().cors();
 	}
     
 	/**
@@ -31,8 +33,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	 */
 	@Autowired
 	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-		auth.inMemoryAuthentication().withUser("admin").password("{noop}***").roles("USER");
-		auth.inMemoryAuthentication().withUser("ui").password("{noop}***").roles("USER");
+		auth.inMemoryAuthentication().withUser("admin").password("{noop}Enfec@13").roles("USER");
+		auth.inMemoryAuthentication().withUser("ui").password("{noop}Enfec@ui").roles("USER");
 	}
     
     private static final String[] AUTH_WHITELIST = {

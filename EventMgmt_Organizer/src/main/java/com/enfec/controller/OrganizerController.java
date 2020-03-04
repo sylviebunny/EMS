@@ -475,5 +475,5 @@ public class OrganizerController {
 			logger.info("Not valid token: {}",json.get("organizerToken").textValue());
 			return new ResponseEntity<>(
 					"{\"message\" : \"Token expired. Please re-reset password.\"}", HttpStatus.OK);
-		}
+	}
 }

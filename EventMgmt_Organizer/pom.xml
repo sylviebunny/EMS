@@ -87,7 +87,7 @@
 
 
 	<build>
-		<finalName>organizer-api</finalName>
+		<finalName>Organizer-api</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>

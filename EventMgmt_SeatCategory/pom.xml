@@ -82,7 +82,7 @@
 	</dependencies>
 
 	<build>
-		<finalName>seatCategory-api</finalName>
+		<finalName>SeatCategory-api</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>

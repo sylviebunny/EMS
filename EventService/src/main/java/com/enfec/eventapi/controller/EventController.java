@@ -9,6 +9,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.DataFormatException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -34,6 +36,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class EventController {
 
+    private static final Logger logger = LoggerFactory.getLogger(EventController.class); 
+    
 	@Autowired
 	EventRepositoryImpl eventRepositoryImpl;
 
@@ -48,12 +52,19 @@ public class EventController {
 			List<EventTable> resultEvent = eventRepositoryImpl.getEventByID(event_id);
 
 			if (resultEvent.isEmpty()) {
+			    logger.info("No event found, event_id: {}", event_id);
 				return new ResponseEntity<>("{\"message\" : \"No event found\"}", HttpStatus.OK);
 			} else {
+			    logger.info("Event found by event id, event_id: {}", event_id); 
 				return new ResponseEntity<>(new Gson().toJson(resultEvent), HttpStatus.OK);
 			}
-		} catch (Exception ex) {
-			return new ResponseEntity<>("{\"message\" : \"Unknown error, please contact developer\"}", HttpStatus.OK);
+		} catch (CannotGetJdbcConnectionException ce) {
+            logger.error("Fail to connect database");
+            return new ResponseEntity<>("{\"message\" : \"Fail to connect database\"}",
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception ex) {
+		    logger.error("Exception in searching event: {}", ex.getMessage());
+			return new ResponseEntity<>("{\"message\" : \"Unknown error, please contact developer\"}", HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
@@ -69,15 +80,24 @@ public class EventController {
 			List<Map> resultEvents = eventRepositoryImpl.getFilteredEventsByRefinedZipcode(getAllEvent, word);
 
 			if (resultEvents.isEmpty()) {
+			    logger.info("No event found, word: {}", word);
 				return new ResponseEntity<>("{\"message\" : \"No event found\"}", HttpStatus.OK);
 			} else {
+			    logger.info("Events found, word: {}", word); 
 				return new ResponseEntity<>(new Gson().toJson(resultEvents), HttpStatus.OK);
 			}
 		} catch (NotBoundException nbe) {
+		    logger.warn("Not a valid zipcode, {}", word); 
 			return new ResponseEntity<>("{\"message\" : \"Not a valid zipcode\"}", HttpStatus.OK);
-		} catch (Exception ex) {
+		} catch (CannotGetJdbcConnectionException ce) {
+            logger.error("Fail to connect database");
+            return new ResponseEntity<>("{\"message\" : \"Fail to connect database\"}",
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception ex) {
+		    logger.error("Input word: {}", word);
+		    logger.error("Exception in getting events: {}", ex.getMessage()); 
 			return new ResponseEntity<>("{\"message\" : \"Unknown error, please contact with developer\"}",
-					HttpStatus.OK);
+					HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
@@ -118,16 +138,27 @@ public class EventController {
 			List<Map> result_events = eventRepositoryImpl.getEventByEventType(result_events_by_zipcode, event_type);  // Get events with specific type
 
 			if (result_events == null || result_events.size() == 0) {
+			    logger.info("Based on given criteria, no event found");
 				return new ResponseEntity<>("{\"message\" : \"No event found\"}", HttpStatus.OK);
 			} else {
+			    logger.info("Events found");
+			    logger.info("start date: {}", start_date);
+                logger.info("end date: {}", end_date);
+                logger.info("zipcode: {}", zipcode); 
+                logger.info("event type: {}", event_type);
 				return new ResponseEntity<>(new Gson().toJson(result_events), HttpStatus.OK);
 			}
 		} catch (DataFormatException ex) {
+		    logger.error("Invalid input date");
+		    logger.error("start date: {}", start_date);
+            logger.error("end date: {}", end_date);
 			return new ResponseEntity<>("{\"message\" : \"Invalid input date\"}", HttpStatus.BAD_REQUEST);
 		} catch (CannotGetJdbcConnectionException ce) {
+		    logger.error("Fail to connect database: {}",ce.getMessage());
 			return new ResponseEntity<>("{\"message\" : \"Fail to connect database\"}",
 					HttpStatus.INTERNAL_SERVER_ERROR);
 		} catch (Exception e) {
+		    logger.error("Exception in searching events: {}", e.getMessage());
 			return new ResponseEntity<>("{\"message\" : \"Unknown error, please contact developer\"}",
 					HttpStatus.INTERNAL_SERVER_ERROR);
 		}
@@ -144,14 +175,26 @@ public class EventController {
 			int affectedRow = eventRepositoryImpl.createEvent(eventTable);
 
 			if (affectedRow == 0) {
-				return new ResponseEntity<>("{\"message\" : \"Event not registerd\"}", HttpStatus.OK);
+			    logger.info("No event created");
+				return new ResponseEntity<>("{\"message\" : \"No event created\"}", HttpStatus.OK);
 			} else {
+			    logger.info("Event successfully registered");
 				return new ResponseEntity<>("{\"message\" : \"Event successfully registered\"}", HttpStatus.OK);
 			}
 		} catch (DataIntegrityViolationException dve) {
+		    logger.error("Lack of required event information or invalid input");
+            logger.error("Organizer id: {}", eventTable.getOrganizer_id());
+            logger.error("Venue id: {}", eventTable.getVenue_id());
+            logger.error("Event status code: {}", eventTable.getEvent_status_code());
+            logger.error("Event type code: {}", eventTable.getEvent_type_code());
 			return new ResponseEntity<>("{\"message\" : \"Lack of required event information or invalid input\"}",
 					HttpStatus.BAD_REQUEST);
-		} catch (Exception ex) {
+		} catch (CannotGetJdbcConnectionException ce) {
+            logger.error("Fail to connect database: {}", ce.getMessage());
+            return new ResponseEntity<>("{\"message\" : \"Fail to connect database\"}",
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception ex) {
+            logger.error("Exception in creating event: {}", ex.getMessage());
 			return new ResponseEntity<>("{\"message\" : \"Unknown Error, need contact admin\"}",
 					HttpStatus.INTERNAL_SERVER_ERROR);
 		}
@@ -168,14 +211,27 @@ public class EventController {
 			int affectedRow = eventRepositoryImpl.updateEvent(eventTable);
 
 			if (affectedRow == 0) {
+			    logger.info("Event not found, event_id: {}", eventTable.getEvent_id());
 				return new ResponseEntity<>("{\"message\" : \"Event not found\"}", HttpStatus.OK);
 			} else {
+			    logger.info("Event successfully updated, event_id: {}", eventTable.getEvent_id());
 				return new ResponseEntity<>("{\"message\" : \"Event successfully updated\"}", HttpStatus.OK);
 			}
 		} catch (DataIntegrityViolationException dve) {
+		    logger.error("Lack of required event information or invalid input");
+            logger.error("Organizer id: {}", eventTable.getOrganizer_id());
+            logger.error("Venue id: {}", eventTable.getVenue_id());
+            logger.error("Event status code: {}", eventTable.getEvent_status_code());
+            logger.error("Event type code: {}", eventTable.getEvent_type_code());
 			return new ResponseEntity<>("{\"message\" : \"Lack of required event information or invalid input\"}",
 					HttpStatus.BAD_REQUEST);
-		} catch (Exception ex) {
+		} catch (CannotGetJdbcConnectionException ce) {
+            logger.error("Fail to connect database: {}", ce.getMessage());
+            return new ResponseEntity<>("{\"message\" : \"Fail to connect database\"}",
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception ex) {
+            logger.error("Exception in updating event, event_id: {}", eventTable.getEvent_id());
+            logger.error("Error message: {}", ex.getMessage());
 			return new ResponseEntity<>("{\"message\" : \"Unknown Error, need contact admin\"}",
 					HttpStatus.INTERNAL_SERVER_ERROR);
 		}
@@ -188,13 +244,25 @@ public class EventController {
 	 */
 	@RequestMapping(value = "/event/delete/{Event_ID}", method = RequestMethod.DELETE, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> deleteEvent(@PathVariable int Event_ID) {
-		int affectedRow = eventRepositoryImpl.deleteEvent(Event_ID);
-
-		if (affectedRow == Integer.MIN_VALUE) {
-			// Didn't find this event by event_id
-			return new ResponseEntity<>("{\"message\" : \"Event not found\"}", HttpStatus.OK);
-		} else {
-			return new ResponseEntity<>("{\"message\" : \"Event successfully deleted\"}", HttpStatus.OK);
-		}
+	    try {
+    		int affectedRow = eventRepositoryImpl.deleteEvent(Event_ID);
+    
+    		if (affectedRow == Integer.MIN_VALUE) {
+    		    logger.info("No event found based on event id, event_id: {}", Event_ID);
+    			return new ResponseEntity<>("{\"message\" : \"Event not found\"}", HttpStatus.OK);
+    		} else {
+    		    logger.info("Event successfully deleted");
+    			return new ResponseEntity<>("{\"message\" : \"Event successfully deleted\"}", HttpStatus.OK);
+    		}
+	    } catch (CannotGetJdbcConnectionException ce) {
+            logger.error("Fail to connect database: {}", ce.getMessage());
+            return new ResponseEntity<>("{\"message\" : \"Fail to connect database\"}",
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception ex) {
+            logger.error("Exception in updating event, event_id: {}", Event_ID);
+            logger.error("Error message: {}", ex.getMessage());
+            return new ResponseEntity<>("{\"message\" : \"Unknown Error, need contact admin\"}",
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
 	}
 }

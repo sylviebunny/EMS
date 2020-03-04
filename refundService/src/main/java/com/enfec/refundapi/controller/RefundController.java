@@ -5,10 +5,13 @@ import com.enfec.refundapi.model.OOrderRefundTable;
 import com.enfec.refundapi.repository.RefundRepositoryImpl;
 import com.google.gson.Gson;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,6 +30,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class RefundController {
 
+    private static final Logger logger = LoggerFactory.getLogger(RefundController.class); 
+    
     @Autowired
     RefundRepositoryImpl refundRepositoryImpl;
 
@@ -40,19 +45,25 @@ public class RefundController {
             method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
     public ResponseEntity<String> getOrganizerRefundByRefundID(
             @PathVariable int organizer_refund_id) {
-
         try {
             List<OOrderRefundTable> organizerRefundList =
                     refundRepositoryImpl.getOrganizerRefundByRefundID(organizer_refund_id);
 
             if (organizerRefundList == null || organizerRefundList.isEmpty()) {
+                logger.info("No refund found, organizer refund id: {}", organizer_refund_id);
                 return new ResponseEntity<>("{\"message\" : \"No refund found\"}", HttpStatus.OK);
             } else {
+                logger.info("organizer refund found based on organizer refund id: {}", organizer_refund_id);
                 return new ResponseEntity<>(new Gson().toJson(
                         (refundRepositoryImpl.getOrganizerRefundByRefundID(organizer_refund_id))),
                         HttpStatus.OK);
             }
+        } catch (CannotGetJdbcConnectionException ce) {
+            logger.error("Fail to connect database: {}", ce.getMessage());
+            return new ResponseEntity<>("{\"message\" : \"Fail to connect database\"}",
+                    HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (Exception e) {
+            logger.error("Exception info in searching organizer refund: {}", e.getMessage());
             return new ResponseEntity<>("{\"message\" : \"Unknown error\"}",
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -73,14 +84,19 @@ public class RefundController {
                     refundRepositoryImpl.getOrganizerRefundByOorderID(oorder_id);
 
             if (organizerRefundList == null || organizerRefundList.isEmpty()) {
-                return new ResponseEntity<>("{\"message\" : \"No refund found\"}", HttpStatus.OK);
+                logger.info("No organizer refund found based on organizer order id: {}", oorder_id);
+                return new ResponseEntity<>("{\"message\" : \"No organizer refund found\"}", HttpStatus.OK);
             } else {
-                return new ResponseEntity<>(
-                        new Gson().toJson(
-                                (refundRepositoryImpl.getOrganizerRefundByOorderID(oorder_id))),
+                logger.info("Organizer refund found by organizer order id: {}", oorder_id);
+                return new ResponseEntity<>(new Gson().toJson(organizerRefundList),
                         HttpStatus.OK);
             }
+        } catch (CannotGetJdbcConnectionException ce) {
+            logger.error("Fail to connect database: {}", ce.getMessage());
+            return new ResponseEntity<>("{\"message\" : \"Fail to connect database\"}",
+                    HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (Exception e) {
+            logger.error("Exception in searching organizer refund: " + e.getMessage());
             return new ResponseEntity<>("{\"message\" : \"Unknown error\"}",
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -100,17 +116,25 @@ public class RefundController {
             int affectedRow = refundRepositoryImpl.createOrganizerRefund(organizerRefundTable);
 
             if (affectedRow == 0) {
+                logger.info("Organizer refund not created, organizer order id: {}", organizerRefundTable.getOorder_id());
                 return new ResponseEntity<>("{\"message\" : \"Organizer refund not created\"}",
                         HttpStatus.OK);
             } else {
+                logger.info("Organizer refund successfully created");
                 return new ResponseEntity<>(
-                        "{\"message\" : \"Organizer refund successfully registered\"}",
+                        "{\"message\" : \"Organizer refund successfully created\"}",
                         HttpStatus.OK);
             }
         } catch (DataIntegrityViolationException di) {
+            logger.error("Invalid input: {}", organizerRefundTable.getOorder_id());
             return new ResponseEntity<>("{\"message\" : \"Invalid input, lack of data\"}",
                     HttpStatus.BAD_REQUEST);
+        } catch (CannotGetJdbcConnectionException ce) {
+            logger.error("Fail to connect database: {}", ce.getMessage());
+            return new ResponseEntity<>("{\"message\" : \"Fail to connect database\"}",
+                    HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (Exception e) {
+            logger.error("Exception info in creating organizer refund: {}", e.getMessage());
             return new ResponseEntity<>("{\"message\" : \"Unknown error\"}",
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -130,16 +154,25 @@ public class RefundController {
             int affectedRow = refundRepositoryImpl.updateOrganizerRefund(organizerRefundTable);
 
             if (affectedRow == 0) {
+                logger.info("Organizer refund not updated, organizer refund id: " + organizerRefundTable.getRefund_id());
                 return new ResponseEntity<>("{\"message\" : \"Organizer refund not updated\"}",
                         HttpStatus.OK);
             } else {
+                logger.info("Organizer successfully updated, organizer refund id: " + organizerRefundTable.getRefund_id());
                 return new ResponseEntity<>(
                         "{\"message\" : \"Organizer refund successfully updated\"}", HttpStatus.OK);
             }
+        } catch (CannotGetJdbcConnectionException ce) {
+            logger.error("Fail to connect database: {}", ce.getMessage());
+            return new ResponseEntity<>("{\"message\" : \"Fail to connect database\"}",
+                    HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (DataIntegrityViolationException di) {
+            logger.error("Invalid input, organizer refund id: " + organizerRefundTable.getRefund_id()); 
+            logger.error("Exceptioin message: {}", di.getMessage());
             return new ResponseEntity<>("{\"message\" : \"Invalid input, lack of data\"}",
                     HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
+            logger.error("Exception info in updating organizer refund: {}", e.getMessage());
             return new ResponseEntity<>("{\"message\" : \"Unknown error\"}",
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -158,14 +191,20 @@ public class RefundController {
             int affectedRow = refundRepositoryImpl.deleteOrganizerRefund(organizer_refund_id);
 
             if (affectedRow == Integer.MIN_VALUE) {
-                // Didn't find this event by event_id
+                logger.info("Organizer refund not found, organizer refund id: {}", organizer_refund_id);
                 return new ResponseEntity<>("{\"message\" : \"Organizer refund not found\"}",
                         HttpStatus.OK);
             } else {
+                logger.info("Organizer refund successfully deleted, organizer refund id: {}", organizer_refund_id);
                 return new ResponseEntity<>(
                         "{\"message\" : \"Organizer refund successfully deleted\"}", HttpStatus.OK);
             }
+        } catch (CannotGetJdbcConnectionException ce) {
+            logger.error("Fail to connect database: {}", ce.getMessage());
+            return new ResponseEntity<>("{\"message\" : \"Fail to connect database\"}",
+                    HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (Exception e) {
+            logger.error("Exception in deleting organizer refund: {}", e.getMessage());
             return new ResponseEntity<>("{\"message\" : \"Unknown error\"}",
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -187,14 +226,22 @@ public class RefundController {
                     refundRepositoryImpl.getCustomerRefundByCRefundID(customer_refund_id);
 
             if (customerRefundList == null || customerRefundList.isEmpty()) {
+                logger.info("No customer refund found by customer refund id: {}", customer_refund_id);
                 return new ResponseEntity<>("{\"message\" : \"No customer refund found\"}",
                         HttpStatus.OK);
             } else {
+                logger.info("Customer refund found by customer refund id: {}", customer_refund_id);
                 return new ResponseEntity<>(new Gson().toJson(
                         (refundRepositoryImpl.getCustomerRefundByCRefundID(customer_refund_id))),
                         HttpStatus.OK);
             }
+        } catch (CannotGetJdbcConnectionException ce) {
+            logger.error("Fail to connect database: {}", ce.getMessage());
+            return new ResponseEntity<>("{\"message\" : \"Fail to connect database\"}",
+                    HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (Exception e) {
+            logger.error("Input customer refund id: {}", customer_refund_id);
+            logger.error("Exception info in searching customer refund: {}", e.getMessage());
             return new ResponseEntity<>("{\"message\" : \"Unknown error\"}",
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -215,15 +262,21 @@ public class RefundController {
                     refundRepositoryImpl.getCustomerRefundByCorderID(corder_id);
 
             if (customerRefundList == null || customerRefundList.isEmpty()) {
+                logger.info("No customer refund found by customer order id: " + corder_id);
                 return new ResponseEntity<>("{\"message\" : \"No customer refund found\"}",
                         HttpStatus.OK);
             } else {
-                return new ResponseEntity<>(
-                        new Gson().toJson(
-                                (refundRepositoryImpl.getCustomerRefundByCorderID(corder_id))),
+                logger.info("Customer refund found by customer order id: " + corder_id);
+                return new ResponseEntity<>(new Gson().toJson(customerRefundList),
                         HttpStatus.OK);
             }
+        } catch (CannotGetJdbcConnectionException ce) {
+            logger.error("Fail to connect database: {}", ce.getMessage());
+            return new ResponseEntity<>("{\"message\" : \"Fail to connect database\"}",
+                    HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (Exception e) {
+            logger.error("Input cutomer order id: " + corder_id);
+            logger.error("Exception info in searching customer refund: " + e.getMessage());
             return new ResponseEntity<>("{\"message\" : \"Unknown error\"}",
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -243,17 +296,26 @@ public class RefundController {
             int affectedRow = refundRepositoryImpl.createCustomerRefund(customerRefund);
 
             if (affectedRow == 0) {
+                logger.info("Customer refund not created");
                 return new ResponseEntity<>("{\"message\" : \"Customer refund not created\"}",
                         HttpStatus.OK);
             } else {
-                return new ResponseEntity<>(
-                        "{\"message\" : \"Customer refund successfully registered\"}",
+                logger.info("Customer refund successfully created for customer order id: " + customerRefund.getCorder_id());
+                return new ResponseEntity<>("{\"message\" : \"Customer refund successfully created\"}",
                         HttpStatus.OK);
             }
+        } catch (CannotGetJdbcConnectionException ce) {
+            logger.error("Fail to connect database: {}", ce.getMessage());
+            return new ResponseEntity<>("{\"message\" : \"Fail to connect database\"}",
+                    HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (DataIntegrityViolationException di) {
+            logger.error("Invalid input");
+            logger.error("Customer order id: {}", customerRefund.getCorder_id());
             return new ResponseEntity<>("{\"message\" : \"Invalid input, lack of data\"}",
                     HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
+            logger.error("Customer order id: {}", customerRefund.getCorder_id());
+            logger.error("Exception info in creating customer refund: {}", e.getMessage());
             return new ResponseEntity<>("{\"message\" : \"Unknown error\"}",
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -273,16 +335,27 @@ public class RefundController {
             int affectedRow = refundRepositoryImpl.updateCustomerRefund(customerRefund);
 
             if (affectedRow == 0) {
-                return new ResponseEntity<>("{\"message\" : \"Organizer refund not updated\"}",
+                logger.info("Customer refund not updated, customer refund id: {}", customerRefund.getCrefund_id());
+                return new ResponseEntity<>("{\"message\" : \"Customer refund not updated\"}",
                         HttpStatus.OK);
             } else {
+                logger.info("Customer refund successfully updated, customer refund id: {}", customerRefund.getCrefund_id());
                 return new ResponseEntity<>(
-                        "{\"message\" : \"Organizer refund successfully updated\"}", HttpStatus.OK);
+                        "{\"message\" : \"Customer refund successfully updated\"}", HttpStatus.OK);
             }
+        } catch (CannotGetJdbcConnectionException ce) {
+            logger.error("Fail to connect database: {}", ce.getMessage());
+            return new ResponseEntity<>("{\"message\" : \"Fail to connect database\"}",
+                    HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (DataIntegrityViolationException di) {
+            logger.error("Invalid input");
+            logger.error("Input customer refund id: {}", customerRefund.getCrefund_id());
+            logger.error("Input customer order id: {}", customerRefund.getCorder_id());
+            logger.error("Exception message: ", di.getMessage());
             return new ResponseEntity<>("{\"message\" : \"Invalid input, lack of data\"}",
                     HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
+            logger.error("Exception info in updating customer refund: {}", e.getMessage());
             return new ResponseEntity<>("{\"message\" : \"Unknown error\"}",
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -301,14 +374,20 @@ public class RefundController {
             int affectedRow = refundRepositoryImpl.deleteCustomerRefund(customer_refund_id);
 
             if (affectedRow == Integer.MIN_VALUE) {
-                // Didn't find this event by event_id
-                return new ResponseEntity<>("{\"message\" : \"Organizer refund not found\"}",
+                logger.info("Customer refund not found by customer refund id: {}", customer_refund_id);
+                return new ResponseEntity<>("{\"message\" : \"Customer refund not found\"}",
                         HttpStatus.OK);
             } else {
+                logger.info("Customer refund successfully deleted: {}", customer_refund_id);
                 return new ResponseEntity<>(
-                        "{\"message\" : \"Organizer refund successfully deleted\"}", HttpStatus.OK);
+                        "{\"message\" : \"Customer refund successfully deleted\"}", HttpStatus.OK);
             }
+        } catch (CannotGetJdbcConnectionException ce) {
+            logger.error("Fail to connect database: {}", ce.getMessage());
+            return new ResponseEntity<>("{\"message\" : \"Fail to connect database\"}",
+                    HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (Exception e) {
+            logger.error("Exception info in deleting customer refund: {}", e.getMessage());
             return new ResponseEntity<>("{\"message\" : \"Unknown error\"}",
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }

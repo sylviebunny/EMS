@@ -15,7 +15,7 @@
 
 		<appender name="FILE-ROLLING"
 			class="ch.qos.logback.core.rolling.RollingFileAppender">
-			<file>propertiesApi.log</file>
+			<file>CustomerOrderAPI.log</file>
 
 			<rollingPolicy
 				class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">

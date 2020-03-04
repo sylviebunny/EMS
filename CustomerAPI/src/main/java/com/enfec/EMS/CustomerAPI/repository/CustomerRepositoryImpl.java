@@ -61,7 +61,14 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 
 	@Autowired
 	JdbcTemplate jdbcTemplate;
-
+	
+	
+	/**
+	 * For create and update with 'Customers' table in database 
+	 * Mapping customer information between URL body information and database variable attributes
+	 * @param customerTable: customer's information used for create or update
+	 * @return Map<String, Object>: contains variable and it's corresponding information
+	 */
 	public Map<String, Object> CustomerMap(CustomerTable customerTable) {
 		Map<String, Object> cstmMap = new HashMap<>();
 		cstmMap.put("id", customerTable.getId());
@@ -74,7 +81,13 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 		return cstmMap;
 	}
 
-	// Customer Token Map
+
+	/**
+	 * For create and update with 'Customer_Token' table in database 
+	 * Mapping customer token information between URL body information and database variable attributes
+	 * @param customerTokenTable: customer token's information used for create or update
+	 * @return Map<String, Object>: contains variable and it's corresponding information
+	 */
 	private Map<String, Object> CustomerTokenMap(CustomerTokenTable customerTokenTable) {
 		Map<String, Object> cfgpwdMap = new HashMap<>();
 		cfgpwdMap.put("customerTokenID", customerTokenTable.getCustomerTokenID());

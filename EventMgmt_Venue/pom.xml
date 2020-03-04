@@ -82,7 +82,7 @@
 	</dependencies>
 
 	<build>
-		<finalName>venue-api</finalName>
+		<finalName>Venue-api</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>

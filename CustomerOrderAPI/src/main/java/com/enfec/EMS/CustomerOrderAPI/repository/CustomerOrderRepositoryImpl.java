@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /************************************************
+*  Author: Chad Chai
 * Assignment: Implement CRUD methods for Customer order, ticket and discount
 * Class: CustomerOrderRepositoryImpl
 ************************************************/

@@ -19,6 +19,13 @@ public interface CustomerRepository {
 	 */
 	public Object getCustomer(String id);
 	
+	/**
+	 * Get the customer's basic information
+	 * @param customerEmail: customer email address
+	 * @return Object
+	 */
+	public Object getCustomerByEmail(String customerEmail);
+	
 	
 	/**
      * Create a customer

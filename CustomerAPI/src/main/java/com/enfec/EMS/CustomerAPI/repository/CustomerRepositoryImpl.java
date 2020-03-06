@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /************************************************
+* Author: Chad Chai
 * Assignment: Implement CRUD methods for Customer, Customer login, password handling
 * Class: CustomerRepositoryImpl
 ************************************************/
@@ -42,9 +43,13 @@ public class CustomerRepositoryImpl implements CustomerRepository {
      * All the Sql statements to use in MySql database
      */
 	final String SELECT_CUSTOMER = "SELECT Customer_ID, User_Name, Email_Address, CPassword, Phone FROM Customers WHERE Customer_ID =?";
+	final String SELECT_CUSTOMER_BY_EMAIL = "SELECT Customer_ID, User_Name, Email_Address, CPassword, Phone FROM Customers WHERE Email_Address =?";
 	final String REGISTER_CUSTOMER = "INSERT INTO Customers(User_Name, Email_Address, CPassword, Phone) VALUES"
 			+ "(:name, :email, :psw, :phone)";
-	final String UPDATE_CUSTOMER = "UPDATE Customers SET User_name =:name, Email_Address =:email, CPassword =:psw, Phone =:phone WHERE Customer_ID =:id";
+	final String UPDATE_CUSTOMER_INFO_PREFIX = "UPDATE Customers SET ";
+	final String UPDATE_CUSTOMER_INFO_SUFFIX = " WHERE Customer_ID =:id";
+	
+	//final String UPDATE_CUSTOMER =  User_name =:name, Email_Address =:email, CPassword =:psw, Phone =:phone 
 	final String DELETE_CUSTOMER = "DELETE FROM Customers WHERE Customer_ID =?";
 	final String SELECT_PWD = "SELECT Customer_ID, User_Name, Email_Address, CPassword, Phone FROM Customers WHERE Email_Address =?";
 
@@ -72,11 +77,11 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 	public Map<String, Object> CustomerMap(CustomerTable customerTable) {
 		Map<String, Object> cstmMap = new HashMap<>();
 		cstmMap.put("id", customerTable.getId());
-		cstmMap.put("name", customerTable.getName() == null ? null : customerTable.getName());
-		cstmMap.put("email", customerTable.getEmail());
-		cstmMap.put("psw", customerTable.getPsw() == null ? null
+		cstmMap.put("name", customerTable.getName() == null || customerTable.getName().isEmpty() ? null : customerTable.getName());
+		cstmMap.put("email", customerTable.getEmail() == null || customerTable.getEmail().isEmpty() ? null : customerTable.getEmail());
+		cstmMap.put("psw", customerTable.getPsw() == null || customerTable.getPsw().isEmpty() ? null
 				: Base64.getEncoder().encode((customerTable.getPsw().getBytes())));
-		cstmMap.put("phone", customerTable.getPhone());
+		cstmMap.put("phone", customerTable.getPhone() == null || customerTable.getPhone().isEmpty() ? null : customerTable.getPhone());
 
 		return cstmMap;
 	}
@@ -109,6 +114,15 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 		return jdbcTemplate.query(SELECT_CUSTOMER, new Object[] { id }, new CustomerRowmapper());
 	}
 	
+	/**
+     * Get Customer basic information from database by customer email
+     * @param customerEmail
+     * @return List<CustomerTable>: all entries that match the request
+     */
+	@Override
+	public List<CustomerTable> getCustomerByEmail(String customerEmail) {
+		return jdbcTemplate.query(SELECT_CUSTOMER_BY_EMAIL, new Object[] { customerEmail }, new CustomerRowmapper());
+	}
 	
 	/**
      * Create customer basic information
@@ -139,6 +153,22 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 		int affectedRow;
 		Map<String, Object> cstmMap = CustomerMap(customerTable);
 		SqlParameterSource parameterSource = new MapSqlParameterSource(cstmMap);
+		StringBuilder UPDATE_CUSTOMER_INFO = new StringBuilder();
+		if(cstmMap.get("name") != null) {
+				UPDATE_CUSTOMER_INFO.append("User_Name" + "=:" + "name" + ",");
+			}
+		if(cstmMap.get("email") != null) {
+			UPDATE_CUSTOMER_INFO.append("Email_Address" + "=:" + "email" + ",");
+		}
+		if(cstmMap.get("psw") != null) {
+			UPDATE_CUSTOMER_INFO.append("CPassword" + "=:" + "psw" + ",");
+		}
+		if(cstmMap.get("phone") != null) {
+			UPDATE_CUSTOMER_INFO.append("Phone" + "=:" + "phone" + ",");
+		}
+		
+		UPDATE_CUSTOMER_INFO = UPDATE_CUSTOMER_INFO.deleteCharAt(UPDATE_CUSTOMER_INFO.length() - 1);//To delete the , at the end of the string
+		String UPDATE_CUSTOMER = UPDATE_CUSTOMER_INFO_PREFIX + UPDATE_CUSTOMER_INFO + UPDATE_CUSTOMER_INFO_SUFFIX;
 		logger.info("Update customer info:{}", parameterSource);
 		affectedRow = namedParameterJdbcTemplate.update(UPDATE_CUSTOMER, parameterSource);
 

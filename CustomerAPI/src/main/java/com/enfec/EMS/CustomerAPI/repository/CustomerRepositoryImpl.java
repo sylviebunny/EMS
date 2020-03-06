@@ -115,8 +115,8 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 	}
 	
 	/**
-     * Get Customer basic information from database by customer id
-     * @param id
+     * Get Customer basic information from database by customer email
+     * @param customerEmail
      * @return List<CustomerTable>: all entries that match the request
      */
 	@Override

@@ -42,4 +42,10 @@ public interface RoomRepository {
 	 * @return affected row
 	 */
 	public int deleteRoom(int Room_ID);
+	
+	/**
+	 * Get all rooms' information
+	 * @return Object
+	 */
+	public Object getAllRoomInfo();
 }

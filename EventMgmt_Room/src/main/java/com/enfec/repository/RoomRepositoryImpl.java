@@ -3,6 +3,7 @@ package com.enfec.repository;
 
 import java.sql.PreparedStatement;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -88,6 +89,16 @@ public class RoomRepositoryImpl implements RoomRepository {
 			return null;
 		}
 		return room;
+	}
+	
+	/**
+     * Get all rooms' information from 'Rooms' and 'Space_Requests' tables in database
+     * @return List<Room>: all entries that match the request
+     */
+	@Override
+	public List<Room> getAllRoomInfo() {
+		String SELECT_ALL_ROOM = "select * from Rooms r join Space_Requests s on r.Room_ID = s.Room_ID";
+		return jdbcTemplate.query(SELECT_ALL_ROOM, new BeanPropertyRowMapper<Room>(Room.class));
 	}
 	
 	/**

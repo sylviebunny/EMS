@@ -1,5 +1,7 @@
 package com.enfec.controller;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,6 +85,32 @@ public class RoomController {
 		}
 	}
 
+	/**
+	 * Get all rooms' basic and space information from database
+	 * 
+	 * @return ResponseEntity with message and data
+	 */
+	@RequestMapping(value = "/room/searchall", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
+	public ResponseEntity<String> getAllRoomList() {
+		try {		
+			List<Room> roomList = RoomRepositoryImpl.getAllRoomInfo();
+			if (roomList.isEmpty()) {
+				logger.info("No room found");
+				return new ResponseEntity<>(
+						"{\"message\" : \"No room found\"}", HttpStatus.OK);
+			} else {
+				return new ResponseEntity<>(
+						new Gson().toJson((RoomRepositoryImpl
+								.getAllRoomInfo())), HttpStatus.OK);
+			}
+		} catch (Exception e) {
+			logger.error("Exception in getting room info: {}", e.getMessage());
+			return new ResponseEntity<>(
+					"{\"message\" : \"Exception in getting room info, please contact admin\"}",
+					HttpStatus.INTERNAL_SERVER_ERROR);
+		} 
+	}
+	
 	/**
 	 * Update room information, can update partial info
 	 * 

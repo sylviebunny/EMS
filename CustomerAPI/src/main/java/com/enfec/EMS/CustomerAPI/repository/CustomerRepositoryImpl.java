@@ -43,11 +43,13 @@ public class CustomerRepositoryImpl implements CustomerRepository {
      * All the Sql statements to use in MySql database
      */
 	final String SELECT_CUSTOMER = "SELECT Customer_ID, User_Name, Email_Address, CPassword, Phone FROM Customers WHERE Customer_ID =?";
+	final String SELECT_CUSTOMER_BY_EMAIL = "SELECT Customer_ID, User_Name, Email_Address, CPassword, Phone FROM Customers WHERE Email_Address =?";
 	final String REGISTER_CUSTOMER = "INSERT INTO Customers(User_Name, Email_Address, CPassword, Phone) VALUES"
 			+ "(:name, :email, :psw, :phone)";
 	final String UPDATE_CUSTOMER_INFO_PREFIX = "UPDATE Customers SET ";
 	final String UPDATE_CUSTOMER_INFO_SUFFIX = " WHERE Customer_ID =:id";
 	
+	//final String UPDATE_CUSTOMER =  User_name =:name, Email_Address =:email, CPassword =:psw, Phone =:phone 
 	final String DELETE_CUSTOMER = "DELETE FROM Customers WHERE Customer_ID =?";
 	final String SELECT_PWD = "SELECT Customer_ID, User_Name, Email_Address, CPassword, Phone FROM Customers WHERE Email_Address =?";
 
@@ -112,6 +114,15 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 		return jdbcTemplate.query(SELECT_CUSTOMER, new Object[] { id }, new CustomerRowmapper());
 	}
 	
+	/**
+     * Get Customer basic information from database by customer id
+     * @param id
+     * @return List<CustomerTable>: all entries that match the request
+     */
+	@Override
+	public List<CustomerTable> getCustomerByEmail(String customerEmail) {
+		return jdbcTemplate.query(SELECT_CUSTOMER_BY_EMAIL, new Object[] { customerEmail }, new CustomerRowmapper());
+	}
 	
 	/**
      * Create customer basic information

@@ -9,7 +9,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 /************************************************
 *
 * Author: Heidi Huo
-* Assignment: Web configuration for CORS policy
+* Assignment: Web configure
 * Class: WebConfig
 *
 ************************************************/
@@ -22,26 +22,21 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
 
-        registry.addMapping("/**").allowedOrigins("*")
-                .allowedMethods("GET", "POST", "OPTIONS", "PUT")
-                .allowedHeaders("Content-Type", "X-Requested-With", "accept", "Origin",
-                        "Access-Control-Request-Method",
-                        "Access-Control-Request-Headers")
-                .exposedHeaders("Access-Control-Allow-Origin", "Access-Control-Allow-Credentials")
-                .allowCredentials(true).maxAge(3600);
-
+        registry.addMapping("/**").allowedOrigins("*").allowedMethods("GET", "HEAD", "POST", "OPTIONS", "PUT", "DELETE")
+            .allowedHeaders("Content-Type", "X-Requested-With", "accept", "Origin", "Access-Control-Request-Method",
+                "Access-Control-Request-Headers", "Access-Control-Allow-Headers", "X-Auth-Token", "Authorization")
+            .exposedHeaders("Access-Control-Allow-Origin", "Access-Control-Allow-Credentials", "Access-Control-Allow-Headers", "Authorization")
+            .allowCredentials(true).maxAge(3600);
     }
     
     /**
-     * {@inheritDoc}
+     * Web configuration for Swagger UI
+     * Used for deploying to AWS, if cannot get swagger ui page through AWS url
      */
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/static/**").addResourceLocations("classpath:/static/");
-        registry.addResourceHandler("swagger-ui.html")
-                .addResourceLocations("classpath:/META-INF/resources/");
-
-        registry.addResourceHandler("/webjars/**")
-                .addResourceLocations("classpath:/META-INF/resources/webjars/");    
+        registry.addResourceHandler("swagger-ui.html").addResourceLocations("classpath:/META-INF/resources/");
+        registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");  
    }
 }

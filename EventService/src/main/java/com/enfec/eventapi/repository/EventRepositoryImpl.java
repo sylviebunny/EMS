@@ -86,7 +86,7 @@ public class EventRepositoryImpl implements EventRepository {
 	 * @throws NotBoundException when input zipcode is not a valid zipcode
 	 */
 	@Override
-	public List<Map> getFilteredEventsByRefinedZipcode(List<EventTable> allEvent, String str) throws NotBoundException {
+	public List<Map> getFilteredEventsByWordFilter(List<EventTable> allEvent, String str) throws NotBoundException {
 	
 		List<Map> allEventMap = new ArrayList<>();    // Convert EventTable to Map
 		for (EventTable et: allEvent) {
@@ -153,11 +153,16 @@ public class EventRepositoryImpl implements EventRepository {
 	 * <pre>end_date - end date, inclusive</pre>
 	 */
 	@Override
-	public List<Map> getFilteredEvents(List<EventTable> allEvent, Timestamp start_date, Timestamp end_date) {
+	public List<Map> getFilteredEventsWithDateRange(List<EventTable> allEvent, Timestamp start_date, Timestamp end_date) {
 		List<Map> allEventMap = new ArrayList<>(); 
 		for (EventTable et: allEvent) {
 			allEventMap.add(eventMap(et, et.getEvent_id())); 
 		} 
+		
+		if (start_date == null && end_date == null) {
+		    Collections.sort(allEventMap, new EventComparatorByStartTime());
+		    return allEventMap; 
+		}
 		
 		List<Map> dateRangeEvents = new ArrayList<>();
 		for (Map eachEvent: allEventMap) {
@@ -179,6 +184,7 @@ public class EventRepositoryImpl implements EventRepository {
 	@Override
 	public List<Map> getEventByEventType(List<Map> inputEvents, String event_type) {
 		if (event_type == null || event_type.length() == 0) {
+		    Collections.sort(inputEvents, new EventComparatorByStartTime());
 			return inputEvents; 
 		}
 		
@@ -191,6 +197,7 @@ public class EventRepositoryImpl implements EventRepository {
 			}
 		}
 		logger.info("Get {} filtered events based on event type", resultEvents.size());
+		Collections.sort(resultEvents, new EventComparatorByStartTime());
 		return resultEvents; 
 	}
 	
@@ -199,7 +206,7 @@ public class EventRepositoryImpl implements EventRepository {
 	 */
 	@Override
 	public List<EventTable> getEventByID(int event_id) {
-		List<EventTable> allEvents = getAllEvents(); 
+		List<EventTable> allEvents = getAllEvents();
 		
 		List<EventTable> resultEvent = new ArrayList<>(); 
 		

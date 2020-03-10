@@ -32,6 +32,13 @@ public interface OrganizerRepository {
 	public Object getOrganizerInfo(int Organizer_ID);
 
 	/**
+	 * Get all organizer's basic information
+	 * 
+	 * @return Object
+	 */
+	public Object getAllOrganizerInfo();
+	
+	/**
 	 * Update an organizer
 	 * 
 	 * @param organizerTable Organizer basic information

@@ -83,6 +83,16 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 	}
 
 	/**
+     * Get all rooms' information from 'Rooms' and 'Space_Requests' tables in database
+     * @return List<Room>: all entries that match the request
+     */
+	@Override
+	public List<OrganizerTable> getAllOrganizerInfo() {
+		String SELECT_ALL_ORGANZIER = "select * from Organizers";
+		return jdbcTemplate.query(SELECT_ALL_ORGANZIER, new OrganizerRowmapper());
+	}
+	
+	/**
 	 * Update organizer basic information 
 	 * Map organizer table to MySql parameters and update database
 	 * 

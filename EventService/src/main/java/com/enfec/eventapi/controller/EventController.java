@@ -47,7 +47,14 @@ public class EventController {
 	 * @return response entity
 	 */
 	@RequestMapping(value = "/event/search", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
-	public ResponseEntity<String> getEventList(@RequestParam(name = "event_id", required = true) Integer event_id) {
+	public ResponseEntity<String> getEventList(@RequestParam(name = "event_id", required = false) Integer event_id) {
+	    if (event_id == null) {
+	        List<EventTable> getAllEvent = eventRepositoryImpl.getAllEvents();
+	        List<Map> allEvents = eventRepositoryImpl.getFilteredEventsWithDateRange(getAllEvent, null, null); 
+	        logger.info("No input word or filter, print out all events");
+	        return new ResponseEntity<>(new Gson().toJson(allEvents),
+	                HttpStatus.OK) ; 
+	    }
 		try {
 			List<EventTable> resultEvent = eventRepositoryImpl.getEventByID(event_id);
 
@@ -76,8 +83,9 @@ public class EventController {
 	@RequestMapping(value = "/event/search/{word}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> getEventListByFilterBar(@PathVariable(required = false) String word) {
 		List<EventTable> getAllEvent = eventRepositoryImpl.getAllEvents();
+		    
 		try {
-			List<Map> resultEvents = eventRepositoryImpl.getFilteredEventsByRefinedZipcode(getAllEvent, word);
+			List<Map> resultEvents = eventRepositoryImpl.getFilteredEventsByWordFilter(getAllEvent, word);
 
 			if (resultEvents.isEmpty()) {
 			    logger.info("No event found, word: {}", word);
@@ -125,7 +133,7 @@ public class EventController {
 
 			List<EventTable> allEvent = eventRepositoryImpl.getAllEvents();
 
-			List<Map> result_events_within_date = eventRepositoryImpl.getFilteredEvents(allEvent, st, et);
+			List<Map> result_events_within_date = eventRepositoryImpl.getFilteredEventsWithDateRange(allEvent, st, et);
 			
 			List<Map> result_events_by_zipcode = null;
 			if (zipcode != null && zipcode.length() != 0) {

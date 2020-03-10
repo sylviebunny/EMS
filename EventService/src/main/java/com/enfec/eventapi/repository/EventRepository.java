@@ -36,13 +36,13 @@ public interface EventRepository {
 	public int deleteEvent(int event_id);
 
 	/**
-	 * Gets event list by refined zipcode
+	 * Gets event list by word
 	 * @param allEvent events to be searched
-	 * @param str refined zipcode
+	 * @param word to match
 	 * @return result event list
 	 * @throws NotBoundException
 	 */
-    public List<Map> getFilteredEventsByRefinedZipcode(List<EventTable> allEvent, String str) throws NotBoundException;
+    public List<Map> getFilteredEventsByWordFilter(List<EventTable> allEvent, String str) throws NotBoundException;
 	
 	/**
 	 * Gets event list by start and end date
@@ -51,7 +51,7 @@ public interface EventRepository {
 	 * @param end_date end date
 	 * @return result event list
 	 */
-	public List<Map> getFilteredEvents(List<EventTable> allEvent, Timestamp start_date, Timestamp end_date);
+	public List<Map> getFilteredEventsWithDateRange(List<EventTable> allEvent, Timestamp start_date, Timestamp end_date);
 	
 	/**
 	 * Gets a list of {@link EventTable} by event type

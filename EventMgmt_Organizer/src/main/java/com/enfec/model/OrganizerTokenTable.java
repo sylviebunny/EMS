@@ -28,7 +28,8 @@ public class OrganizerTokenTable {
 
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private Timestamp organizerExpiryDate;
-
+	private int hasChecked;
+	
 	public static int getTokenExpiration() {
 		return TOKEN_EXPIRATION;
 	}

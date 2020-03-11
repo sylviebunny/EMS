@@ -72,8 +72,8 @@ public class OrganizerController {
 							"<p>Dear</p>"+
 							"<p><b>"+ organizerTable.getOrganizer_name()+ "</b></p>"+
 							"<p>Welcome to join the EMS. Your account is all set!</p>"+ 
-							"<p><a href = 'http://evntmgmt-alb-295694066.us-east-2.elb.amazonaws.com:8080/Organizer-api/registrationConfirm?oToken="+oToken+"'>Please click this link to Active your account</a></p>" +
-//							"<p><a href = 'http://localhost:4200/organizer-api/registrationConfirm?oToken="+oToken+"'>Please click this link to Active your account</a></p>" +
+//							"<p><a href = 'http://evntmgmt-alb-295694066.us-east-2.elb.amazonaws.com:8080/Organizer-api/registrationConfirm?oToken="+oToken+"'>Please click this link to Active your account</a></p>" +
+							"<p><a href = 'http://localhost:4200/organizer-api/registrationConfirm?oToken="+oToken+"'>Please click this link to Active your account</a></p>" +
 							"<p>This is a system generated mail. Please do not reply to this email ID. If you have a query or need any clarification you may:</p>" + 
 							"<p>(1) Call our 24-hour Customer Care or\r\n</p>" + 
 							"<p>(2) Email Us support@enfec.com\r\n</p>" + 
@@ -398,15 +398,20 @@ public class OrganizerController {
 	 */
 	@RequestMapping(value = "/registrationConfirm", method = RequestMethod.GET, produces = MediaType.TEXT_PLAIN_VALUE)
 	public ResponseEntity<String> confirmRegistration(@RequestParam("oToken") String oToken) {
-	    if (OrganizerRepositoryImpl.validToken(oToken)) {
-	    	logger.info("valid token: {} ", oToken);
-	    	return new ResponseEntity<String>(
-					"{\"message\": \"Organizer account actived\"}", HttpStatus.OK);
-	    	} else {
-	    		return new ResponseEntity<String>(
-						"{\"message\": \"Organizer account active failed\"}", HttpStatus.OK);
-	    	}
-	    }
+		if (OrganizerRepositoryImpl.validToken(oToken) && !OrganizerRepositoryImpl.hasChecked(oToken)) {
+			logger.info("valid token: {} ", oToken);
+			logger.info("token has not checked ");
+			OrganizerRepositoryImpl.updateTokenStatus(oToken);
+			logger.info("change token status to checked ");
+			return new ResponseEntity<String>("{\"message\": \"Organizer account activated\"}", HttpStatus.OK);
+		} else if (OrganizerRepositoryImpl.validToken(oToken) && OrganizerRepositoryImpl.hasChecked(oToken)){
+			logger.info(" has checked already ");
+			return new ResponseEntity<String>("{\"message\": \"Organizer account activated already, please login\"}", HttpStatus.OK);
+		} else {
+			logger.info("invalid token: {} ", oToken);
+			return new ResponseEntity<String>("{\"message\": \"Organizer account activate failed\"}", HttpStatus.OK);
+		}
+	}
 	
 	/**
 	 * Organizer forget password

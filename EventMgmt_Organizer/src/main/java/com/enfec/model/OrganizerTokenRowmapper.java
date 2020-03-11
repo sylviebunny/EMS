@@ -25,7 +25,7 @@ public class OrganizerTokenRowmapper implements RowMapper<OrganizerTokenTable> {
 		oTokenTable.setOrganizerEmail(rs.getString("OEmail"));
 		oTokenTable.setOrganizerToken(rs.getString("OToken"));
 		oTokenTable.setOrganizerExpiryDate(rs.getTimestamp("OTExpire"));
-		
+		oTokenTable.setHasChecked(rs.getInt("Checked"));
 		return oTokenTable;
 	}
 

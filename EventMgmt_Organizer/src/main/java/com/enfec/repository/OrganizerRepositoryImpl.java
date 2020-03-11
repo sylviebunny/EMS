@@ -407,6 +407,7 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 		ofgpwdMap.put("organizerEmail", organizerTokenTable.getOrganizerEmail());
 		ofgpwdMap.put("organizerToken", organizerTokenTable.getOrganizerToken());
 		ofgpwdMap.put("organizerExpiryDate", organizerTokenTable.getOrganizerExpiryDate());
+		ofgpwdMap.put("hasChecked", organizerTokenTable.getHasChecked());
 		return ofgpwdMap;
 	}
 
@@ -595,4 +596,44 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 		affectedRow = namedParameterJdbcTemplate.update(UPDATE_TOKEN, parameterSource);
 		return affectedRow;
 	}
+	
+	/**
+     * Verify token: determine if the token is checked
+     * @param OToken: organizer token 
+     * @return whether the organizer token is checked or not
+     */
+	@Override
+	public boolean hasChecked(String OToken) {
+		String VALID_TOKEN = "SELECT * FROM Organizer_Token WHERE OToken=?";
+		List<OrganizerTokenTable> orgToken = jdbcTemplate.query(VALID_TOKEN, new Object[] { OToken },
+				new OrganizerTokenRowmapper());
+		if (orgToken.isEmpty() || orgToken.get(0).getHasChecked()==0) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+	
+	/**
+	 * Update organizer basic information, can update partial info
+	 * @param OrganizerTable. Organizer id cannot be null and must exist in database
+	 * @return ResponseEntity with message
+	 */
+	@Override
+	public int updateTokenStatus(String oToken) {
+		String UPDATE_TOKEN_STATUS = "UPDATE Organizer_Token SET Checked =:hasChecked WHERE OToken =:organizerToken";
+		int affectedRow;
+		OrganizerTokenTable ott = new OrganizerTokenTable();
+		ott.setOrganizerToken(oToken);
+		ott.setHasChecked(1);
+		logger.info("Organizer token status change to: {}", ott.getHasChecked());
+
+		Map<String, Object> updateTokenMap = OrganizerTokenMap(ott);
+		SqlParameterSource parameterSource = new MapSqlParameterSource(updateTokenMap);
+		logger.info("Update organizer token status to :{}", parameterSource);
+		affectedRow = namedParameterJdbcTemplate.update(UPDATE_TOKEN_STATUS, parameterSource);
+
+		return affectedRow;
+	}
+
 }

@@ -206,4 +206,18 @@ public interface OrganizerRepository {
      * @return affected row
      */
 	public int updateToken(String oEmail, String oToken, Timestamp expireDate);
+	
+	/**
+     * Verify token: determine if the token is checked or not
+     * @param OToken: organizer token 
+     * @return whether the organizer token is checked or not
+     */
+	public boolean hasChecked(String OToken);
+	
+	/**
+     * Update organizer token status if this token has been checked
+     * @param oToken: the random generated OTP 
+     * @return affected row
+     */
+	public int updateTokenStatus(String oToken);
 }

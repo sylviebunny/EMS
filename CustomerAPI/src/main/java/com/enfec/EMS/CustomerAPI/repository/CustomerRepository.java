@@ -19,13 +19,6 @@ public interface CustomerRepository {
 	 */
 	public Object getCustomer(String id);
 	
-	/**
-	 * Get the customer's basic information
-	 * @param customerEmail: customer email address
-	 * @return Object
-	 */
-	public Object getCustomerByEmail(String customerEmail);
-	
 	
 	/**
      * Create a customer
@@ -131,6 +124,14 @@ public interface CustomerRepository {
 	
 	
 	/**
+     * Verify token: determine if the token is checked or not
+     * @param CToken: customer token 
+     * @return whether the customer token is checked or not
+     */
+	public boolean hasChecked(String CToken);
+	
+	
+	/**
      * Update customer password: save the new password to customer table
      * @param cEmail: the email address of the customer
      * @param newpwd: the random generated OTP 
@@ -155,4 +156,12 @@ public interface CustomerRepository {
      * @return affected row
      */
 	public int updateToken(String cEmail, String cToken, Timestamp expireDate);
+	
+	
+	/**
+     * Update customer token status if this token has been checked
+     * @param cToken: the random generated OTP 
+     * @return affected row
+     */
+	public int updateTokenStatus(String cToken);
 }

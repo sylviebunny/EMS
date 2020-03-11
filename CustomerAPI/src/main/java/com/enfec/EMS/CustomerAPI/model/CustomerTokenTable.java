@@ -34,5 +34,6 @@ public class CustomerTokenTable {
 
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private Timestamp customerExpiryDate;
+	private int hasChecked;
 
 }

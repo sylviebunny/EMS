@@ -78,7 +78,7 @@ public class CustromerController {
 					customerRepositoryImpl.sendGreetMail(customerTable.getEmail(), "Welcome to EMS", "<p>Dear</p>"
 							+ "<p><b>" + customerTable.getName() + "</b></p>"
 							+ "<p>Welcome to join the EMS. Your account is all set!</p>"
-							+ "<p><a href = 'http://evntmgmt-alb-295694066.us-east-2.elb.amazonaws.com:8080/customer-api/registrationConfirm?cToken="
+							+ "<p><a href = 'http://localhost:4200/users/registerconfirm?cToken="
 							+ cToken + "'>Please click this link to Active your account</a></p>" +
 
 							"<p>This is a system generated mail. Please do not reply to this email ID. If you have a query or need any clarification you may:</p>"
@@ -112,13 +112,18 @@ public class CustromerController {
 	 */
 	@RequestMapping(value = "/registrationConfirm", method = RequestMethod.GET, produces = MediaType.TEXT_PLAIN_VALUE)
 	public ResponseEntity<String> confirmRegistration(@RequestParam("cToken") String cToken) {
-		if (customerRepositoryImpl.validToken(cToken)) {
+		if (customerRepositoryImpl.validToken(cToken) && !customerRepositoryImpl.hasChecked(cToken)) {
 			logger.info("valid token: {} ", cToken);
+			logger.info("token has not checked ");
+			customerRepositoryImpl.updateTokenStatus(cToken);
+			logger.info("change token status to checked ");
 			return new ResponseEntity<String>("{\"message\": \"Customer account actived\"}", HttpStatus.OK);
+		} else if (customerRepositoryImpl.validToken(cToken) && customerRepositoryImpl.hasChecked(cToken)){
+			logger.info(" has checked already ");
+			return new ResponseEntity<String>("{\"message\": \"Customer account actived already, please login\"}", HttpStatus.OK);
 		} else {
 			logger.info("invalid token: {} ", cToken);
-			return new ResponseEntity<String>("{\"message\": \"Customer account active failed\"}",
-					HttpStatus.OK);
+			return new ResponseEntity<String>("{\"message\": \"Customer account active failed\"}", HttpStatus.OK);
 		}
 	}
 	
@@ -179,8 +184,7 @@ public class CustromerController {
 		try {
 			boolean isMatch = customerRepositoryImpl.isMatching(customerTable.getEmail(), customerTable.getPsw());
 			if (isMatch) {
-				return new ResponseEntity<>("{\"message\" : \"Customer login success\"}" + 
-						"\r{" + "\r	\"id\" : " + "\"" +customerRepositoryImpl.getCustomerByEmail(customerTable.getEmail()).get(0).getId() + "\""+"}", HttpStatus.OK);
+				return new ResponseEntity<>("{\"message\" : \"Customer login success\"}", HttpStatus.OK);
 			} else {
 				return new ResponseEntity<>(
 						"{\"message\" : \"Customer login fail: Email or Password is not correct...\"}", HttpStatus.OK);

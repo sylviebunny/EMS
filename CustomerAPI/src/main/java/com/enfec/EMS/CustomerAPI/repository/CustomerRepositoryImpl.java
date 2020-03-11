@@ -43,13 +43,11 @@ public class CustomerRepositoryImpl implements CustomerRepository {
      * All the Sql statements to use in MySql database
      */
 	final String SELECT_CUSTOMER = "SELECT Customer_ID, User_Name, Email_Address, CPassword, Phone FROM Customers WHERE Customer_ID =?";
-	final String SELECT_CUSTOMER_BY_EMAIL = "SELECT Customer_ID, User_Name, Email_Address, CPassword, Phone FROM Customers WHERE Email_Address =?";
 	final String REGISTER_CUSTOMER = "INSERT INTO Customers(User_Name, Email_Address, CPassword, Phone) VALUES"
 			+ "(:name, :email, :psw, :phone)";
 	final String UPDATE_CUSTOMER_INFO_PREFIX = "UPDATE Customers SET ";
 	final String UPDATE_CUSTOMER_INFO_SUFFIX = " WHERE Customer_ID =:id";
 	
-	//final String UPDATE_CUSTOMER =  User_name =:name, Email_Address =:email, CPassword =:psw, Phone =:phone 
 	final String DELETE_CUSTOMER = "DELETE FROM Customers WHERE Customer_ID =?";
 	final String SELECT_PWD = "SELECT Customer_ID, User_Name, Email_Address, CPassword, Phone FROM Customers WHERE Email_Address =?";
 
@@ -60,6 +58,7 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 	final String UPDATE_PASSWORD = "UPDATE Customers SET CPassword =:psw WHERE Email_Address =:email";
 	final String HAS_FORGET_PWD = "SELECT * FROM Customer_Token WHERE CEmail=?";
 	final String UPDATE_TOKEN = "UPDATE Customer_Token SET CToken =:customerToken, CTExpire =:customerExpiryDate WHERE CEmail =:customerEmail";
+	final String UPDATE_TOKEN_STATUS = "UPDATE Customer_Token SET Checked =:hasChecked WHERE CToken =:customerToken";
 
 	@Autowired
 	NamedParameterJdbcTemplate namedParameterJdbcTemplate;
@@ -99,6 +98,7 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 		cfgpwdMap.put("customerEmail", customerTokenTable.getCustomerEmail());
 		cfgpwdMap.put("customerToken", customerTokenTable.getCustomerToken());
 		cfgpwdMap.put("customerExpiryDate", customerTokenTable.getCustomerExpiryDate());
+		cfgpwdMap.put("hasChecked", customerTokenTable.getHasChecked());
 
 		return cfgpwdMap;
 	}
@@ -114,15 +114,6 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 		return jdbcTemplate.query(SELECT_CUSTOMER, new Object[] { id }, new CustomerRowmapper());
 	}
 	
-	/**
-     * Get Customer basic information from database by customer email
-     * @param customerEmail
-     * @return List<CustomerTable>: all entries that match the request
-     */
-	@Override
-	public List<CustomerTable> getCustomerByEmail(String customerEmail) {
-		return jdbcTemplate.query(SELECT_CUSTOMER_BY_EMAIL, new Object[] { customerEmail }, new CustomerRowmapper());
-	}
 	
 	/**
      * Create customer basic information
@@ -390,6 +381,24 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 			}
 		}
 	}
+	
+	
+	/**
+     * Verify token: determine if the token is checked
+     * @param CToken: customer token 
+     * @return whether the customer token is checked or not
+     */
+	@Override
+	public boolean hasChecked(String CToken) {
+		List<CustomerTokenTable> cusToken = jdbcTemplate.query(VALID_TOKEN, new Object[] { CToken },
+				new CustomerTokenRowmapper());
+		if (cusToken.isEmpty() || cusToken.get(0).getHasChecked()==0) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+	
 
 	
 	/**
@@ -455,6 +464,28 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 		SqlParameterSource parameterSource = new MapSqlParameterSource(updateTokenMap);
 		logger.info("Update customer token info:{}", parameterSource);
 		affectedRow = namedParameterJdbcTemplate.update(UPDATE_TOKEN, parameterSource);
+
+		return affectedRow;
+	}
+	
+	
+	/**
+	 * Update customer basic information, can update partial info
+	 * @param CustomerTable. Customer id cannot be null and must exist in database
+	 * @return ResponseEntity with message
+	 */
+	@Override
+	public int updateTokenStatus(String cToken) {
+		int affectedRow;
+		CustomerTokenTable ctt = new CustomerTokenTable();
+		ctt.setCustomerToken(cToken);
+		ctt.setHasChecked(1);
+		logger.info("Customer token status change to: {}", ctt.getHasChecked());
+
+		Map<String, Object> updateTokenMap = CustomerTokenMap(ctt);
+		SqlParameterSource parameterSource = new MapSqlParameterSource(updateTokenMap);
+		logger.info("Update customer token status to :{}", parameterSource);
+		affectedRow = namedParameterJdbcTemplate.update(UPDATE_TOKEN_STATUS, parameterSource);
 
 		return affectedRow;
 	}

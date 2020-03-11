@@ -27,6 +27,7 @@ public class CustomerTokenRowmapper implements RowMapper<CustomerTokenTable> {
 		cTokenTable.setCustomerEmail(rs.getString("CEmail"));
 		cTokenTable.setCustomerToken(rs.getString("CToken"));
 		cTokenTable.setCustomerExpiryDate(rs.getTimestamp("CTExpire"));
+		cTokenTable.setHasChecked(rs.getInt("Checked"));
 
 		return cTokenTable;
 	}

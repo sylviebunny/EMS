@@ -353,7 +353,7 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 	
 	/**
      * Organizer register: determine if the email exist in database
-     * @param organizerEmail: organizer email which is used to register as a new customer
+     * @param organizerEmail: organizer email which is used to register as a new organizer
      * @return whether the organizerEmail exist in database or not.
      */
 	@Override

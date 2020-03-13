@@ -1,7 +1,6 @@
 package com.enfec.EMS.CustomerAPI.repository;
 
 import java.sql.Timestamp;
-
 import com.enfec.EMS.CustomerAPI.model.CustomerTable;
 
 /************************************************
@@ -18,6 +17,13 @@ public interface CustomerRepository {
 	 * @return Object
 	 */
 	public Object getCustomer(String id);
+	
+	
+	/**
+     * Get all Customer basic information from database 
+     * @return List<CustomerTable>: all entries that match the request
+     */
+	public Object getAllCustomer();
 	
 	
 	/**
@@ -51,6 +57,14 @@ public interface CustomerRepository {
      * @return whether the cEmail match with the cPwd in database
      */
 	public boolean isMatching(String cEmail, String cPwd);
+	
+	
+	/**
+     * Login role type check: determine if email belongs to customer or organizer
+     * @param email: email which is used to login
+     * @return "Customer" or "Organizer"
+     */
+	public String roleType(String email);
 	
 	
 	/**

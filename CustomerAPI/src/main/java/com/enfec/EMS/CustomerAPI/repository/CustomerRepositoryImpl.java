@@ -43,6 +43,7 @@ public class CustomerRepositoryImpl implements CustomerRepository {
      * All the Sql statements to use in MySql database
      */
 	final String SELECT_CUSTOMER = "SELECT Customer_ID, User_Name, Email_Address, CPassword, Phone FROM Customers WHERE Customer_ID =?";
+	final String SELECT_ALL = "SELECT * FROM Customers";
 	final String REGISTER_CUSTOMER = "INSERT INTO Customers(User_Name, Email_Address, CPassword, Phone) VALUES"
 			+ "(:name, :email, :psw, :phone)";
 	final String UPDATE_CUSTOMER_INFO_PREFIX = "UPDATE Customers SET ";
@@ -51,7 +52,11 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 	final String DELETE_CUSTOMER = "DELETE FROM Customers WHERE Customer_ID =?";
 	final String SELECT_PWD = "SELECT Customer_ID, User_Name, Email_Address, CPassword, Phone FROM Customers WHERE Email_Address =?";
 
-	final String VALID_CUSTOMER = "SELECT Customer_ID, User_Name, Email_Address, CPassword, Phone FROM Customers WHERE Email_Address=?";
+	final String VALID_CUSTOMER = "SELECT * FROM Customers WHERE Email_Address=?";
+	
+	final String CUSTOMER = "SELECT Email_Address FROM Customers WHERE Email_Address=?";
+	final String ORGANIZER = "SELECT Email_Address FROM Organizers WHERE Email_Address=?";
+	
 	final String CREATE_TOKEN = "INSERT INTO Customer_Token(CEmail, CToken, CTExpire) VALUE (:customerEmail, :customerToken, :customerExpiryDate)";
 	final String FIND_EMAIL_BY_TOKEN = "SELECT * FROM Customer_Token WHERE CToken=?";
 	final String VALID_TOKEN = "SELECT * FROM Customer_Token WHERE CToken=?";
@@ -113,6 +118,19 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 	public List<CustomerTable> getCustomer(String id) {
 		return jdbcTemplate.query(SELECT_CUSTOMER, new Object[] { id }, new CustomerRowmapper());
 	}
+	
+	
+	
+	/**
+     * Get All Customer basic information from database
+     * 
+     * @return List<CustomerTable>: all entries that match the request
+     */
+	@Override
+	public List<CustomerTable> getAllCustomer() {
+		return jdbcTemplate.query(SELECT_ALL, new Object[] {}, new CustomerRowmapper());
+	}
+	
 	
 	
 	/**
@@ -204,19 +222,43 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 	
 	
 	/**
+     * Login role type check: determine if email belongs to customer or organizer
+     * @param email: email which is used to login
+     * @return "Customer" or "Organizer"
+     */
+	@Override
+	public String roleType(String email) {
+		List<Map<String, Object>>findCustomerRole = jdbcTemplate.queryForList(CUSTOMER, new Object[] { email });
+		List<Map<String, Object>>findOrganizerRole = jdbcTemplate.queryForList(ORGANIZER, new Object[] { email });
+		
+		if(!findCustomerRole.isEmpty()) {
+			return "Customer";
+		}
+		if(!findOrganizerRole.isEmpty()) {
+			return "Organizer";
+		} else {
+			return "Please register";
+		}
+	}
+	
+	
+	/**
      * Customer register: determine if the email exist in database
      * @param customerEmail: customer email which is used to register as a new customer
      * @return whether the customerEmail exist in database or not.
      */
 	@Override
-	public boolean hasRegistered(String customerEmail) {
-		List<CustomerTable> hasRegis = jdbcTemplate.query(VALID_CUSTOMER, new Object[] { customerEmail },
-				new CustomerRowmapper());
-		if (hasRegis.isEmpty() || hasRegis.get(0).getEmail().isEmpty()) {
-			logger.info("not register before: {}", customerEmail);
+	public boolean hasRegistered(String email) {
+		List<Map<String, Object>> regisAsCustomer = jdbcTemplate.queryForList(CUSTOMER, new Object[] { email });
+		List<Map<String, Object>> regisOrganizer = jdbcTemplate.queryForList(ORGANIZER, new Object[] { email });
+		if (regisAsCustomer.isEmpty() && regisOrganizer.isEmpty()) {
+			logger.info("not register before: {}", email);
 			return false;
+		} else if (!regisAsCustomer.isEmpty()) {
+			logger.info("registed as Customer already");
+			return true;
 		} else {
-			logger.info("registed already");
+			logger.info("registed as Organizer already");
 			return true;
 		}
 

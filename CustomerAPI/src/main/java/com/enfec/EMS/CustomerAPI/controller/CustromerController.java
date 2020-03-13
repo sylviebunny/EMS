@@ -54,6 +54,23 @@ public class CustromerController {
 	
 	
 	/**
+	 * Get customer basic information from database by customer id
+	 * @param id
+	 * @return ResponseEntity with message and data
+	 */
+	@RequestMapping(value = "/AllCustomers", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
+	public ResponseEntity<String> getCustomerList() {
+		List<CustomerTable> customerList = customerRepositoryImpl.getAllCustomer();
+		if (customerList.isEmpty()) {
+			logger.info("No Customer found ");
+			return new ResponseEntity<>("{\"message\" : \"No Customer found\"}", HttpStatus.OK);
+
+		}
+		return new ResponseEntity<>(new Gson().toJson((customerRepositoryImpl.getAllCustomer())), HttpStatus.OK);
+	}
+	
+	
+	/**
 	 * Create or register an customer user, send account active email to user and put basic information into database
 	 * @param customerTable. Contains customer basic information; email_address and password cannot be null
 	 * @return ResponseEntity with message
@@ -195,6 +212,7 @@ public class CustromerController {
 		}
 	}
 
+
 	
 	/**
 	 * Customer forget password
@@ -221,7 +239,8 @@ public class CustromerController {
 							+ "<p>(2) Email Us support@enfec.com\r\n</p>"
 							+ "<p>Your One Time Password (OTP) for First Time Registration or Forgot Password recovery on Event Management System is: \r\n</p>"
 							+ "<p><b>" + cToken + "</b></p>"
-							+ "<p><a href = 'http://evntmgmt-alb-295694066.us-east-2.elb.amazonaws.com:8080/customer-api/reset_password'>Please click this link to Reset Password</a></p>"
+							+ "<p><a href = 'http://localhost:4200/users/resetpassword?cToken="
+							+ cToken + "'>Please click this link to Reset Password</a></p>"
 							+ "<p>For any problem please contact us at 24*7 Hrs. Customer Support at 18001231234 (TBD) or mail us at support@enfec.com\r\n"
 							+ "Thank you for using our Event Management System\r\n</p>",
 					cToken);
@@ -239,15 +258,16 @@ public class CustromerController {
 	
 	/**
 	 * Customer reset password
-	 * @param json. the ObjectNode include two parameters: customerToken and newPassword
+	 * @param json. the ObjectNode include one parameter: newPassword
+	 * @param cToken: the customer token get from the URL
 	 * @return ResponseEntity with reset password result message
 	 */
 	@RequestMapping(value = "/reset_password", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
-	public ResponseEntity<String> get(@RequestBody(required = true) ObjectNode json) {
-		String cusToken = json.get("customerToken").textValue();
-		if (customerRepositoryImpl.validToken(cusToken)) {
-			logger.info("valid token: {} ", cusToken);
-			String customerEmail = customerRepositoryImpl.findEmailByToken(cusToken).get(0).getCustomerEmail();
+	public ResponseEntity<String> get(@RequestBody(required = true) ObjectNode json, @RequestParam("cToken") String cToken) {
+		//String cusToken = json.get("customerToken").textValue();
+		if (customerRepositoryImpl.validToken(cToken)) {
+			logger.info("valid token: {} ", cToken);
+			String customerEmail = customerRepositoryImpl.findEmailByToken(cToken).get(0).getCustomerEmail();
 			logger.info("customer email: {} ", customerEmail);
 
 			String newPassword = json.get("newPassword").textValue();
@@ -256,8 +276,30 @@ public class CustromerController {
 			return new ResponseEntity<>("{\"message\" : \"Password reset successfully!\"}", HttpStatus.OK);
 
 		}
-		logger.info("Not valid token: {}", json.get("customerToken").textValue());
+		//logger.info("Not valid token: {}", json.get("customerToken").textValue());
+		logger.info("Not valid token: {}", cToken);
 		return new ResponseEntity<>("{\"message\" : \"Token expired. Please re-reset password.\"}", HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/LoginRole", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+	public ResponseEntity<String> lr(@RequestBody(required = true) ObjectNode json) {
+		try {
+			String cEmail = json.get("email").textValue();
+			String role = customerRepositoryImpl.roleType(cEmail);
+			if (role == "Customer") {
+				return new ResponseEntity<>("{\"message\" : \"Customer\"}", HttpStatus.OK);
+			} 
+			if (role == "Organizer") {
+				return new ResponseEntity<>("{\"message\" : \"Organizer\"}", HttpStatus.OK);
+			} 
+			else {
+				return new ResponseEntity<>(
+						"{\"message\" : \"Please Regist first\"}", HttpStatus.OK);
+			}
+		} catch (Exception ex) {
+			return new ResponseEntity<>("{\"message\" : \"login fail: need assistance\"}",
+					HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 
 }

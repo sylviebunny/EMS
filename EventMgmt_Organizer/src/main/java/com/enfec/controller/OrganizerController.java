@@ -441,7 +441,9 @@ public class OrganizerController {
 						"<p>(2) Email Us support@enfec.com\r\n</p>" + 
 						"<p>Your One Time Password (OTP) for First Time Registration or Forgot Password recovery on Event Management System is: \r\n</p>" + 
 						"<p><b>"+ oToken +"</b></p>"+
-						"<p><a href = 'http://evntmgmt-alb-295694066.us-east-2.elb.amazonaws.com:8080/organizer-api/reset_password'>Please click this link to Reset Password</a></p>" +
+//						"<p><a href = 'http://evntmgmt-alb-295694066.us-east-2.elb.amazonaws.com:8080/organizer-api/reset_password'>Please click this link to Reset Password</a></p>" +
+						"<p><a href = 'http://localhost:4200/users/orgresetpassword?oToken="
+						+ oToken + "'>Please click this link to Reset Password</a></p>" +
 						"<p>For any problem please contact us at 24*7 Hrs. Customer Support at 18001231234 (TBD) or mail us at support@enfec.com\r\n" + 
 						"Thank you for using our Event Management System\r\n</p>", 
 						oToken);
@@ -458,28 +460,26 @@ public class OrganizerController {
 		
 	/**
 	 * Organizer reset password
-	 * 
-	 * @param json. the ObjectNode include two parameters: organizerToken and newPassword
+	 * @param json. the ObjectNode include one parameter: newPassword
+	 * @param oToken: the organizer token get from the URL
 	 * @return ResponseEntity with reset password result message
 	 */
 	@RequestMapping(value = "/reset_password", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
-	public ResponseEntity<String>get(@RequestBody(required = true) ObjectNode json) { 
-			String orgToken = json.get("organizerToken").textValue();
-			if (OrganizerRepositoryImpl.validToken(orgToken)) {
-				logger.info("valid token: {} ", orgToken);
-				String organizerEmail = OrganizerRepositoryImpl.findEmailByToken(orgToken).get(0).getOrganizerEmail();
-				logger.info("customer email: {} ", organizerEmail);
-				
-				String newPassword = json.get("newPassword").textValue();
-				OrganizerRepositoryImpl.updatePassword(organizerEmail, newPassword);
-				logger.info("Password reset successfully.");
-				return new ResponseEntity<>(
-						"{\"message\" : \"Password reset successfully!\"}", HttpStatus.OK);
-			
-			}
-			logger.info("Not valid token: {}",json.get("organizerToken").textValue());
-			return new ResponseEntity<>(
-					"{\"message\" : \"Token expired. Please re-reset password.\"}", HttpStatus.OK);
+	public ResponseEntity<String> get(@RequestBody(required = true) ObjectNode json, @RequestParam("oToken") String oToken) {
+		
+		if (OrganizerRepositoryImpl.validToken(oToken)) {
+			logger.info("valid token: {} ", oToken);
+			String organizerEmail = OrganizerRepositoryImpl.findEmailByToken(oToken).get(0).getOrganizerEmail();
+			logger.info("Organizer email: {} ", organizerEmail);
+
+			String newPassword = json.get("newPassword").textValue();
+			OrganizerRepositoryImpl.updatePassword(organizerEmail, newPassword);
+			logger.info("Password reset successfully.");
+			return new ResponseEntity<>("{\"message\" : \"Password reset successfully!\"}", HttpStatus.OK);
+
+		}
+		logger.info("Not valid token: {}", oToken);
+		return new ResponseEntity<>("{\"message\" : \"Token expired. Please re-reset password.\"}", HttpStatus.OK);
 	}
 	
 	/**

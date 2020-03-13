@@ -353,21 +353,29 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 	
 	/**
      * Organizer register: determine if the email exist in database
-     * 
-     * @param organizerEmail: organizer email which is used to register as a new organizer
+     * @param organizerEmail: organizer email which is used to register as a new customer
      * @return whether the organizerEmail exist in database or not.
      */
 	@Override
-	public boolean hasRegistered(String organizerEmail) {
-		String VALID_ORGANIZER = "SELECT * FROM Organizers WHERE Email_Address=?";
-		List<OrganizerTable> hasRegis = jdbcTemplate.query(VALID_ORGANIZER, new Object[] { organizerEmail },
-				new OrganizerRowmapper());
-		if (hasRegis.isEmpty() || hasRegis.get(0).getEmail_address().isEmpty()) {
+	public boolean hasRegistered(String email) {
+		String CUSTOMER = "SELECT Email_Address FROM Customers WHERE Email_Address=?";
+		String ORGANIZER = "SELECT Email_Address FROM Organizers WHERE Email_Address=?";
+
+		List<Map<String, Object>> regisAsCustomer = jdbcTemplate.queryForList(CUSTOMER, new Object[] { email });
+		List<Map<String, Object>> regisOrganizer = jdbcTemplate.queryForList(ORGANIZER, new Object[] { email });
+		if (regisAsCustomer.isEmpty() && regisOrganizer.isEmpty()) {
+			logger.info("not register before: {}", email);
 			return false;
+		} else if (!regisAsCustomer.isEmpty()) {
+			logger.info("registed as Customer already");
+			return true;
 		} else {
+			logger.info("registed as Organizer already");
 			return true;
 		}
+
 	}
+	
 
 	/**
      * Organizer register: send register confirmation email to organizer
@@ -389,7 +397,6 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 			helper.setText(body, true);// true indicate html
 			mailSender.send(message);
 		} catch (MessagingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -423,8 +430,10 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 		List<OrganizerTable> orgEmail = jdbcTemplate.query(VALID_ORGANIZER, new Object[] { organizerEmail },
 				new OrganizerRowmapper());
 		if (orgEmail.isEmpty() || orgEmail.get(0).getEmail_address().isEmpty()) {
+			logger.info("not valid organizer email: {}", organizerEmail);
 			return false;
 		} else {
+			logger.info("Valid organizer email");
 			return true;
 		}
 	}
@@ -494,7 +503,6 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 			helper.setText(body, true);// true indicate html
 			mailSender.send(message);
 		} catch (MessagingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -635,5 +643,4 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 
 		return affectedRow;
 	}
-
 }

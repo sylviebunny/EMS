@@ -507,4 +507,74 @@ public class OrganizerController {
 					HttpStatus.INTERNAL_SERVER_ERROR);
 		} 
 	}
+	
+	/**
+	 * Organizer change email
+	 * @param organizerTable. Organizer email cannot be null and must exist in database
+	 * @return ResponseEntity with forget password result message
+	 */
+	@RequestMapping(value = "/changeEmail", method = RequestMethod.POST, produces = "applications/json;charset=UTF-8")
+	public ResponseEntity<String> resetEmail(@RequestBody(required = true) OrganizerTable organizerTable) {
+		
+			String oEmail = organizerTable.getEmail_address();
+			String oToken = OrganizerRepositoryImpl.generateToken();
+			Timestamp expireDate = new Timestamp(System.currentTimeMillis());
+			if (OrganizerRepositoryImpl.hasForgetenPWD(oEmail)) {
+				logger.info("has forget password before");
+				OrganizerRepositoryImpl.updateToken(oEmail, oToken, expireDate);
+			} else {
+				logger.info("first time forget");
+				OrganizerRepositoryImpl.saveTokenInfo(oEmail, oToken, expireDate);
+
+			}
+			OrganizerRepositoryImpl.sendPwdMail(oEmail, "Reset Eamil",
+					"<p>This is a system generated mail. Please do not reply to this email ID. If you have a query or need any clarification you may:</p>"
+							+ "<p>(1) Call our 24-hour Customer Care or\r\n</p>"
+							+ "<p>(2) Email Us support@enfec.com\r\n</p>"
+							+ "<p>Your One Time Password (OTP) for Reset Email Address on Event Management System is: \r\n</p>"
+							+ "<p><b>" + oToken + "</b></p>"
+							//+ "<p><a href = 'http://localhost:4200/users/resetemail?cToken="
+							+ "<p><a href = 'http://localhost:8080/reset_email?cToken="
+							+ oToken + "'>Please click this link to Reset Email</a></p>"
+							+ "<p>For any problem please contact us at 24*7 Hrs. Customer Support at 18001231234 (TBD) or mail us at support@enfec.com\r\n"
+							+ "Thank you for using our Event Management System\r\n</p>",
+					oToken);
+			logger.info("OTP send to the eamil address: {}", oEmail);
+			return new ResponseEntity<String>(
+					"{\"message\" : \"Send reset link and OTP to the organizer email address\"}", HttpStatus.OK);
+		}
+	
+	
+	/**
+	 * Organizer reset email
+	 * @param json. the ObjectNode include one parameter: newPassword
+	 * @param oToken: the organizer token get from the URL
+	 * @return ResponseEntity with reset password result message
+	 */
+	@RequestMapping(value = "/reset_email", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+	public ResponseEntity<String> setEmail(@RequestBody(required = true) ObjectNode jPwd, @RequestParam("oToken") String oToken) {
+		if (OrganizerRepositoryImpl.validToken(oToken)) {
+			logger.info("valid token: {} ", oToken);
+			String oldEmail = OrganizerRepositoryImpl.findEmailByToken(oToken).get(0).getOrganizerEmail();
+			logger.info("old email: {} ", oldEmail);
+			int oID = OrganizerRepositoryImpl.findIDByEmail(oldEmail).get(0).getOrganizer_id();
+			logger.info("Organizer ID: {} ", oID);
+
+			String newEmail = jPwd.get("newEmail").textValue();
+			OrganizerRepositoryImpl.updateEmail(oID, newEmail);
+			logger.info("Email reset successfully.");
+			
+			OrganizerRepositoryImpl.sendGreetMail(newEmail, "Welcome to EMS", 
+					"<p>You have successfully changed your account to this Email Address</p>"
+					+"<p>Thank you for using our Event Management System\r\n</p>", 
+					oToken);
+			logger.info("Greeting send to the eamil address: {}", newEmail);
+			
+			
+			return new ResponseEntity<>("{\"message\" : \"Email reset successfully!\"}", HttpStatus.OK);
+
+		}
+		logger.info("Not valid token: {}", oToken);
+		return new ResponseEntity<>("{\"message\" : \"Invalid Toke. Please re-reset Email.\"}", HttpStatus.OK);
+	}
 }

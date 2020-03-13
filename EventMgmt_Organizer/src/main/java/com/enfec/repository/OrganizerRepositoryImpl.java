@@ -353,7 +353,7 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 	
 	/**
      * Organizer register: determine if the email exist in database
-     * @param organizerEmail: organizer email which is used to register as a new organizer
+     * @param organizerEmail: organizer email which is used to register as a new customer
      * @return whether the organizerEmail exist in database or not.
      */
 	@Override
@@ -642,5 +642,42 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 		affectedRow = namedParameterJdbcTemplate.update(UPDATE_TOKEN_STATUS, parameterSource);
 
 		return affectedRow;
+	}
+
+	/**
+     * Update organizer email address: save the new address to organizer table
+     * Map organizer table to MySql parameters, and update database
+     * @param oldEmail: the original email address of the organizer
+     * @param newEmail: the new email address
+     * @return affected row
+     */
+	@Override
+	public int updateEmail(int oID, String newEmail) {
+		String UPDATE_EMAIL = "UPDATE Organizers SET Email_Address =:email WHERE Organizer_ID =:id";
+		int affectedRow;
+		OrganizerTable ot = new OrganizerTable();
+		ot.setOrganizer_id(oID);
+		logger.info(String.valueOf(oID));
+		
+		ot.setEmail_address(newEmail);
+		logger.info(newEmail);
+		
+		Map<String, Object> updateEmailMap = OrganizerMap(ot);
+		SqlParameterSource parameterSource = new MapSqlParameterSource(updateEmailMap);
+		logger.info("Update organizer email:{}", parameterSource);
+		affectedRow = namedParameterJdbcTemplate.update(UPDATE_EMAIL, parameterSource);
+		return affectedRow;
+	}
+	
+
+	/**
+     * Get customer id information from database by customer email
+     * @param CEmail
+     * @return List<CustomerTable>: all entries that match the request
+     */
+	@Override
+	public List<OrganizerTable> findIDByEmail(String OEmail) {
+		String FIND_ID_BY_EMAIL = "SELECT * FROM Organizers WHERE Email_Address=?";
+		return jdbcTemplate.query(FIND_ID_BY_EMAIL, new Object[] {OEmail }, new OrganizerRowmapper());
 	}
 }

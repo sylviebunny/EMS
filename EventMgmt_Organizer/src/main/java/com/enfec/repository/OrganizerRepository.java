@@ -220,4 +220,19 @@ public interface OrganizerRepository {
      * @return affected row
      */
 	public int updateTokenStatus(String oToken);
+	
+	/**
+     * Update organizer email: change email address
+     * @param oID: the organizer ID
+     * @param newEmail: the new email address
+     * @return affected row
+     */
+	public int updateEmail(int oID, String newEmail);
+	
+	/**
+	 * Get the organizer's ID information using organizer Email
+	 * @param OEmail: the organizer Email Address
+	 * @return Object
+	 */
+	public Object findIDByEmail(String OEmail);
 }

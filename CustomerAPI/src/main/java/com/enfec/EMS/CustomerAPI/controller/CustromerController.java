@@ -301,5 +301,78 @@ public class CustromerController {
 					HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+	
+	
+	/**
+	 * Customer change email
+	 * @param customerTable. Customer email cannot be null and must exist in database
+	 * @return ResponseEntity with forget password result message
+	 */
+	@RequestMapping(value = "/changeEmail", method = RequestMethod.POST, produces = "applications/json;charset=UTF-8")
+	public ResponseEntity<String> resetEmail(@RequestBody(required = true) CustomerTable customerTable) {
+		
+			String cEmail = customerTable.getEmail();
+			String cToken = customerRepositoryImpl.generateToken();
+			Timestamp expireDate = new Timestamp(System.currentTimeMillis());
+			if (customerRepositoryImpl.hasForgetenPWD(cEmail)) {
+				logger.info("has forget password before");
+				customerRepositoryImpl.updateToken(cEmail, cToken, expireDate);
+			} else {
+				logger.info("first time forget");
+				customerRepositoryImpl.saveTokenInfo(cEmail, cToken, expireDate);
+
+			}
+			customerRepositoryImpl.sendPwdMail(cEmail, "Reset Eamil",
+					"<p>This is a system generated mail. Please do not reply to this email ID. If you have a query or need any clarification you may:</p>"
+							+ "<p>(1) Call our 24-hour Customer Care or\r\n</p>"
+							+ "<p>(2) Email Us support@enfec.com\r\n</p>"
+							+ "<p>Your One Time Password (OTP) for Reset Email Address on Event Management System is: \r\n</p>"
+							+ "<p><b>" + cToken + "</b></p>"
+							//+ "<p><a href = 'http://localhost:4200/users/resetemail?cToken="
+							+ "<p><a href = 'http://localhost:8080/reset_email?cToken="
+							+ cToken + "'>Please click this link to Reset Email</a></p>"
+							+ "<p>For any problem please contact us at 24*7 Hrs. Customer Support at 18001231234 (TBD) or mail us at support@enfec.com\r\n"
+							+ "Thank you for using our Event Management System\r\n</p>",
+					cToken);
+			logger.info("OTP send to the eamil address: {}", cEmail);
+			return new ResponseEntity<String>(
+					"{\"message\" : \"Send reset link and OTP to the customer email address\"}", HttpStatus.OK);
+		}
+	
+	
+	/**
+	 * Customer reset email
+	 * @param json. the ObjectNode include one parameter: newPassword
+	 * @param cToken: the customer token get from the URL
+	 * @return ResponseEntity with reset password result message
+	 */
+	@RequestMapping(value = "/reset_email", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+	public ResponseEntity<String> setEmail(@RequestBody(required = true) ObjectNode jPwd, @RequestParam("cToken") String cToken) {
+		if (customerRepositoryImpl.validToken(cToken)) {
+			logger.info("valid token: {} ", cToken);
+			String oldEmail = customerRepositoryImpl.findEmailByToken(cToken).get(0).getCustomerEmail();
+			logger.info("old email: {} ", oldEmail);
+			int cID = customerRepositoryImpl.findIDByEmail(oldEmail).get(0).getId();
+			logger.info("customer ID: {} ", cID);
+
+			String newEmail = jPwd.get("newEmail").textValue();
+			customerRepositoryImpl.updateEmail(cID, newEmail);
+			logger.info("Email reset successfully.");
+			
+			customerRepositoryImpl.sendGreetMail(newEmail, "Welcome to EMS", 
+					"<p>You have successfully changed your account to this Email Address</p>"
+					+"<p>Thank you for using our Event Management System\r\n</p>", 
+					cToken);
+			logger.info("Greeting send to the eamil address: {}", newEmail);
+			
+			
+			return new ResponseEntity<>("{\"message\" : \"Email reset successfully!\"}", HttpStatus.OK);
+
+		}
+		logger.info("Not valid token: {}", cToken);
+		return new ResponseEntity<>("{\"message\" : \"Invalid Toke. Please re-reset Email.\"}", HttpStatus.OK);
+	}
+	
+	
 
 }

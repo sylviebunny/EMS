@@ -178,4 +178,19 @@ public interface CustomerRepository {
      * @return affected row
      */
 	public int updateTokenStatus(String cToken);
+	
+	/**
+     * Update customer email: change email address
+     * @param cID: the customer ID
+     * @param newEmail: the new email address
+     * @return affected row
+     */
+	public int updateEmail(int cID, String newEmail);
+	
+	/**
+	 * Get the customer's ID information using customer Email
+	 * @param CEmail: the Customer Email Address
+	 * @return Object
+	 */
+	public Object findIDByEmail(String CEmail);
 }

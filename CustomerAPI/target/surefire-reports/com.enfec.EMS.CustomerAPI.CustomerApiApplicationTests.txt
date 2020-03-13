@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: com.enfec.EMS.CustomerAPI.CustomerApiApplicationTests
 -------------------------------------------------------------------------------
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 9.554 s - in com.enfec.EMS.CustomerAPI.CustomerApiApplicationTests
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 6.77 s - in com.enfec.EMS.CustomerAPI.CustomerApiApplicationTests

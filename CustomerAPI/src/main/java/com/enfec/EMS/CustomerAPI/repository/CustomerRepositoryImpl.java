@@ -11,6 +11,7 @@ import javax.mail.internet.MimeMessage;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
@@ -61,6 +62,10 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 	final String FIND_EMAIL_BY_TOKEN = "SELECT * FROM Customer_Token WHERE CToken=?";
 	final String VALID_TOKEN = "SELECT * FROM Customer_Token WHERE CToken=?";
 	final String UPDATE_PASSWORD = "UPDATE Customers SET CPassword =:psw WHERE Email_Address =:email";
+	
+	final String UPDATE_EMAIL = "UPDATE Customers SET Email_Address =:email WHERE Customer_ID =:id";
+	final String FIND_ID_BY_EMAIL = "SELECT * FROM Customers WHERE Email_Address=?";
+
 	final String HAS_FORGET_PWD = "SELECT * FROM Customer_Token WHERE CEmail=?";
 	final String UPDATE_TOKEN = "UPDATE Customer_Token SET CToken =:customerToken, CTExpire =:customerExpiryDate WHERE CEmail =:customerEmail";
 	final String UPDATE_TOKEN_STATUS = "UPDATE Customer_Token SET Checked =:hasChecked WHERE CToken =:customerToken";
@@ -167,6 +172,7 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 				UPDATE_CUSTOMER_INFO.append("User_Name" + "=:" + "name" + ",");
 			}
 		if(cstmMap.get("email") != null) {
+			
 			UPDATE_CUSTOMER_INFO.append("Email_Address" + "=:" + "email" + ",");
 		}
 		if(cstmMap.get("psw") != null) {
@@ -530,6 +536,44 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 		affectedRow = namedParameterJdbcTemplate.update(UPDATE_TOKEN_STATUS, parameterSource);
 
 		return affectedRow;
+	}
+	
+	
+	/**
+     * Update customer email address: save the new address to customer table
+     * Map customer table to MySql parameters, and update database
+     * @param oldEmail: the original email address of the customer
+     * @param newEmail: the new email address
+     * @return affected row
+     */
+	@Override
+	public int updateEmail(int cID, String newEmail) {
+		int affectedRow;
+		CustomerTable ct = new CustomerTable();
+		ct.setId(cID);
+		logger.info(String.valueOf(cID));
+		
+		ct.setEmail(newEmail);
+		logger.info(newEmail);
+		
+		Map<String, Object> updateEmailMap = CustomerMap(ct);
+		SqlParameterSource parameterSource = new MapSqlParameterSource(updateEmailMap);
+		logger.info("Update customer email:{}", parameterSource);
+		affectedRow = namedParameterJdbcTemplate.update(UPDATE_EMAIL, parameterSource);
+
+		return affectedRow;
+
+	}
+	
+
+	/**
+     * Get customer id information from database by customer email
+     * @param CEmail
+     * @return List<CustomerTable>: all entries that match the request
+     */
+	@Override
+	public List<CustomerTable> findIDByEmail(String CEmail) {
+		return jdbcTemplate.query(FIND_ID_BY_EMAIL, new Object[] {CEmail }, new CustomerRowmapper());
 	}
 
 }

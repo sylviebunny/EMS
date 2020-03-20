@@ -527,14 +527,15 @@ public class OrganizerController {
 				OrganizerRepositoryImpl.saveTokenInfo(oEmail, oToken, expireDate);
 
 			}
-			OrganizerRepositoryImpl.sendPwdMail(oEmail, "Reset Eamil",
+			OrganizerRepositoryImpl.sendPwdMail(oEmail, "Reset Email",
 					"<p>This is a system generated mail. Please do not reply to this email ID. If you have a query or need any clarification you may:</p>"
 							+ "<p>(1) Call our 24-hour Customer Care or\r\n</p>"
 							+ "<p>(2) Email Us support@enfec.com\r\n</p>"
 							+ "<p>Your One Time Password (OTP) for Reset Email Address on Event Management System is: \r\n</p>"
 							+ "<p><b>" + oToken + "</b></p>"
 							//+ "<p><a href = 'http://localhost:4200/users/resetemail?cToken="
-							+ "<p><a href = 'http://localhost:8080/reset_email?cToken="
+//							+ "<p><a href = 'http://evntmgmt-alb-295694066.us-east-2.elb.amazonaws.com:8080/Organizer-api/reset_email?oToken="
+							+ "<p><a href = 'http://localhost:4200/reset_email?oToken="
 							+ oToken + "'>Please click this link to Reset Email</a></p>"
 							+ "<p>For any problem please contact us at 24*7 Hrs. Customer Support at 18001231234 (TBD) or mail us at support@enfec.com\r\n"
 							+ "Thank you for using our Event Management System\r\n</p>",
@@ -547,7 +548,7 @@ public class OrganizerController {
 	
 	/**
 	 * Organizer reset email
-	 * @param json. the ObjectNode include one parameter: newPassword
+	 * @param json. the ObjectNode include one parameter: newEmail
 	 * @param oToken: the organizer token get from the URL
 	 * @return ResponseEntity with reset password result message
 	 */
@@ -568,13 +569,13 @@ public class OrganizerController {
 					"<p>You have successfully changed your account to this Email Address</p>"
 					+"<p>Thank you for using our Event Management System\r\n</p>", 
 					oToken);
-			logger.info("Greeting send to the eamil address: {}", newEmail);
+			logger.info("Greeting send to the email address: {}", newEmail);
 			
 			
 			return new ResponseEntity<>("{\"message\" : \"Email reset successfully!\"}", HttpStatus.OK);
 
 		}
 		logger.info("Not valid token: {}", oToken);
-		return new ResponseEntity<>("{\"message\" : \"Invalid Toke. Please re-reset Email.\"}", HttpStatus.OK);
+		return new ResponseEntity<>("{\"message\" : \"Invalid Token. Please re-reset Email.\"}", HttpStatus.OK);
 	}
 }

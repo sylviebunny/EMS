@@ -653,7 +653,7 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
      */
 	@Override
 	public int updateEmail(int oID, String newEmail) {
-		String UPDATE_EMAIL = "UPDATE Organizers SET Email_Address =:email WHERE Organizer_ID =:id";
+		String UPDATE_EMAIL = "UPDATE Organizers SET Email_Address =:email_address WHERE Organizer_ID =:organizer_id";
 		int affectedRow;
 		OrganizerTable ot = new OrganizerTable();
 		ot.setOrganizer_id(oID);

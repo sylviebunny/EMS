@@ -29,7 +29,6 @@ public class OrganizerRowmapper implements RowMapper<OrganizerTable> {
 		organizerTable.setEmail_address((rs.getString("Email_Address")));
 		organizerTable.setPassword((rs.getString("Password")));
 		organizerTable.setOther_details((rs.getString("Other_Details")));
-
 		return organizerTable;
 	}
 }

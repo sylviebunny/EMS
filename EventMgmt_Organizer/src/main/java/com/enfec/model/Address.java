@@ -24,7 +24,6 @@ public class Address {
 	private String street2;
 	private String city;
 	private String state;
-	private int zipcode;
-	private String other_details;
+	private String zipcode;
 	private int organizer_id;
 }

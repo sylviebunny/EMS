@@ -24,4 +24,14 @@ public class OrganizerTable {
 	private String email_address;
 	private String password;
 	private String other_details;
+	private int contact_id; 
+	private int address_id; 
+	private String contact_name; 
+	private String telephone;
+	private String web_site_address;
+	private String street1; 
+	private String street2;
+	private String city; 
+	private String state; 
+	private String zipcode; 
 }

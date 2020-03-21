@@ -101,7 +101,7 @@ public class OrganizerController {
 	}
 
 	/**
-	 * Get organizer basic information from database by organizer id
+	 * Get organizer information from database by organizer id
 	 * 
 	 * @param Organizer_ID
 	 * @return ResponseEntity with message and data
@@ -109,17 +109,17 @@ public class OrganizerController {
 	@RequestMapping(value = "/organizer/search/{Organizer_ID}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> getOrganizerList(@PathVariable int Organizer_ID) {
 		try {
-			List<OrganizerTable> organizerList = OrganizerRepositoryImpl.getOrganizerInfo(Organizer_ID);
-			if (organizerList.isEmpty()) {
-				logger.info("No organizer found for: {} ", Organizer_ID);
+			OrganizerTable org = OrganizerRepositoryImpl.getOrganizerInfo(Organizer_ID);
+			if (org == null) {
+				logger.info("No organizer found for: {}", Organizer_ID);
 				return new ResponseEntity<>("{\"message\" : \"No organizer found\"}", HttpStatus.OK);
 			} else {
-				return new ResponseEntity<>(new Gson().toJson((OrganizerRepositoryImpl.
-						getOrganizerInfo(Organizer_ID))), HttpStatus.OK);
+				return new ResponseEntity<>(new Gson().toJson((OrganizerRepositoryImpl.getOrganizerInfo(Organizer_ID))),
+						HttpStatus.OK);
 			}
 		} catch (Exception e) {
-			logger.error("Exception in getting organizer info: {} ", e.getMessage());
-			return new ResponseEntity<>("{\"message\" : \"Exception in getting organzier info, please contact admin\"}",
+			logger.error("Exception in getting organizer info: {}", e.getMessage());
+			return new ResponseEntity<>("{\"message\" : \"Exception in getting organizer info, please contact admin\"}",
 					HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}

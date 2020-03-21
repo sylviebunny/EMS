@@ -30,8 +30,7 @@ public class AddressRowmapper implements RowMapper<Address> {
 		address.setStreet2((rs.getString("Street2")));
 		address.setCity((rs.getString("City")));
 		address.setState((rs.getString("State")));
-		address.setZipcode(rs.getInt("Zipcode"));
-		address.setOther_details(rs.getString("Other_Details"));
+		address.setZipcode(rs.getString("Zipcode"));
 		address.setOrganizer_id(rs.getInt("Organizer_ID"));
 		return address;
 	}

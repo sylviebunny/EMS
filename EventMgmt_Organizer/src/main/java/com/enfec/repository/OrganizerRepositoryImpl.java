@@ -12,6 +12,7 @@ import javax.mail.internet.MimeMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -71,15 +72,25 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 	}
 
 	/**
-	 * Get organizer basic information from database by organizer id
+	 * Get organizer information from database by organizer id
 	 * 
 	 * @param Organizer_ID
 	 * @return List<OrganizerTable>: all entries that match the request
 	 */
 	@Override
-	public List<OrganizerTable> getOrganizerInfo(int Organizer_ID) {
-		String SELECT_ORGANIZER = "select * FROM Organizers where Organizer_ID = ?";
-		return jdbcTemplate.query(SELECT_ORGANIZER, new Object[] { Organizer_ID }, new OrganizerRowmapper());
+	public OrganizerTable getOrganizerInfo(int Organizer_ID) {
+//		String SELECT_ORGANIZER = "select * FROM Organizers where Organizer_ID = ?";
+//		return jdbcTemplate.query(SELECT_ORGANIZER, new Object[] { Organizer_ID }, new OrganizerRowmapper());
+		String SELECT_ORGANIZER = "select * from Organizers o join Contacts c on o.Organizer_ID = c.Organizer_ID join Address a on a.Address_ID=c.Address_ID where o.Organizer_ID=?";
+		
+		OrganizerTable org;
+		try {
+			org = jdbcTemplate.queryForObject(SELECT_ORGANIZER, new Object[] { Organizer_ID }, 
+					new BeanPropertyRowMapper<OrganizerTable>(OrganizerTable.class));
+		} catch (EmptyResultDataAccessException e) {
+			return null;
+		}
+		return org;
 	}
 
 	/**
@@ -147,8 +158,8 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 	 */
 	@Override
 	public int createAddress(Address address) {
-		String CREATE_ADDRESS = "INSERT INTO Address(Street1, Street2, City, State, Zipcode, Other_Details, Organizer_ID) VALUES "
-				+ "(:street1, :street2, :city, :state, :zipcode, :other_details, :organizer_id)";
+		String CREATE_ADDRESS = "INSERT INTO Address(Street1, Street2, City, State, Zipcode, Organizer_ID) VALUES "
+				+ "(:street1, :street2, :city, :state, :zipcode, :organizer_id)";
 
 		Map<String, Object> param = AddressMap(address);
 		SqlParameterSource pramSource = new MapSqlParameterSource(param);
@@ -180,7 +191,7 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 	@Override
 	public int updateAddress(Address address) {
 		String UPDATE_ADDRESS = "UPDATE Address SET Street1 = :street1, Street2 = :street2, "
-				+ "City = :city, State = :state, Zipcode = :zipcode, Other_Details = :other_details "
+				+ "City = :city, State = :state, Zipcode = :zipcode "
 				+ "WHERE Organizer_ID = :organizer_id AND Address_ID = :address_id";
 
 		Map<String, Object> param = AddressMap(address);
@@ -300,8 +311,7 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 		param.put("street2", address.getStreet2().isEmpty() ? null : address.getStreet2());
 		param.put("city", address.getCity().isEmpty() ? null : address.getCity());
 		param.put("state", address.getState().isEmpty() ? null : address.getState());
-		param.put("zipcode", address.getZipcode() == 0 ? null : address.getZipcode());
-		param.put("other_details", address.getOther_details().isEmpty() ? null : address.getOther_details());
+		param.put("zipcode", address.getZipcode().isEmpty() ? null : address.getZipcode());
 		param.put("organizer_id", address.getOrganizer_id() == 0 ? null : address.getOrganizer_id());
 		return param;
 	}

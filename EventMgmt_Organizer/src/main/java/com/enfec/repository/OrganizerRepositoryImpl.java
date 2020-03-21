@@ -99,8 +99,8 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
      */
 	@Override
 	public List<OrganizerTable> getAllOrganizerInfo() {
-		String SELECT_ALL_ORGANZIER = "select * from Organizers";
-		return jdbcTemplate.query(SELECT_ALL_ORGANZIER, new OrganizerRowmapper());
+		String SELECT_ALL_ORGANZIER = "select * from Organizers o join Contacts c on o.Organizer_ID = c.Organizer_ID join Address a on a.Address_ID=c.Address_ID";
+		return jdbcTemplate.query(SELECT_ALL_ORGANZIER, new BeanPropertyRowMapper<OrganizerTable>(OrganizerTable.class));
 	}
 	
 	/**

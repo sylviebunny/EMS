@@ -294,7 +294,7 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 		param.put("other_details",
 				organizerTable.getOther_details() == null || organizerTable.getOther_details().isEmpty() ? null
 						: organizerTable.getOther_details());
-		param.put("hasActived", organizerTable.getHasActived());
+		param.put("actived", organizerTable.getActived());
 		return param;
 	}
 
@@ -701,7 +701,7 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 	public boolean hasActived(String oEmail) {
 		String SELECT_ACTIVE_STATUS = "SELECT * FROM Organizers WHERE Email_Address=?";
 		List<OrganizerTable> ot = jdbcTemplate.query(SELECT_ACTIVE_STATUS, new Object[] { oEmail }, new OrganizerRowmapper());
-		if (ot.get(0).getHasActived() == 0) {
+		if (ot.get(0).getActived() == 0) {
 			logger.info("Organizer not actived yet");
 			return false;
 		} else {
@@ -725,8 +725,8 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 		ot.setEmail_address(oEmail);
 		logger.info(oEmail);
 		
-		ot.setHasActived(1);
-		logger.info("Organizer Active Status change to {}", ot.getHasActived());
+		ot.setActived(1);
+		logger.info("Organizer Active Status change to {}", ot.getActived());
 
 		Map<String, Object> updateActiveMap = OrganizerMap(ot);
 		SqlParameterSource parameterSource = new MapSqlParameterSource(updateActiveMap);

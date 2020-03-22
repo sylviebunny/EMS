@@ -132,8 +132,14 @@ public class CustromerController {
 		if (customerRepositoryImpl.validToken(cToken) && !customerRepositoryImpl.hasChecked(cToken)) {
 			logger.info("valid token: {} ", cToken);
 			logger.info("token has not checked ");
+			
 			customerRepositoryImpl.updateTokenStatus(cToken);
 			logger.info("change token status to checked ");
+			
+			String cEmail = customerRepositoryImpl.findEmailByToken(cToken).get(0).getCustomerEmail();
+			customerRepositoryImpl.updateActiveStatus(cEmail);
+			logger.info("Customer Active Status changed");
+			
 			return new ResponseEntity<String>("{\"message\": \"Customer account actived\"}", HttpStatus.OK);
 		} else if (customerRepositoryImpl.validToken(cToken) && customerRepositoryImpl.hasChecked(cToken)){
 			logger.info(" has checked already ");
@@ -198,13 +204,22 @@ public class CustromerController {
 	 */
 	@RequestMapping(value = "/Customers/Login", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> cLogin(@RequestBody(required = true) CustomerTable customerTable) {
-		try {
-			boolean isMatch = customerRepositoryImpl.isMatching(customerTable.getEmail(), customerTable.getPsw());
-			if (isMatch) {
-				return new ResponseEntity<>("{\"message\" : \"Customer login success\"}", HttpStatus.OK);
+		try {			
+			boolean hasActived = customerRepositoryImpl.hasActived(customerTable.getEmail());
+			if(hasActived) {
+				boolean isMatch = customerRepositoryImpl.isMatching(customerTable.getEmail(), customerTable.getPsw());
+				if (isMatch) {
+					return new ResponseEntity<>("{\"message\" : \"Customer login success\",\n" 
+							+ "\"CustomerID\" :"  
+							+ customerRepositoryImpl.findIDByEmail(customerTable.getEmail()).get(0).getId()
+							+ "\n}", HttpStatus.OK) ;
+				} else {
+					return new ResponseEntity<>(
+							"{\"message\" : \"Customer login fail: Email or Password is not correct...\"}", HttpStatus.OK);
+				}
 			} else {
 				return new ResponseEntity<>(
-						"{\"message\" : \"Customer login fail: Email or Password is not correct...\"}", HttpStatus.OK);
+						"{\"message\" : \"Customer hasn't active account yet, please active first...\"}", HttpStatus.OK);
 			}
 		} catch (Exception ex) {
 			return new ResponseEntity<>("{\"message\" : \"login fail: need assistance\"}",
@@ -276,7 +291,7 @@ public class CustromerController {
 			return new ResponseEntity<>("{\"message\" : \"Password reset successfully!\"}", HttpStatus.OK);
 
 		}
-		//logger.info("Not valid token: {}", json.get("customerToken").textValue());
+		
 		logger.info("Not valid token: {}", cToken);
 		return new ResponseEntity<>("{\"message\" : \"Token expired. Please re-reset password.\"}", HttpStatus.OK);
 	}
@@ -322,14 +337,14 @@ public class CustromerController {
 				customerRepositoryImpl.saveTokenInfo(cEmail, cToken, expireDate);
 
 			}
-			customerRepositoryImpl.sendPwdMail(cEmail, "Reset Eamil",
+			customerRepositoryImpl.sendPwdMail(cEmail, "Reset Email",
 					"<p>This is a system generated mail. Please do not reply to this email ID. If you have a query or need any clarification you may:</p>"
 							+ "<p>(1) Call our 24-hour Customer Care or\r\n</p>"
 							+ "<p>(2) Email Us support@enfec.com\r\n</p>"
 							+ "<p>Your One Time Password (OTP) for Reset Email Address on Event Management System is: \r\n</p>"
 							+ "<p><b>" + cToken + "</b></p>"
-							//+ "<p><a href = 'http://localhost:4200/users/resetemail?cToken="
-							+ "<p><a href = 'http://localhost:8080/reset_email?cToken="
+							+ "<p><a href = 'http://localhost:4200/users/resetemail?cToken="
+							//+ "<p><a href = 'http://localhost:8080/reset_email?cToken="
 							+ cToken + "'>Please click this link to Reset Email</a></p>"
 							+ "<p>For any problem please contact us at 24*7 Hrs. Customer Support at 18001231234 (TBD) or mail us at support@enfec.com\r\n"
 							+ "Thank you for using our Event Management System\r\n</p>",
@@ -347,7 +362,7 @@ public class CustromerController {
 	 * @return ResponseEntity with reset password result message
 	 */
 	@RequestMapping(value = "/reset_email", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
-	public ResponseEntity<String> setEmail(@RequestBody(required = true) ObjectNode jPwd, @RequestParam("cToken") String cToken) {
+	public ResponseEntity<String> setEmail(@RequestBody(required = true) ObjectNode jEmail, @RequestParam("cToken") String cToken) {
 		if (customerRepositoryImpl.validToken(cToken)) {
 			logger.info("valid token: {} ", cToken);
 			String oldEmail = customerRepositoryImpl.findEmailByToken(cToken).get(0).getCustomerEmail();
@@ -355,7 +370,7 @@ public class CustromerController {
 			int cID = customerRepositoryImpl.findIDByEmail(oldEmail).get(0).getId();
 			logger.info("customer ID: {} ", cID);
 
-			String newEmail = jPwd.get("newEmail").textValue();
+			String newEmail = jEmail.get("newEmail").textValue();
 			customerRepositoryImpl.updateEmail(cID, newEmail);
 			logger.info("Email reset successfully.");
 			

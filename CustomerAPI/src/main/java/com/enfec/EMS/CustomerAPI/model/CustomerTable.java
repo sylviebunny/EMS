@@ -22,5 +22,6 @@ public class CustomerTable {
 	private String email;
 	private String psw;
 	private String phone;
+	private int hasActived;
 
 }

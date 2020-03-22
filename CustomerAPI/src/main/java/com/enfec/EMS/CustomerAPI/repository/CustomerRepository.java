@@ -57,6 +57,21 @@ public interface CustomerRepository {
      * @return whether the cEmail match with the cPwd in database
      */
 	public boolean isMatching(String cEmail, String cPwd);
+
+	/**
+     * Verify active status: determine if the customer is actived or not
+     * @param cEmail: customer email 
+     * @return whether the customer is actived or not
+     */
+	public boolean hasActived(String cEmail);
+	
+	
+	/**
+     * Update active status: update customer active status 
+     * @param cEmail: customer email 
+     * @return affected row
+     */
+	public int updateActiveStatus(String cEmail);
 	
 	
 	/**

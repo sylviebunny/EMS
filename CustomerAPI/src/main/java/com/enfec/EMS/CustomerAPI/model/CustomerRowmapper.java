@@ -28,6 +28,7 @@ public class CustomerRowmapper implements RowMapper<CustomerTable> {
 		customerTable.setEmail(rs.getString("Email_Address"));
 		customerTable.setPsw(rs.getString("CPassword") == null ? null : rs.getString("CPassword"));
 		customerTable.setPhone(rs.getString("Phone"));
+		customerTable.setHasActived(rs.getInt("Actived"));
 		return customerTable;
 	}
 

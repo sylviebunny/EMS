@@ -11,7 +11,6 @@ import javax.mail.internet.MimeMessage;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
@@ -51,17 +50,19 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 	final String UPDATE_CUSTOMER_INFO_SUFFIX = " WHERE Customer_ID =:id";
 	
 	final String DELETE_CUSTOMER = "DELETE FROM Customers WHERE Customer_ID =?";
-	final String SELECT_PWD = "SELECT Customer_ID, User_Name, Email_Address, CPassword, Phone FROM Customers WHERE Email_Address =?";
+	final String SELECT_PWD = "SELECT * FROM Customers WHERE Email_Address =?";
 
 	final String VALID_CUSTOMER = "SELECT * FROM Customers WHERE Email_Address=?";
 	
 	final String CUSTOMER = "SELECT Email_Address FROM Customers WHERE Email_Address=?";
 	final String ORGANIZER = "SELECT Email_Address FROM Organizers WHERE Email_Address=?";
+	final String SELECT_ACTIVE_STATUS = "SELECT * FROM Customers WHERE Email_Address=?";
 	
 	final String CREATE_TOKEN = "INSERT INTO Customer_Token(CEmail, CToken, CTExpire) VALUE (:customerEmail, :customerToken, :customerExpiryDate)";
 	final String FIND_EMAIL_BY_TOKEN = "SELECT * FROM Customer_Token WHERE CToken=?";
 	final String VALID_TOKEN = "SELECT * FROM Customer_Token WHERE CToken=?";
 	final String UPDATE_PASSWORD = "UPDATE Customers SET CPassword =:psw WHERE Email_Address =:email";
+	final String UPDATE_ACTIVE = "UPDATE Customers SET Actived =:hasActived WHERE Email_Address =:email";
 	
 	final String UPDATE_EMAIL = "UPDATE Customers SET Email_Address =:email WHERE Customer_ID =:id";
 	final String FIND_ID_BY_EMAIL = "SELECT * FROM Customers WHERE Email_Address=?";
@@ -91,6 +92,7 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 		cstmMap.put("psw", customerTable.getPsw() == null || customerTable.getPsw().isEmpty() ? null
 				: Base64.getEncoder().encode((customerTable.getPsw().getBytes())));
 		cstmMap.put("phone", customerTable.getPhone() == null || customerTable.getPhone().isEmpty() ? null : customerTable.getPhone());
+		cstmMap.put("hasActived", customerTable.getHasActived());
 
 		return cstmMap;
 	}
@@ -228,6 +230,51 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 	
 	
 	/**
+     * Verify active status: determine if the customer is actived or not
+     * @param cEmail: customer email 
+     * @return whether the customer is actived or not
+     */
+	@Override
+	public boolean hasActived(String cEmail) {
+		List<CustomerTable> ct = jdbcTemplate.query(SELECT_ACTIVE_STATUS, new Object[] { cEmail }, new CustomerRowmapper());
+		if (ct.get(0).getHasActived() == 0) {
+			logger.info("Customer not actived yet");
+			return false;
+		} else {
+			logger.info("Customer actived already");
+			return true;
+		}
+	}
+	
+	
+	/**
+     * Update active status: update customer active status 
+     * Map customer table to MySql parameters, and update database
+     * @param cEmail: customer email 
+     * @return affected row
+     */
+	@Override
+	public int updateActiveStatus(String cEmail) {
+		int affectedRow;
+		CustomerTable ct = new CustomerTable();
+
+		ct.setEmail(cEmail);
+		logger.info(cEmail);
+		
+		ct.setHasActived(1);
+		logger.info("Customer Active Status change to {}", ct.getHasActived());
+
+		Map<String, Object> updateActiveMap = CustomerMap(ct);
+		SqlParameterSource parameterSource = new MapSqlParameterSource(updateActiveMap);
+		logger.info("Update customer active status :{}", parameterSource);
+		affectedRow = namedParameterJdbcTemplate.update(UPDATE_ACTIVE, parameterSource);
+
+		return affectedRow;
+
+	}
+	
+	
+	/**
      * Login role type check: determine if email belongs to customer or organizer
      * @param email: email which is used to login
      * @return "Customer" or "Organizer"
@@ -291,7 +338,6 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 			helper.setText(body, true);// true indicate html
 			mailSender.send(message);
 		} catch (MessagingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -385,7 +431,6 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 			helper.setText(body, true);// true indicate html
 			mailSender.send(message);
 		} catch (MessagingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 

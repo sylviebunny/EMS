@@ -187,20 +187,24 @@ public class OrganizerController {
 	 */
 	@RequestMapping(value = "/organizer/login", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> oLogin(@RequestBody(required = true) OrganizerTable organizerTable) {
-
-		try {
-			boolean isMatch = OrganizerRepositoryImpl.isMatching(organizerTable.getEmail_address(),
-					organizerTable.getPassword());
-			if (isMatch) {
-				logger.info("Organizer login successfully by email: {}", organizerTable.getEmail_address());
-				return new ResponseEntity<>("{\"message\" : \"Organizer login successfully\"}", HttpStatus.OK);
+		try {			
+			boolean hasActived = OrganizerRepositoryImpl.hasActived(organizerTable.getEmail_address());
+			if(hasActived) {
+				boolean isMatch = OrganizerRepositoryImpl.isMatching(organizerTable.getEmail_address(), organizerTable.getPassword());
+				if (isMatch) {
+					return new ResponseEntity<>("{\"message\" : \"Organizer login success\",\n" 
+							+ "\"OrganizerID\" :"  
+							+ OrganizerRepositoryImpl.findIDByEmail(organizerTable.getEmail_address()).get(0).getOrganizer_id()
+							+ "\n}", HttpStatus.OK) ;
+				} else {
+					return new ResponseEntity<>(
+							"{\"message\" : \"Organizer login fail: Email or Password is not correct...\"}", HttpStatus.OK);
+				}
 			} else {
-				logger.info("Organizer login failed: Email or Password not correct");
 				return new ResponseEntity<>(
-						"{\"message\" : \"Organizer login failed: Email or Password is not correct...\"}",
-						HttpStatus.OK);
+						"{\"message\" : \"Organizer hasn't active account yet, please active first...\"}", HttpStatus.OK);
 			}
-		} catch (DataIntegrityViolationException dataIntegrityViolationException) {
+		}  catch (DataIntegrityViolationException dataIntegrityViolationException) {
 			logger.error("Invalid input");
 			return new ResponseEntity<>("{\"message\" : \"Invalid input\"}", HttpStatus.BAD_REQUEST);
 		} catch (Exception e) {
@@ -397,19 +401,25 @@ public class OrganizerController {
 	 * @return ResponseEntity with message
 	 */
 	@RequestMapping(value = "/registrationConfirm", method = RequestMethod.GET, produces = MediaType.TEXT_PLAIN_VALUE)
-	public ResponseEntity<String> confirmRegistration(@RequestParam("oToken") String oToken) {
+	public ResponseEntity<String> confirmRegistration(@RequestParam("oToken") String oToken) {	
 		if (OrganizerRepositoryImpl.validToken(oToken) && !OrganizerRepositoryImpl.hasChecked(oToken)) {
 			logger.info("valid token: {} ", oToken);
 			logger.info("token has not checked ");
+			
 			OrganizerRepositoryImpl.updateTokenStatus(oToken);
 			logger.info("change token status to checked ");
-			return new ResponseEntity<String>("{\"message\": \"Organizer account activated\"}", HttpStatus.OK);
+			
+			String oEmail = OrganizerRepositoryImpl.findEmailByToken(oToken).get(0).getOrganizerEmail();
+			OrganizerRepositoryImpl.updateActiveStatus(oEmail);
+			logger.info("Customer Active Status changed");
+			
+			return new ResponseEntity<String>("{\"message\": \"Organizer account actived\"}", HttpStatus.OK);
 		} else if (OrganizerRepositoryImpl.validToken(oToken) && OrganizerRepositoryImpl.hasChecked(oToken)){
 			logger.info(" has checked already ");
-			return new ResponseEntity<String>("{\"message\": \"Organizer account activated already, please login\"}", HttpStatus.OK);
+			return new ResponseEntity<String>("{\"message\": \"Organizer account actived already, please login\"}", HttpStatus.OK);
 		} else {
 			logger.info("invalid token: {} ", oToken);
-			return new ResponseEntity<String>("{\"message\": \"Organizer account activate failed\"}", HttpStatus.OK);
+			return new ResponseEntity<String>("{\"message\": \"Organizer account active failed\"}", HttpStatus.OK);
 		}
 	}
 	
@@ -553,7 +563,7 @@ public class OrganizerController {
 	 * @return ResponseEntity with reset password result message
 	 */
 	@RequestMapping(value = "/reset_email", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
-	public ResponseEntity<String> setEmail(@RequestBody(required = true) ObjectNode jPwd, @RequestParam("oToken") String oToken) {
+	public ResponseEntity<String> setEmail(@RequestBody(required = true) ObjectNode jEmail, @RequestParam("oToken") String oToken) {
 		if (OrganizerRepositoryImpl.validToken(oToken)) {
 			logger.info("valid token: {} ", oToken);
 			String oldEmail = OrganizerRepositoryImpl.findEmailByToken(oToken).get(0).getOrganizerEmail();
@@ -561,7 +571,7 @@ public class OrganizerController {
 			int oID = OrganizerRepositoryImpl.findIDByEmail(oldEmail).get(0).getOrganizer_id();
 			logger.info("Organizer ID: {} ", oID);
 
-			String newEmail = jPwd.get("newEmail").textValue();
+			String newEmail = jEmail.get("newEmail").textValue();
 			OrganizerRepositoryImpl.updateEmail(oID, newEmail);
 			logger.info("Email reset successfully.");
 			

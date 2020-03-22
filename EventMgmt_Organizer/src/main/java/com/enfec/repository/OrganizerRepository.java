@@ -235,4 +235,18 @@ public interface OrganizerRepository {
 	 * @return Object
 	 */
 	public Object findIDByEmail(String OEmail);
+
+	/**
+     * Verify active status: determine if the organizer is actived or not
+     * @param oEmail: organizer email 
+     * @return whether the organizer is actived or not
+     */
+	public boolean hasActived(String oEmail);
+	
+	/**
+     * Update active status: update organizer active status 
+     * @param oEmail: organizer email 
+     * @return affected row
+     */
+	public int updateActiveStatus(String oEmail);
 }

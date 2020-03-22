@@ -34,4 +34,5 @@ public class OrganizerTable {
 	private String city; 
 	private String state; 
 	private String zipcode; 
+	private int hasActived;
 }

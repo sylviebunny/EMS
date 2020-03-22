@@ -294,6 +294,7 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 		param.put("other_details",
 				organizerTable.getOther_details() == null || organizerTable.getOther_details().isEmpty() ? null
 						: organizerTable.getOther_details());
+		param.put("hasActived", organizerTable.getHasActived());
 		return param;
 	}
 
@@ -689,5 +690,49 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 	public List<OrganizerTable> findIDByEmail(String OEmail) {
 		String FIND_ID_BY_EMAIL = "SELECT * FROM Organizers WHERE Email_Address=?";
 		return jdbcTemplate.query(FIND_ID_BY_EMAIL, new Object[] {OEmail }, new OrganizerRowmapper());
+	}
+	
+	/**
+     * Verify active status: determine if the organizer is actived or not
+     * @param oEmail: organizer email 
+     * @return whether the organizer is actived or not
+     */
+	@Override
+	public boolean hasActived(String oEmail) {
+		String SELECT_ACTIVE_STATUS = "SELECT * FROM Organizers WHERE Email_Address=?";
+		List<OrganizerTable> ot = jdbcTemplate.query(SELECT_ACTIVE_STATUS, new Object[] { oEmail }, new OrganizerRowmapper());
+		if (ot.get(0).getHasActived() == 0) {
+			logger.info("Organizer not actived yet");
+			return false;
+		} else {
+			logger.info("Organizer actived already");
+			return true;
+		}
+	}
+	
+	/**
+     * Update active status: update organizer active status 
+     * Map organizer table to MySql parameters, and update database
+     * @param oEmail: organizer email 
+     * @return affected row
+     */
+	@Override
+	public int updateActiveStatus(String oEmail) {
+		String UPDATE_ACTIVE = "UPDATE Organizers SET Actived =:hasActived WHERE Email_Address =:email_address";
+		int affectedRow;
+		OrganizerTable ot = new OrganizerTable();
+
+		ot.setEmail_address(oEmail);
+		logger.info(oEmail);
+		
+		ot.setHasActived(1);
+		logger.info("Organizer Active Status change to {}", ot.getHasActived());
+
+		Map<String, Object> updateActiveMap = OrganizerMap(ot);
+		SqlParameterSource parameterSource = new MapSqlParameterSource(updateActiveMap);
+		logger.info("Update organizer active status :{}", parameterSource);
+		affectedRow = namedParameterJdbcTemplate.update(UPDATE_ACTIVE, parameterSource);
+
+		return affectedRow;
 	}
 }

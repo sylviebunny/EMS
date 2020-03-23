@@ -46,9 +46,9 @@ public class EventRepositoryImpl implements EventRepository {
      * {@value #REGISTER_EVENT} Query for event registration 
      */
 	private static final String REGISTER_EVENT = "INSERT INTO Events(Event_Status_Code, Event_Type_Code, Commercial_Type, Organizer_ID, Venue_ID, "
-			+ "Event_Name, Event_Start_Time, Event_End_Time, Timezone, Number_of_Participants, Derived_Days_Duration, Event_Cost, Discount, Comments) VALUES "
+			+ "Event_Name, Event_Start_Time, Event_End_Time, Timezone, Number_of_Participants, Derived_Days_Duration, Event_Cost, Discount, Comments, Event_photo_URL) VALUES "
 			+ "(:event_status_code, :event_type_code, :commercial_type, :organizer_id, "
-			+ ":venue_id, :event_name, :event_start_time, :event_end_time, :timezone, :number_of_participants, :derived_days_duration, :event_cost, :discount, :comments)";
+			+ ":venue_id, :event_name, :event_start_time, :event_end_time, :timezone, :number_of_participants, :derived_days_duration, :event_cost, :discount, :comments, :event_photo_url)";
 	
     /**
      * Query prefix and suffix for updating an event
@@ -64,7 +64,7 @@ public class EventRepositoryImpl implements EventRepository {
 	/**
 	 * {@value #GET_ALL_EVENT} Query for collecting all event information 
 	 */
-	private static final String GET_ALL_EVENT = "SELECT Event_ID, Events.Event_Status_Code, Events.Event_Type_Code, Commercial_Type, Events.Organizer_ID, Events.Venue_ID, Event_Name, Event_Start_Time, Event_End_Time, Timezone, Number_of_Participants, Derived_Days_Duration, Event_Cost, Discount, Comments, Venue_Name, Venues.Other_Details, Street1, Street2, City, State, Zipcode, Latitude, Longitude, Event_Status_Description, Event_Type_Description, Organizer_Name\n" + 
+	private static final String GET_ALL_EVENT = "SELECT Event_ID, Events.Event_Status_Code, Events.Event_Type_Code, Commercial_Type, Events.Organizer_ID, Events.Venue_ID, Event_Name, Event_Start_Time, Event_End_Time, Timezone, Number_of_Participants, Derived_Days_Duration, Event_Cost, Discount, Comments, Venue_Name, Venues.Other_Details, Street1, Street2, City, State, Zipcode, Latitude, Longitude, Event_Status_Description, Event_Type_Description, Organizer_Name, Event_Photo_URL\n" + 
 			"FROM Events, Venues, Venue_Address, Ref_Event_Status, Ref_Event_Types, Organizers\n" + 
 			"WHERE Events.Venue_ID = Venues.Venue_ID AND Events.Venue_ID = Venue_Address.Venue_ID AND Events.Event_Status_Code = Ref_Event_Status.Event_Status_Code AND Events.Event_Type_Code = Ref_Event_Types.Event_Type_Code AND Organizers.Organizer_ID = Events.Organizer_ID; ";
 
@@ -216,7 +216,7 @@ public class EventRepositoryImpl implements EventRepository {
 				resultEvent.add(eachEvent); 
 			}
 		}
-		logger.info("Get" + resultEvent.size() + "event based on event_id: " + event_id);
+		logger.info("Get " + resultEvent.size() + " event based on event_id: " + event_id);
 		return resultEvent; 
 	}
 	
@@ -504,30 +504,30 @@ public class EventRepositoryImpl implements EventRepository {
 				null : eventTable.getDiscount());
 		
 		param.put("comments", eventTable.getComments() == null || eventTable.getComments().isEmpty() ? 
-				null :eventTable.getComments());
+				null : eventTable.getComments());
 				
 		param.put("venue_id", eventTable.getVenue_id());			// Cannot be null 
 		
 		param.put("venue_name", eventTable.getVenue_name() == null || eventTable.getVenue_name().isEmpty() ? 
-				null :eventTable.getVenue_name());
+				null : eventTable.getVenue_name());
 		
 		param.put("other_details", eventTable.getOther_details() == null || eventTable.getOther_details().isEmpty() ? 
-				null :eventTable.getOther_details());
+				null : eventTable.getOther_details());
 		
 		param.put("street1", eventTable.getStreet1() == null || eventTable.getStreet1().isEmpty() ? 
-				null :eventTable.getStreet1());
+				null : eventTable.getStreet1());
 		
 		param.put("street2", eventTable.getStreet2() == null || eventTable.getStreet2().isEmpty() ? 
-				null :eventTable.getStreet2());
+				null : eventTable.getStreet2());
 		
 		param.put("city", eventTable.getCity() == null || eventTable.getCity().isEmpty() ? 
-				null :eventTable.getCity());
+				null : eventTable.getCity());
 		
 		param.put("state", eventTable.getState() == null || eventTable.getState().isEmpty() ? 
-				null :eventTable.getState());
+				null : eventTable.getState());
 		
 		param.put("zipcode", eventTable.getZipcode() == null ? 
-				null :eventTable.getZipcode());
+				null : eventTable.getZipcode());
 		
 		param.put("latitude", eventTable.getLatitude() == null ? 
 				null : eventTable.getLatitude());
@@ -536,13 +536,16 @@ public class EventRepositoryImpl implements EventRepository {
 				null : eventTable.getLongitude()); 
 		
 		param.put("event_type_description", eventTable.getEvent_type_description() == null || eventTable.getEvent_type_description().isEmpty() ? 
-				null :eventTable.getEvent_type_description());
+				null : eventTable.getEvent_type_description());
 		
 		param.put("event_status_description", eventTable.getEvent_status_description() == null || eventTable.getEvent_status_description().isEmpty() ? 
-				null :eventTable.getEvent_status_description());
+				null : eventTable.getEvent_status_description());
 		
 		param.put("organizer_name", eventTable.getOrganizer_name() == null || eventTable.getOrganizer_name().isEmpty() ? 
 				null :eventTable.getOrganizer_name());
+		
+		param.put("event_photo_url", eventTable.getEvent_photo_url() == null || eventTable.getEvent_photo_url().isEmpty() ? 
+		        null : eventTable.getEvent_photo_url()); 
 		
 		logger.info("Event map created: {}", param);
 		return param;

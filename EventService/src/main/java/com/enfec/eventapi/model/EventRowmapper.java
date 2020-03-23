@@ -82,6 +82,8 @@ public class EventRowmapper implements RowMapper<EventTable> {
 
 		et.setOrganizer_name(hasColumn(rs, "Organizer_Name") ? rs.getString("Organizer_Name") : null);
 
+		et.setEvent_photo_url(hasColumn(rs, "Event_Photo_URL") ? rs.getString("Event_Photo_URL") : null);
+		
 		return et;
 	}
 

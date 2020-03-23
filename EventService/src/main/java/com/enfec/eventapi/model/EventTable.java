@@ -153,4 +153,8 @@ public class EventTable {
 	 */
 	private String organizer_name;
 
+	/** 
+	 * Event Photo URL
+	 */
+	private String event_photo_url; 
 }

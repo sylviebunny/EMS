@@ -718,7 +718,7 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
      */
 	@Override
 	public int updateActiveStatus(String oEmail) {
-		String UPDATE_ACTIVE = "UPDATE Organizers SET Actived =:hasActived WHERE Email_Address =:email_address";
+		String UPDATE_ACTIVE = "UPDATE Organizers SET Actived =:actived WHERE Email_Address =:email_address";
 		int affectedRow;
 		OrganizerTable ot = new OrganizerTable();
 

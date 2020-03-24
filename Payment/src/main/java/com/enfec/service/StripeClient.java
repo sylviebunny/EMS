@@ -15,7 +15,7 @@ public class StripeClient {
 	
     @Autowired
     StripeClient() {
-        Stripe.apiKey = "sk_test_xxxxxxxxxxxxxxxxxxxxxxxxx";
+        Stripe.apiKey = "sk_test_IWw7MbFn77yp1EuA22QjR9AH00gmonC4hs";
     }
 
 	/**
@@ -24,13 +24,16 @@ public class StripeClient {
      * 
      * @param token Requested token sent by front-end
      * @param amount How much to be charged
+     * @param email to be charged for
+     * 
      * @return Charge object
      */
-    public Charge chargeCreditCard(String token, double amount) throws Exception {
+    public Charge chargeCreditCard(String token, double amount, String email) throws Exception {
         Map<String, Object> chargeParams = new HashMap<String, Object>();
         chargeParams.put("amount", (int)(amount * 100));
         chargeParams.put("currency", "USD");
         chargeParams.put("source", token);
+        chargeParams.put("description", "Charge for " + email);
         Charge charge = Charge.create(chargeParams);
         return charge;
     }
@@ -58,14 +61,16 @@ public class StripeClient {
      * @param amount How much to be charged
      * @return Charge object
      */
-    public Charge chargeCustomerCard(String customerId, int amount) throws Exception {
+    public Charge chargeCustomerCard(String customerId, double amount) throws Exception {
         String sourceCard = Customer.retrieve(customerId).getDefaultSource();
         Map<String, Object> chargeParams = new HashMap<String, Object>();
-        chargeParams.put("amount", amount);
+//      chargeParams.put("amount", amount);
+        chargeParams.put("amount", (int)(amount * 100));
         chargeParams.put("currency", "USD");
         chargeParams.put("customer", customerId);
         chargeParams.put("source", sourceCard);
         Charge charge = Charge.create(chargeParams);
+//        String id = charge.getId();
         return charge;
     }
 }

@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.enfec.repository.StripeClient;
+import com.enfec.service.StripeClient;
 import com.stripe.model.Charge;
 
 @RestController

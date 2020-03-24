@@ -1,4 +1,4 @@
-package com.enfec.repository;
+package com.enfec.service;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,7 +15,7 @@ public class StripeClient {
 	
     @Autowired
     StripeClient() {
-        Stripe.apiKey = "sk_test_xxxxxxxxxxxx";
+        Stripe.apiKey = "sk_test_xxxxxxxxxxxxxxxxxxxxxxxxx";
     }
 
 	/**

@@ -1,5 +1,6 @@
 package com.enfec.repository;
 
+import java.sql.PreparedStatement;
 import java.sql.Timestamp;
 import java.util.Base64;
 import java.util.HashMap;
@@ -18,6 +19,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
@@ -53,7 +56,7 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 	JdbcTemplate jdbcTemplate;
 
 	/**
-	 * Create organizer basic information 
+	 * Create organizer basic information, default address and contact
 	 * Map organizer table to MySql parameters and insert into database
 	 * 
 	 * @param organizerTable: The information that needs to be created
@@ -62,13 +65,28 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 	@Override
 	public int createOrganizer(OrganizerTable organizerTable) {
 		String REGISTER_ORGANIZER = "INSERT INTO Organizers(Organizer_Name, Email_Address, Password, Other_Details) VALUES "
-				+ "(:organizer_name, :email_address, :password, :other_details)";
+		+ "(:organizer_name, :email_address, :password, :other_details)";
+		String CREATE_DEFAULT_ADDRESS = "INSERT INTO `Address` (`Organizer_ID`) VALUES(?)";
+		String CREATE_DEFAULT_CONTACT = "INSERT INTO `Contacts` (`Organizer_ID`, `Address_ID`) VALUES(?,?)";
 
 		Map<String, Object> param = OrganizerMap(organizerTable);
 		SqlParameterSource pramSource = new MapSqlParameterSource(param);
+		
+		KeyHolder keyHolder = new GeneratedKeyHolder();
 		logger.info("Register Organizer Info: {}", pramSource);
-		int affectedRow = namedParameterJdbcTemplate.update(REGISTER_ORGANIZER, pramSource);
-		return affectedRow;
+	    int count = namedParameterJdbcTemplate.update(REGISTER_ORGANIZER, pramSource, keyHolder);
+	    Number key = keyHolder.getKey(); //key is primary key (organizer_id)
+	      
+	    KeyHolder holder = new GeneratedKeyHolder();
+	    int count1 = jdbcTemplate.update(
+	              connection -> {
+	                  PreparedStatement ps = connection.prepareStatement(CREATE_DEFAULT_ADDRESS, new String[]{"Address_ID"});
+	                  ps.setInt(1, key.intValue());
+	                  return ps;
+	              }, holder);
+	    Number key1 = holder.getKey(); //primary key (address_id)
+		int count2 = jdbcTemplate.update(CREATE_DEFAULT_CONTACT, key.longValue(), key1.longValue());
+		return count;
 	}
 
 	/**
@@ -100,9 +118,11 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 	@Override
 	public List<OrganizerTable> getAllOrganizerInfo() {
 		String SELECT_ALL_ORGANZIER = "select * from Organizers o join Contacts c on o.Organizer_ID = c.Organizer_ID join Address a on a.Address_ID=c.Address_ID";
+//		String SELECT_ALL_ORGANZIER = "SELECT * FROM Organizers LEFT JOIN (Contacts LEFT JOIN Address on Contacts.Organizer_ID = Address.Organizer_ID) "
+//				+ "ON Organizers.Organizer_ID = Contacts.Organizer_ID";
 		return jdbcTemplate.query(SELECT_ALL_ORGANZIER, new BeanPropertyRowMapper<OrganizerTable>(OrganizerTable.class));
 	}
-	
+
 	/**
 	 * Update organizer basic information 
 	 * Map organizer table to MySql parameters and update database

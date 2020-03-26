@@ -23,7 +23,9 @@ public class CustomerOrderRowmapper implements RowMapper<CustomerOrderTable>  {
 		customerOederTable.setCustomerOrderID(rs.getInt("COrder_ID"));
 		customerOederTable.setCustomerID(rs.getInt("Customer_ID"));
 		customerOederTable.setOrderTime(rs.getTimestamp("OrderCreateTime"));
-		
+		customerOederTable.setOrderStatus(rs.getString("Order_Status"));
+		customerOederTable.setStripeStatus(rs.getString("Stripe_Status"));
+		customerOederTable.setStripeChargeID(rs.getString("Stripe_Charge_ID"));
 		return customerOederTable;
 	}
 	

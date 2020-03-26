@@ -22,6 +22,10 @@ import lombok.Setter;
 public class CustomerOrderTable {
 	private int customerOrderID;
 	private int customerID;
+	
 	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
 	private Timestamp orderTime;
+	private String orderStatus;
+	private String stripeStatus;
+	private String stripeChargeID;
 }

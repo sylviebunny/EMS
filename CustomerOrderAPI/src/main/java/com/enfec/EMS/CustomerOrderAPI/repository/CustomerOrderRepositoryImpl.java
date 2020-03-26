@@ -36,8 +36,8 @@ public class CustomerOrderRepositoryImpl implements CustomerOrderRepository {
      * All the Sql statements to use in MySql database
      */
 	//Customer Order SQL
-	final String SELECT_CUSTOMER_ORDER = "SELECT COrder_ID, Customer_ID, OrderCreateTime FROM Customer_Orders WHERE COrder_ID=?";
-	final String SELECT_CUSTOMER_ORDER_BY_CID = "SELECT COrder_ID, Customer_ID, OrderCreateTime FROM Customer_Orders WHERE Customer_ID=?";
+	final String SELECT_CUSTOMER_ORDER = "SELECT * FROM Customer_Orders WHERE COrder_ID=?";
+	final String SELECT_CUSTOMER_ORDER_BY_CID = "SELECT * FROM Customer_Orders WHERE Customer_ID=?";
 	final String CREATE_CUSTOMER_ORDER = "INSERT INTO Customer_Orders(Customer_ID) VALUES (:customerID)";
 	final String DELETE_CUSTOMER_ORDER = "DELETE FROM Customer_Orders WHERE COrder_ID =?";
 	
@@ -77,6 +77,10 @@ public class CustomerOrderRepositoryImpl implements CustomerOrderRepository {
 		cstmoMap.put("customerOrderID", customerOrderTable.getCustomerOrderID());
 		cstmoMap.put("customerID", customerOrderTable.getCustomerID());
 		cstmoMap.put("orderTime", customerOrderTable.getOrderTime());
+		cstmoMap.put("orderStatus", customerOrderTable.getOrderStatus());
+		cstmoMap.put("stripeStatus", customerOrderTable.getStripeStatus());
+		cstmoMap.put("stripeChargeID", customerOrderTable.getStripeChargeID());
+		
 
 		return cstmoMap;
 	}

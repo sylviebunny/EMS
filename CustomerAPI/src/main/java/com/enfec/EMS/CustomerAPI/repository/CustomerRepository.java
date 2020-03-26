@@ -51,6 +51,14 @@ public interface CustomerRepository {
 	
 	
 	/**
+	 * Delete a customer token
+	 * @param cEmail: customer email
+	 * @return affected row
+	 */
+	public int deleteCustomerToken(String cEmail);
+	
+	
+	/**
      * Customer login: determine if email and password match in database
      * @param cEmail: customer email which is used to login
 	 * @param cPwd: Customer input password

@@ -42,7 +42,7 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 	/**
      * All the Sql statements to use in MySql database
      */
-	final String SELECT_CUSTOMER = "SELECT Customer_ID, User_Name, Email_Address, CPassword, Phone FROM Customers WHERE Customer_ID =?";
+	final String SELECT_CUSTOMER = "SELECT * FROM Customers WHERE Customer_ID =?";
 	final String SELECT_ALL = "SELECT * FROM Customers";
 	final String REGISTER_CUSTOMER = "INSERT INTO Customers(User_Name, Email_Address, CPassword, Phone) VALUES"
 			+ "(:name, :email, :psw, :phone)";
@@ -50,6 +50,8 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 	final String UPDATE_CUSTOMER_INFO_SUFFIX = " WHERE Customer_ID =:id";
 	
 	final String DELETE_CUSTOMER = "DELETE FROM Customers WHERE Customer_ID =?";
+	final String DELETE_CUSTOMER_TOOKEN = "DELETE FROM Customer_Token WHERE CEmail =?";
+	
 	final String SELECT_PWD = "SELECT * FROM Customers WHERE Email_Address =?";
 
 	final String VALID_CUSTOMER = "SELECT * FROM Customers WHERE Email_Address=?";
@@ -204,6 +206,18 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 		int affectedRow = jdbcTemplate.update(DELETE_CUSTOMER, id);
 		return affectedRow;
 
+	}
+	
+	
+	/**
+     * Delete the customer token information from database by customer email
+     * @param cEmail
+     * @return number of affected rows
+     */
+	@Override
+	public int deleteCustomerToken(String cEmail) {
+		int affectedRow = jdbcTemplate.update(DELETE_CUSTOMER_TOOKEN, cEmail);
+		return affectedRow;
 	}
 	
 	

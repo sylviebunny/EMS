@@ -186,6 +186,14 @@ public class CustromerController {
 	 */
 	@RequestMapping(value = "/Customer/Delete/{id}", method = RequestMethod.DELETE, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> deleteCustomer(@PathVariable String id) {
+		
+		String cEmail = customerRepositoryImpl.getCustomer(id).get(0).getEmail();
+		int affectedTokenRow = customerRepositoryImpl.deleteCustomerToken(cEmail);
+		if(affectedTokenRow == 0) {
+			logger.info("Customer Token doesn't exist...");
+		} else {
+			logger.info("Customer Token deleted...");
+		}
 
 		int affectedRow = customerRepositoryImpl.deleteCustomer(id);
 		if (affectedRow == 0) {

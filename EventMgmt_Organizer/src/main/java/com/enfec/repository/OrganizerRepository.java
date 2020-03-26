@@ -55,6 +55,20 @@ public interface OrganizerRepository {
 	public int deleteOrganizer(int Organizer_ID);
 
 	/**
+	 * Get organizer's basic information, used for organizer token deletion
+	 * 
+	 * @return Object
+	 */
+	public Object getOrganizer(int Organizer_ID);
+	
+	/**
+	 * Delete an organizer token
+	 * @param oEmail: organizer email
+	 * @return affected row
+	 */
+	public int deleteOrganizerToken(String oEmail);
+	
+	/**
 	 * Create an organizer address
 	 * 
 	 * @param address Organizer address information

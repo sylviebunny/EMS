@@ -163,6 +163,14 @@ public class OrganizerController {
 	@RequestMapping(value = "/organizer/delete/{Organizer_ID}", method = RequestMethod.DELETE, produces = "application/json;charset=UTF-8")
 	public ResponseEntity<String> deleteOrganizer(@PathVariable int Organizer_ID) {
 		try {
+			String oEmail = OrganizerRepositoryImpl.getOrganizer(Organizer_ID).get(0).getEmail_address();
+			int affectedTokenRow = OrganizerRepositoryImpl.deleteOrganizerToken(oEmail);
+			if(affectedTokenRow == 0) {
+				logger.info("Organizer Token doesn't exist...");
+			} else {
+				logger.info("Organizer Token deleted...");
+			}
+			
 			int affectedRow = OrganizerRepositoryImpl.deleteOrganizer(Organizer_ID);
 			if (affectedRow > 0) {
 				logger.info("Organizer deleted for: {}", Organizer_ID);

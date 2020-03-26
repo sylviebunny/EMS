@@ -97,8 +97,6 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 	 */
 	@Override
 	public OrganizerTable getOrganizerInfo(int Organizer_ID) {
-//		String SELECT_ORGANIZER = "select * FROM Organizers where Organizer_ID = ?";
-//		return jdbcTemplate.query(SELECT_ORGANIZER, new Object[] { Organizer_ID }, new OrganizerRowmapper());
 		String SELECT_ORGANIZER = "select * from Organizers o join Contacts c on o.Organizer_ID = c.Organizer_ID join Address a on a.Address_ID=c.Address_ID where o.Organizer_ID=?";
 		
 		OrganizerTable org;
@@ -168,7 +166,30 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 		jdbcTemplate.update(DELETEfromCONTACTS, Organizer_ID);
 		return affectedRow;
 	}
-
+	
+	/**
+     * Get organizer basic information from database by organizer id, used for organizer token deletion
+     * @param id
+     * @return List<OrganizerTable>: all entries that match the request
+     */
+	@Override
+	public List<OrganizerTable> getOrganizer(int Organizer_ID) {
+		String SELECT_ORGANIZER = "select * FROM Organizers where Organizer_ID = ?";
+		return jdbcTemplate.query(SELECT_ORGANIZER, new Object[] { Organizer_ID }, new OrganizerRowmapper());
+	}
+	
+	/**
+     * Delete the organizer token information from database by organizer email
+     * @param oEmail
+     * @return number of affected rows
+     */
+	@Override
+	public int deleteOrganizerToken(String oEmail) {
+		String DELETE_ORGANIZER_TOOKEN = "DELETE FROM Organizer_Token WHERE OEmail =?";
+		int affectedRow = jdbcTemplate.update(DELETE_ORGANIZER_TOOKEN, oEmail);
+		return affectedRow;
+	}
+	
 	/**
 	 * Create organizer address information 
 	 * Map organizer address table to MySql parameters and insert into database

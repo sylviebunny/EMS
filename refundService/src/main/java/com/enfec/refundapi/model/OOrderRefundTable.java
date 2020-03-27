@@ -44,4 +44,13 @@ public class OOrderRefundTable {
      */
     private String refund_status;
 
+    /**
+     * Organizer refund stripe status
+     */
+    private String stripe_status; 
+    
+    /**
+     * Organizer refund stripe id
+     */
+    private String stripe_refund_id; 
 }

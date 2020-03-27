@@ -26,7 +26,9 @@ public class OOrderRefundRowmapper implements RowMapper<OOrderRefundTable> {
         oot.setDescription(rs.getString("Description"));
         oot.setRefund_updated_time(rs.getTimestamp("Refund_Updated_Time"));
         oot.setRefund_status(rs.getString("Refund_Status"));
-
+        oot.setStripe_status(rs.getString("Refund.Stripe_Status"));
+        oot.setStripe_refund_id(rs.getString("Refund.Stripe_Refund_ID"));
+        
         return oot;
     }
 

@@ -43,4 +43,14 @@ public class COrderRefundTable {
      * Customer refund status
      */
     private String crefund_status;
+    
+    /**
+     * Customer refund stripe status
+     */
+    private String stripe_status; 
+    
+    /**
+     * Customer refund stripe refund id
+     */
+    private String stripe_refund_id; 
 }

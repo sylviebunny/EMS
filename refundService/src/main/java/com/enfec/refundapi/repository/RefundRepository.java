@@ -17,7 +17,7 @@ public interface RefundRepository {
      * @param organizerRefundTable - organizer order information
      * @return affected row
      */
-    public int createOrganizerRefund(OOrderRefundTable organizerTable);
+    public String createOrganizerRefund(OOrderRefundTable organizerTable);
 
     /**
      * Deletes an organizer refund
@@ -26,6 +26,12 @@ public interface RefundRepository {
      */
     public int deleteOrganizerRefund(int refund_id);
 
+    /**
+     * Gets organizer's refunds information by organizer id
+     * @param organizer_id - organizer id
+     * @return all entries that match organizer refund id
+     */
+    public Object getOrganizerRefundByOrganizerID(int organizer_id);
     /**
      * Gets an organizer's refund information by organizer refund id
      * @param refund_id - organizer refund_id
@@ -50,9 +56,9 @@ public interface RefundRepository {
     /**
      * Creates a customer refund
      * @param customerRefundTable - customer refund information 
-     * @return affected row
+     * @return created customer refund id
      */
-    public int createCustomerRefund(COrderRefundTable customerRefundTable);
+    public String createCustomerRefund(COrderRefundTable customerRefundTable);
 
     /**
      * Deletes a customer refund
@@ -61,6 +67,13 @@ public interface RefundRepository {
      */
     public int deleteCustomerRefund(int refund_id);
 
+    /**
+     * Get customer refunds by customer id
+     * @param customer_id - customer id 
+     * @return all entries that match customer id
+     */
+    public Object getCustomerRefundByCustomerID(int customer_id); 
+    
     /**
      * Gets customer refund by customer refund id
      * @param customer_refund_id - customer refund id

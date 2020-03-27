@@ -63,6 +63,14 @@ public class RefundRepositoryImpl implements RefundRepository {
             "SELECT * FROM Refund WHERE OOrder_ID =?";
 
     /**
+     * {@value #SELECT_ORGANIZER_REFUND_BY_ORGANIZER_ID} Query for selecting organizer refunds by organizer id 
+     */
+    private static final String SELECT_ORGANIZER_REFUND_BY_ORGANIZER_ID = 
+            "SELECT Refund_ID, Refund.OOrder_ID, Description, Refund_Updated_Time, Refund_Status " + 
+            "FROM Refund,  Organizer_Orders " + 
+            "WHERE Organizer_Orders.OOrder_ID = Refund.OOrder_ID and Organizer_Orders.Organizer_ID =?;";
+    
+    /**
      * {@value #CREATE_CUSTOMER_REFUND} Query for creating a customer refund
      */
     private static final String CREATE_CUSTOMER_REFUND =
@@ -75,6 +83,14 @@ public class RefundRepositoryImpl implements RefundRepository {
     private static final String DELETE_CUSTOMER_REFUND =
             "DELETE FROM Customer_Refund WHERE CRefund_ID =?";
 
+    /**
+     * {@value #SELECT_CUSTOMER_REFUND_BY_CUSTOMER_ID} Query for selecting customer refunds by customer id
+     */
+    private static final String SELECT_CUSTOMER_REFUND_BY_CUSTOMER_ID = 
+            "SELECT CRefund_ID, Customer_Refund.COrder_ID, CRefund_Description, CRefund_Updated_Time, CRefund_Status "
+            + "FROM Customer_Refund,  Customer_Orders "
+            + "WHERE Customer_Orders.COrder_ID = Customer_Refund.COrder_ID and Customer_Orders.Customer_ID =?";
+    
     /**
      * {@value #SELECT_CUSTOMER_REFUND_BY_CREFUND_ID} Query for selecting a customer refund by customer refund id
      */
@@ -94,11 +110,28 @@ public class RefundRepositoryImpl implements RefundRepository {
             "UPDATE Customer_Refund SET CRefund_Status = :crefund_status, "
                     + "CRefund_Description = :crefund_description, CRefund_Updated_Time = :crefund_updated_time WHERE CRefund_ID = :crefund_id;";
 
+    /**
+     * {@value GET_ID_FROM_CUSTOMER_REFUND} Query for getting the latest customer refund id
+     */
+    private static final String GET_ID_FROM_CUSTOMER_REFUND = "SELECT LAST_INSERT_ID(CRefund_ID) from Customer_Refund;";
+
+    private static final String GET_ID_FROM_ORGANIZER_REFUND = "SELECT LAST_INSERT_ID(Refund_ID) from Refund;";
+
+
     @Autowired
     NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     @Autowired
     JdbcTemplate jdbcTemplate;
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<OOrderRefundTable> getOrganizerRefundByOrganizerID(int organizer_id) {
+        logger.info("Connect to database and get organizer refund by organizer id: {}", organizer_id);
+        return jdbcTemplate.query(SELECT_ORGANIZER_REFUND_BY_ORGANIZER_ID, new Object[] {organizer_id}, new OOrderRefundRowmapper());
+    }
     
     /**
      * {@inheritDoc}
@@ -125,14 +158,15 @@ public class RefundRepositoryImpl implements RefundRepository {
      * {@inheritDoc}
      */
     @Override
-    public int createOrganizerRefund(OOrderRefundTable organizerRefundTable) {
+    public String createOrganizerRefund(OOrderRefundTable organizerRefundTable) {
         Map<String, Object> param = getOrganizerRefundMap(organizerRefundTable, Integer.MIN_VALUE);
 
         SqlParameterSource paramSource = new MapSqlParameterSource(param);
         logger.info("Create organizer refund: {}", paramSource);
-        int affectedRow = namedParameterJdbcTemplate.update(CREATE_ORGANIZER_REFUND, paramSource);
-
-        return affectedRow;
+        namedParameterJdbcTemplate.update(CREATE_ORGANIZER_REFUND, paramSource);
+        List<Map<String, Object>> ids = jdbcTemplate.queryForList(GET_ID_FROM_ORGANIZER_REFUND); 
+        String newID = ids.get(ids.size() - 1).get("LAST_INSERT_ID(Refund_ID)").toString();
+        return newID;
     }
 
     /**
@@ -209,12 +243,14 @@ public class RefundRepositoryImpl implements RefundRepository {
      * {@inheritDoc}
      */
     @Override
-    public int createCustomerRefund(COrderRefundTable customerRefundTable) {
+    public String createCustomerRefund(COrderRefundTable customerRefundTable) {
         Map<String, Object> param = getCustomerRefundMap(customerRefundTable, Integer.MIN_VALUE);
         SqlParameterSource paramSource = new MapSqlParameterSource(param);
         logger.info("Create customer refund: {}", paramSource);
-        int affectedRow = namedParameterJdbcTemplate.update(CREATE_CUSTOMER_REFUND, paramSource); 
-        return affectedRow;
+        namedParameterJdbcTemplate.update(CREATE_CUSTOMER_REFUND, paramSource); 
+        List<Map<String, Object>> ids = jdbcTemplate.queryForList(GET_ID_FROM_CUSTOMER_REFUND); 
+        String newID = ids.get(ids.size() - 1).get("LAST_INSERT_ID(CRefund_ID)").toString();
+        return newID; 
     }
 
     /**
@@ -226,8 +262,7 @@ public class RefundRepositoryImpl implements RefundRepository {
      * otherwise it's for updating
      * @return Map<String, Object>
      */
-    private Map<String, Object> getCustomerRefundMap(COrderRefundTable customerRefund,
-            Integer crefund_id) {
+    private Map<String, Object> getCustomerRefundMap(COrderRefundTable customerRefund, Integer crefund_id) {
         Map<String, Object> param = new HashMap<>();
 
         if (crefund_id != null && crefund_id != Integer.MIN_VALUE) {
@@ -270,6 +305,15 @@ public class RefundRepositoryImpl implements RefundRepository {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<COrderRefundTable> getCustomerRefundByCustomerID(int customer_id) {
+        logger.info("Connect to database and get customer refund by customer id: {}", customer_id);
+        return jdbcTemplate.query(SELECT_CUSTOMER_REFUND_BY_CUSTOMER_ID, new Object[] {customer_id}, new COrderRefundRowmapper());
+    }
+    
     /**
      * {@inheritDoc}
      */

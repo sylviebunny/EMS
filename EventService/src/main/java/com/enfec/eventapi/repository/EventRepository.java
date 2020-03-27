@@ -62,6 +62,13 @@ public interface EventRepository {
 	public List<Map> getEventByEventType(List<Map> inputEvents, String event_type);
 	
 	/**
+	 * Get a list of {@link EventTable} after today}
+	 * @param inputEvents events to be searched
+	 * @return result event list
+	 */
+	public List<Map> getEventsAfterToday(List<Map> inputEvents); 
+	
+	/**
      * Gets all events
      * @return result event list
      */
@@ -73,7 +80,5 @@ public interface EventRepository {
      * @return a list of {@link EventTable}, which should have only one element; or an empty list if no such event_id in database
      */
     public List<EventTable> getEventByID(int event_id); 
-
-
 	
 }

@@ -89,7 +89,11 @@ public class CustromerOrderController {
 						HttpStatus.OK);
 			}else {
 				logger.info("Custoer order created customerID: {}", customerOrderTable.getCustomerID());
-				return new ResponseEntity<String>("{\"message\": \"Customer order created\"}", HttpStatus.OK);
+				int length = customerOrderRepositoryImpl.getCustomerOrderByCID(String.valueOf(customerOrderTable.getCustomerID())).size()-1;
+				return new ResponseEntity<String>("{\"message\": \"Customer order created\",\n"
+						+ "\"CustomerOrderID\" :"
+						+ customerOrderRepositoryImpl.getCustomerOrderByCID(String.valueOf(customerOrderTable.getCustomerID())).get(length).getCustomerOrderID()
+						+ "\n}", HttpStatus.OK);
 			}
 		
 		}catch(DataIntegrityViolationException dataIntegrityViolationException){

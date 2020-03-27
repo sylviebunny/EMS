@@ -26,7 +26,9 @@ public class COrderRefundRowmapper implements RowMapper<COrderRefundTable> {
         cot.setCrefund_description(rs.getString("CRefund_Description"));
         cot.setCrefund_updated_time(rs.getTimestamp("CRefund_Updated_Time"));
         cot.setCrefund_status(rs.getString("CRefund_Status"));
-
+        cot.setStripe_status(rs.getString("Customer_Refund.Stripe_Status"));
+        cot.setStripe_refund_id(rs.getString("Customer_Refund.Stripe_Refund_ID"));
+        
         return cot;
     }
 }

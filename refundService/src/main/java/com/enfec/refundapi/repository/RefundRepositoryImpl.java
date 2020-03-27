@@ -66,7 +66,7 @@ public class RefundRepositoryImpl implements RefundRepository {
      * {@value #SELECT_ORGANIZER_REFUND_BY_ORGANIZER_ID} Query for selecting organizer refunds by organizer id 
      */
     private static final String SELECT_ORGANIZER_REFUND_BY_ORGANIZER_ID = 
-            "SELECT Refund_ID, Refund.OOrder_ID, Description, Refund_Updated_Time, Refund_Status " + 
+            "SELECT Refund_ID, Refund.OOrder_ID, Description, Refund_Updated_Time, Refund_Status, Refund.Stripe_Status, Refund.Stripe_Refund_ID " + 
             "FROM Refund,  Organizer_Orders " + 
             "WHERE Organizer_Orders.OOrder_ID = Refund.OOrder_ID and Organizer_Orders.Organizer_ID =?;";
     
@@ -87,7 +87,7 @@ public class RefundRepositoryImpl implements RefundRepository {
      * {@value #SELECT_CUSTOMER_REFUND_BY_CUSTOMER_ID} Query for selecting customer refunds by customer id
      */
     private static final String SELECT_CUSTOMER_REFUND_BY_CUSTOMER_ID = 
-            "SELECT CRefund_ID, Customer_Refund.COrder_ID, CRefund_Description, CRefund_Updated_Time, CRefund_Status "
+            "SELECT CRefund_ID, Customer_Refund.COrder_ID, CRefund_Description, CRefund_Updated_Time, CRefund_Status, Customer_Refund.Stripe_Status, Customer_Refund.Stripe_Refund_ID "
             + "FROM Customer_Refund,  Customer_Orders "
             + "WHERE Customer_Orders.COrder_ID = Customer_Refund.COrder_ID and Customer_Orders.Customer_ID =?";
     
@@ -140,8 +140,7 @@ public class RefundRepositoryImpl implements RefundRepository {
     public List<OOrderRefundTable> getOrganizerRefundByRefundID(int refund_id) {
         logger.info("Connect to database to search organizer refund");
         logger.info("organizer refund id: {}", refund_id);
-        return jdbcTemplate.query(SELECT_ORGANIZER_REFUND, new Object[] {refund_id},
-                new OOrderRefundRowmapper());
+        return jdbcTemplate.query(SELECT_ORGANIZER_REFUND, new Object[] {refund_id}, new OOrderRefundRowmapper());
     }
 
     /**
@@ -150,8 +149,7 @@ public class RefundRepositoryImpl implements RefundRepository {
     @Override
     public List<OOrderRefundTable> getOrganizerRefundByOorderID(int oorder_id) {
         logger.info("Connect to database to get organizer refund by organizer order id: {}", oorder_id);
-        return jdbcTemplate.query(SELECT_ORGANIZER_REFUND_BY_OORDER_ID, new Object[] {oorder_id},
-                new OOrderRefundRowmapper());
+        return jdbcTemplate.query(SELECT_ORGANIZER_REFUND_BY_OORDER_ID, new Object[] {oorder_id}, new OOrderRefundRowmapper());
     }
 
     /**
@@ -174,8 +172,7 @@ public class RefundRepositoryImpl implements RefundRepository {
      */
     @Override
     public int updateOrganizerRefund(OOrderRefundTable organizerRefundTable) {
-        Map<String, Object> param =
-                getOrganizerRefundMap(organizerRefundTable, organizerRefundTable.getRefund_id());
+        Map<String, Object> param = getOrganizerRefundMap(organizerRefundTable, organizerRefundTable.getRefund_id());
 
         SqlParameterSource paramSource = new MapSqlParameterSource(param);
         logger.info("Update organizer refund: {}", paramSource);
@@ -221,19 +218,15 @@ public class RefundRepositoryImpl implements RefundRepository {
         
         param.put("oorder_id", organizerRefund.getOorder_id()); // oorder_id cannot be null, must give oorder_id
 
-        param.put("description",
-                organizerRefund.getDescription() == null
-                        || organizerRefund.getDescription().length() == 0 ? null
-                                : organizerRefund.getDescription());
+        param.put("description", organizerRefund.getDescription() == null || organizerRefund.getDescription().length() == 0 ? 
+                null : organizerRefund.getDescription());
         
         Date date = new Date(); // Default time is current time based on machine
-        param.put("refund_updated_time",
-                organizerRefund.getRefund_updated_time() == null ? new Timestamp(date.getTime())
-                        : organizerRefund.getRefund_updated_time());
+        param.put("refund_updated_time", organizerRefund.getRefund_updated_time() == null ? 
+                new Timestamp(date.getTime()) : organizerRefund.getRefund_updated_time());
         
-        param.put("refund_status",                   
-                organizerRefund.getRefund_status() == null ? new String("Created")
-                        : organizerRefund.getRefund_status());  // Default status is created
+        param.put("refund_status", organizerRefund.getRefund_status() == null ? 
+                new String("Created") : organizerRefund.getRefund_status());  // Default status is created
 
         logger.info("Organizer refund map created: {}", param);
         return param;
@@ -243,13 +236,42 @@ public class RefundRepositoryImpl implements RefundRepository {
      * {@inheritDoc}
      */
     @Override
+    public List<COrderRefundTable> getCustomerRefundByCustomerID(int customer_id) {
+        logger.info("Connect to database and get customer refund by customer id: {}", customer_id);
+        return jdbcTemplate.query(SELECT_CUSTOMER_REFUND_BY_CUSTOMER_ID, new Object[] {customer_id}, new COrderRefundRowmapper());
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<COrderRefundTable> getCustomerRefundByCRefundID(int crefund_id) {
+        logger.info("Connect to database and get customer refund by customer refund id: {}", crefund_id);
+        return jdbcTemplate.query(SELECT_CUSTOMER_REFUND_BY_CREFUND_ID, new Object[] {crefund_id}, new COrderRefundRowmapper());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<COrderRefundTable> getCustomerRefundByCorderID(int corder_id) {
+        logger.info("Connect to database and get customer refund by customer order id: {}", corder_id);
+        return jdbcTemplate.query(SELECT_CUSTOMER_REFUND_BY_CORDER_ID, new Object[] {corder_id}, new COrderRefundRowmapper());
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String createCustomerRefund(COrderRefundTable customerRefundTable) {
         Map<String, Object> param = getCustomerRefundMap(customerRefundTable, Integer.MIN_VALUE);
         SqlParameterSource paramSource = new MapSqlParameterSource(param);
+        
         logger.info("Create customer refund: {}", paramSource);
         namedParameterJdbcTemplate.update(CREATE_CUSTOMER_REFUND, paramSource); 
         List<Map<String, Object>> ids = jdbcTemplate.queryForList(GET_ID_FROM_CUSTOMER_REFUND); 
         String newID = ids.get(ids.size() - 1).get("LAST_INSERT_ID(CRefund_ID)").toString();
+        
         return newID; 
     }
 
@@ -271,19 +293,15 @@ public class RefundRepositoryImpl implements RefundRepository {
 
         param.put("corder_id", customerRefund.getCorder_id());         // corder_id cannot be null, corder_id must be given
 
-        param.put("crefund_description",
-                customerRefund.getCrefund_description() == null
-                        || customerRefund.getCrefund_description().length() == 0 ? null
-                                : customerRefund.getCrefund_description());
+        param.put("crefund_description", customerRefund.getCrefund_description() == null || customerRefund.getCrefund_description().length() == 0 ? 
+                null : customerRefund.getCrefund_description());
 
         Date date = new Date();             // Default time is current time based on machine
-        param.put("crefund_updated_time",
-                customerRefund.getCrefund_updated_time() == null ? new Timestamp(date.getTime())
-                        : customerRefund.getCrefund_updated_time());
+        param.put("crefund_updated_time", customerRefund.getCrefund_updated_time() == null ? 
+                        new Timestamp(date.getTime()) : customerRefund.getCrefund_updated_time());
 
-        param.put("crefund_status",
-                customerRefund.getCrefund_status() == null ? new String("Created")
-                        : customerRefund.getCrefund_status());  // Default status is created
+        param.put("crefund_status", customerRefund.getCrefund_status() == null ? 
+                new String("Created") : customerRefund.getCrefund_status());  // Default status is created
         logger.info("Customer refund map created: {}", param);
         return param;
     }
@@ -303,35 +321,6 @@ public class RefundRepositoryImpl implements RefundRepository {
             int affectedRow = jdbcTemplate.update(DELETE_CUSTOMER_REFUND, crefund_id);
             return affectedRow;
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public List<COrderRefundTable> getCustomerRefundByCustomerID(int customer_id) {
-        logger.info("Connect to database and get customer refund by customer id: {}", customer_id);
-        return jdbcTemplate.query(SELECT_CUSTOMER_REFUND_BY_CUSTOMER_ID, new Object[] {customer_id}, new COrderRefundRowmapper());
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public List<COrderRefundTable> getCustomerRefundByCRefundID(int crefund_id) {
-        logger.info("Connect to database and get customer refund by customer refund id: {}", crefund_id);
-        return jdbcTemplate.query(SELECT_CUSTOMER_REFUND_BY_CREFUND_ID, new Object[] {crefund_id},
-                new COrderRefundRowmapper());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public List<COrderRefundTable> getCustomerRefundByCorderID(int corder_id) {
-        logger.info("Connect to database and get customer refund by customer order id: {}", corder_id);
-        return jdbcTemplate.query(SELECT_CUSTOMER_REFUND_BY_CORDER_ID, new Object[] {corder_id},
-                new COrderRefundRowmapper());
     }
 
     /**

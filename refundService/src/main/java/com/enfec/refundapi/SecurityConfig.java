@@ -37,8 +37,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
      */
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-        auth.inMemoryAuthentication().withUser("admin").password("{noop}***").roles("USER");
-        auth.inMemoryAuthentication().withUser("ui").password("{noop}***").roles("USER");
+        auth.inMemoryAuthentication().withUser("admin").password("{noop}").roles("USER");
+        auth.inMemoryAuthentication().withUser("ui").password("{noop}").roles("USER");
     }
     
     private static final String[] AUTH_WHITELIST = {

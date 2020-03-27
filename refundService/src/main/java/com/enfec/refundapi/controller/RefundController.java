@@ -34,15 +34,45 @@ public class RefundController {
     
     @Autowired
     RefundRepositoryImpl refundRepositoryImpl;
-
+    
+    /** 
+     * Get organizer refunds by organizer id
+     * @param organizer_id
+     * @return ResponseEntity with message and data 
+     */
+    @RequestMapping(value = "/organizer_refund/get_organizer_refund/{organizer_id}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
+    public ResponseEntity<String> getOrganzerRefundByOrganizerID(@PathVariable int organizer_id) {
+        try {
+            List<OOrderRefundTable> organizerRefundList = refundRepositoryImpl.getOrganizerRefundByOrganizerID(organizer_id); 
+            
+            if (organizerRefundList == null || organizerRefundList.size() == 0) {
+                logger.info("No organizer refund found for customer_id: " + organizer_id);
+                return new ResponseEntity<>("{\"message\" : \"No organizer refund found \"}", 
+                        HttpStatus.OK); 
+            } else {
+                logger.info(String.format("%s organizer refund found for customer id: %s", organizerRefundList.size(), organizer_id));
+                return new ResponseEntity<>(new Gson().toJson(organizerRefundList), 
+                        HttpStatus.OK); 
+            }
+        } catch (CannotGetJdbcConnectionException ce) {
+            logger.error("Fail to connect database: {}", ce.getMessage());
+            return new ResponseEntity<>("{\"message\" : \"Fail to connect database\"}",
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            logger.error("Input organizer id: {}", organizer_id);
+            logger.error("Exception info in searching otganizer refund: {}", e.getMessage());
+            return new ResponseEntity<>("{\"message\" : \"Unknown error\"}",
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    
     /**
      * Get organizer refund information from database by organizer refund id
      * 
      * @param organizer_refund_id. Cannot be null and must be positive
      * @return ResponseEntity with message and data 
      */
-    @RequestMapping(value = "/organizer_refund/search/{organizer_refund_id}",
-            method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
+    @RequestMapping(value = "/organizer_refund/search/{organizer_refund_id}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
     public ResponseEntity<String> getOrganizerRefundByRefundID(
             @PathVariable int organizer_refund_id) {
         try {
@@ -108,21 +138,19 @@ public class RefundController {
      * @param organizerRefundTable. Organizer_order_id Cannot be null and must exist in database; 
      * @return ResponseEntity with message
      */
-    @RequestMapping(value = "/organizer_refund/create", method = RequestMethod.POST,
-            produces = "application/json;charset=UTF-8")
+    @RequestMapping(value = "/organizer_refund/create", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
     public ResponseEntity<String> createOrganizerRefund(
             @RequestBody(required = true) OOrderRefundTable organizerRefundTable) {
         try {
-            int affectedRow = refundRepositoryImpl.createOrganizerRefund(organizerRefundTable);
+            String newORefundID = refundRepositoryImpl.createOrganizerRefund(organizerRefundTable);
 
-            if (affectedRow == 0) {
+            if (newORefundID == null || newORefundID.length() == 0) {
                 logger.info("Organizer refund not created, organizer order id: {}", organizerRefundTable.getOorder_id());
                 return new ResponseEntity<>("{\"message\" : \"Organizer refund not created\"}",
                         HttpStatus.OK);
             } else {
                 logger.info("Organizer refund successfully created");
-                return new ResponseEntity<>(
-                        "{\"message\" : \"Organizer refund successfully created\"}",
+                return new ResponseEntity<>(String.format("{\"Organizer refund ID\" : \"%s\"}", newORefundID),
                         HttpStatus.OK);
             }
         } catch (DataIntegrityViolationException di) {
@@ -211,7 +239,38 @@ public class RefundController {
     }
 
     /**
-     * Get customer refund
+     * Get customer refunds by customer id
+     * @param customer_id. Cannot be null and must be positive
+     * @return ResponseEntity with message and data
+     */
+    @RequestMapping(value = "/customer_refund/get_customer_refund/{customer_id}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
+    public ResponseEntity<String> getCustomerRefundByCustomerID(@PathVariable int customer_id) {
+        try {
+            List<COrderRefundTable> customerRefundList = refundRepositoryImpl.getCustomerRefundByCustomerID(customer_id); 
+            
+            if (customerRefundList == null || customerRefundList.size() == 0) {
+                logger.info("No customer refund found for customer_id: " + customer_id);
+                return new ResponseEntity<>("{\"message\" : \"No customer refund found \"}", 
+                        HttpStatus.OK); 
+            } else {
+                logger.info(String.format("%s customer refund found for customer id: %s", customerRefundList.size(), customer_id));
+                return new ResponseEntity<>(new Gson().toJson(customerRefundList), 
+                        HttpStatus.OK); 
+            }
+        } catch (CannotGetJdbcConnectionException ce) {
+            logger.error("Fail to connect database: {}", ce.getMessage());
+            return new ResponseEntity<>("{\"message\" : \"Fail to connect database\"}",
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            logger.error("Input customer id: {}", customer_id);
+            logger.error("Exception info in searching customer refund: {}", e.getMessage());
+            return new ResponseEntity<>("{\"message\" : \"Unknown error\"}",
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+        
+    /**
+     * Get customer refund by customer refund id
      * 
      * @param customer_refund_id. Cannot be null and must be positive
      * @return ResponseEntity with message and data
@@ -231,8 +290,7 @@ public class RefundController {
                         HttpStatus.OK);
             } else {
                 logger.info("Customer refund found by customer refund id: {}", customer_refund_id);
-                return new ResponseEntity<>(new Gson().toJson(
-                        (refundRepositoryImpl.getCustomerRefundByCRefundID(customer_refund_id))),
+                return new ResponseEntity<>(new Gson().toJson(customerRefundList),
                         HttpStatus.OK);
             }
         } catch (CannotGetJdbcConnectionException ce) {
@@ -248,7 +306,7 @@ public class RefundController {
     }
 
     /**
-     * Get customer refund
+     * Get customer refund by customer order id
      * 
      * @param customer_order_id. Cannot be null and must be positive
      * @return ResponseEntity with message and data
@@ -283,25 +341,24 @@ public class RefundController {
     }
 
     /**
-     * Create an organizer refund and insert information into database
+     * Create a customer refund and insert information into database
      * 
      * @param CustomerRefundTable. Customer_order_id cannot be null and must exist in database; 
      * @return ResponseEntity with message
      */
-    @RequestMapping(value = "/customer_refund/create", method = RequestMethod.POST,
-            produces = "application/json;charset=UTF-8")
+    @RequestMapping(value = "/customer_refund/create", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
     public ResponseEntity<String> createCustomerRefund(
             @RequestBody(required = true) COrderRefundTable customerRefund) {
         try {
-            int affectedRow = refundRepositoryImpl.createCustomerRefund(customerRefund);
+            String newCRefund_ID = refundRepositoryImpl.createCustomerRefund(customerRefund);
 
-            if (affectedRow == 0) {
+            if (newCRefund_ID == null || newCRefund_ID.length() == 0) {
                 logger.info("Customer refund not created");
                 return new ResponseEntity<>("{\"message\" : \"Customer refund not created\"}",
                         HttpStatus.OK);
             } else {
                 logger.info("Customer refund successfully created for customer order id: " + customerRefund.getCorder_id());
-                return new ResponseEntity<>("{\"message\" : \"Customer refund successfully created\"}",
+                return new ResponseEntity<>(String.format("{\"Customer refund ID\" : \"%s\"}", newCRefund_ID),
                         HttpStatus.OK);
             }
         } catch (CannotGetJdbcConnectionException ce) {
@@ -322,7 +379,7 @@ public class RefundController {
     }
 
     /**
-     * Update an organizer refund information
+     * Update an customer refund information
      * 
      * @param CustomerRefundTable. Customer_refund_id cannot be null and must exist in database;  
      * @return ResponseEntity with message
@@ -362,7 +419,7 @@ public class RefundController {
     }
 
     /**
-     * Delete an organizer refund
+     * Delete a customer refund
      * 
      * @param customer_refund_id. Cannot be null and must be positive 
      * @return ResponseEntity with message

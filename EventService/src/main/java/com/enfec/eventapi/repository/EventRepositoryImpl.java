@@ -27,6 +27,7 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /************************************************
@@ -401,6 +402,24 @@ public class EventRepositoryImpl implements EventRepository {
 	    logger.info("Connect with database to get all events");
 		return jdbcTemplate.query(GET_ALL_EVENT, new EventRowmapper()); 
 	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+    @Override
+    public List<Map> getEventsAfterToday(List<Map> inputEvents) {
+        List<Map> results = new ArrayList<>(); 
+        
+        Timestamp currentTime = new Timestamp(System.currentTimeMillis()); 
+        for (Map eachEvent: inputEvents) {
+            Timestamp currentEndTime = Timestamp.valueOf(eachEvent.get("event_end_time").toString()); 
+            if (currentEndTime.after(currentTime)) {
+                results.add(eachEvent); 
+            }
+        }
+        Collections.sort(results, new EventComparatorByStartTime()); 
+        return results; 
+    }
 	
 	/**
 	 * {@inheritDoc}

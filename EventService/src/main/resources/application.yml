@@ -10,3 +10,12 @@ spring.datasource.driver-class-name: com.mysql.cj.jdbc.Driver
 spring.datasource.hikari.connection-timeout: 60000
 # max 5
 spring.datasource.hikari.maximum-pool-size: 3
+
+spring.servlet.multipart.max-file-size: 2MB
+spring.servlet.multipart.max-request-size: 2MB
+
+amazonProperties:
+ endpointUrl: https://s3.us-west-2.amazonaws.com
+ accessKey: AKIAS6ILLV5RPLEIC7SE
+ secretKey: 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
+ bucketName: enfectry20

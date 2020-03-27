@@ -1,8 +1,5 @@
 package com.enfec.eventapi.controller;
 
-import com.enfec.eventapi.model.EventTable;
-import com.enfec.eventapi.repository.EventRepositoryImpl;
-import com.google.gson.Gson;
 import java.rmi.NotBoundException;
 import java.sql.Timestamp;
 import java.util.Date;
@@ -23,7 +20,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+import com.enfec.eventapi.model.EventTable;
+import com.enfec.eventapi.repository.AmazonClient;
+import com.enfec.eventapi.repository.EventRepositoryImpl;
+import com.google.gson.Gson;
 
 /************************************************
 *
@@ -38,8 +41,11 @@ public class EventController {
 
     private static final Logger logger = LoggerFactory.getLogger(EventController.class); 
     
-	@Autowired
+    @Autowired
 	EventRepositoryImpl eventRepositoryImpl;
+    
+    @Autowired
+    private AmazonClient amazonClient;
 
 	/**
 	 * Get API for events with given event ID
@@ -51,8 +57,9 @@ public class EventController {
 	    if (event_id == null) {
 	        List<EventTable> getAllEvent = eventRepositoryImpl.getAllEvents();
 	        List<Map> allEvents = eventRepositoryImpl.getFilteredEventsWithDateRange(getAllEvent, null, null); 
+	        List<Map> afterToday = eventRepositoryImpl.getEventsAfterToday(allEvents); 
 	        logger.info("No input word or filter, print out all events");
-	        return new ResponseEntity<>(new Gson().toJson(allEvents),
+	        return new ResponseEntity<>(new Gson().toJson(afterToday),
 	                HttpStatus.OK) ; 
 	    }
 		try {
@@ -85,8 +92,9 @@ public class EventController {
 		List<EventTable> getAllEvent = eventRepositoryImpl.getAllEvents();
 		    
 		try {
-			List<Map> resultEvents = eventRepositoryImpl.getFilteredEventsByWordFilter(getAllEvent, word);
-
+			List<Map> afterFilterEvents = eventRepositoryImpl.getFilteredEventsByWordFilter(getAllEvent, word);
+			List<Map> resultEvents = eventRepositoryImpl.getEventsAfterToday(afterFilterEvents); 
+			
 			if (resultEvents.isEmpty()) {
 			    logger.info("No event found, word: {}", word);
 				return new ResponseEntity<>("{\"message\" : \"No event found\"}", HttpStatus.OK);
@@ -143,8 +151,10 @@ public class EventController {
 				result_events_by_zipcode = result_events_within_date;
 			}
 			
-			List<Map> result_events = eventRepositoryImpl.getEventByEventType(result_events_by_zipcode, event_type);  // Get events with specific type
+			List<Map> afterFilterEvents = eventRepositoryImpl.getEventByEventType(result_events_by_zipcode, event_type);  // Get events with specific type
 
+			List<Map> result_events = eventRepositoryImpl.getEventsAfterToday(afterFilterEvents); 
+			
 			if (result_events == null || result_events.size() == 0) {
 			    logger.info("Based on given criteria, no event found");
 				return new ResponseEntity<>("{\"message\" : \"No event found\"}", HttpStatus.OK);
@@ -273,4 +283,26 @@ public class EventController {
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
 	}
+	
+	/**
+	 * 
+	 * @param multipartFile Upload Image to cloud storage
+	 * @return URL of the image
+	 */
+    @RequestMapping(value = "/event/uploadImage", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+    public ResponseEntity<String> uploadFile(@RequestPart(value = "file") MultipartFile multipartFile) {
+        try {
+            String newURL = this.amazonClient.uploadFile(multipartFile);
+
+            logger.info("Image URL in S3 is: " + newURL); 
+            return new ResponseEntity<>("{\"Image URL\" : \"" + newURL + "\"}", HttpStatus.OK);
+        } catch (IllegalStateException ilex) {
+          logger.error("Error messageL {}", ilex.getMessage());
+          return new ResponseEntity<>("{\"message\" : \"Upload image should be under 2MB\"}", HttpStatus.INTERNAL_SERVER_ERROR); 
+        } catch (Exception ex) {
+            logger.error("Error message: {}", ex.getMessage());
+            return new ResponseEntity<>("{\"message\" : \"Unknown Error, need contact admin\"}",
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

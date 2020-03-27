@@ -8,5 +8,5 @@ public class ChargeRequest {
     private double amount;
     private String token;
     private int order_id;
-    private String user_type;
+//    private String user_type;
 }

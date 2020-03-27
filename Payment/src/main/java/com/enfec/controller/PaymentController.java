@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.enfec.model.ChargeRequest;
@@ -21,7 +22,7 @@ import com.stripe.model.Refund;
 /************************************************
 *
 * Author: Sylvia Zhao
-* Assignment: Payment and Refund API using Stripe
+* Assignment: Charge and Refund API using Stripe
 * Class: PaymentController
 *
 ************************************************/
@@ -42,25 +43,25 @@ public class PaymentController {
 	 * @param chargeRequest: ChargeRequest, contains requested token,amount for payment, order id and user type
 	 * @return ResponseEntity with message and data
 	 */
-    @PostMapping("/charge")
+    @RequestMapping(value = "/charge", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
     public ResponseEntity<String> chargeCard(@RequestBody ChargeRequest chargeRequest) throws StripeException {
         Charge charge = this.stripeClient.chargeCreditCard(chargeRequest);
         String chargeId = charge.getId();
         Long amount = charge.getAmount();
         String status = charge.getStatus();
         
-        String type = chargeRequest.getUser_type();
+//        String type = chargeRequest.getUser_type();
         int orderID = chargeRequest.getOrder_id();
         
         String dbResult = null;
-        if (type.equals("customer")) {
-        	int count = this.stripeClient.updateCusOrder(status, chargeId, orderID);
-        	if (count > 0) {
-        		dbResult = "Updated.";
-        	} else {
-        		dbResult = "Something wrong...Database cannot update.";
-        	}
-        } else if (type.equals("organizer")) {
+        int count = this.stripeClient.updateCusOrder(status, chargeId, orderID);
+        if (count > 0) {
+        	dbResult = "\"Updated\"";
+        } else {
+        	dbResult = "\"Something wrong...Database cannot update\"";
+        }
+        /*
+        else if (type.equals("organizer")) {
         	int count = this.stripeClient.updateOrgOrder(status, chargeId, orderID);
         	if (count > 0) {
         		dbResult = "Updated.";
@@ -68,9 +69,10 @@ public class PaymentController {
         		dbResult = "Something wrong...Database cannot update.";
         	}
         }
-        return new ResponseEntity<>("{\"message\": \"Your card has been charged sucessfully\", \n" 
-				+ "\"charge_id\": " + chargeId + "\n"
-					+ "\"amount in USD\": " + amount/100.0 + "\n"
+        */
+        return new ResponseEntity<>("{\"message\": \"Your card has been charged successfully\", \n" 
+				+ "\"charge_id\": \"" + chargeId + "\",\n"
+					+ "\"amount in USD\": " + amount/100.0 + ",\n"
 						+ "\"database result\": " + dbResult + "\n}", HttpStatus.OK);
     }
     
@@ -80,24 +82,24 @@ public class PaymentController {
 	 * @param refundRequest: RefundRequest, contains charge id, order id and user type
 	 * @return ResponseEntity with message and data
 	 */
-    @PostMapping("/refund")
+    @RequestMapping(value = "/refund", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
     public ResponseEntity<String> getRefund(@RequestBody RefundRequest refundRequest) throws StripeException {
         Refund refund = this.stripeClient.createRefund(refundRequest);
         String refundId = refund.getId();
         Long amount = refund.getAmount();
         String status = refund.getStatus();
         
-        String type = refundRequest.getUser_type();
+//        String type = refundRequest.getUser_type();
         int orderID = refundRequest.getOrder_id();
         
         String dbResult = null;
-        if (type.equals("customer")) {
-        	int count = this.stripeClient.updateCusRefund(status, refundId, orderID);
-        	if (count > 0) {
-        		dbResult = "Updated.";
-        	} else {
-        		dbResult = "Something wrong...Database cannot update.";
-        	}
+        int count = this.stripeClient.updateCusRefund(status, refundId, orderID);
+        if (count > 0) {
+        	dbResult = "\"Updated\"";
+        } else {
+        	dbResult = "\"Something wrong...Database cannot update\"";
+        }
+        /*
         } else if (type.equals("organizer")) {
         	int count = this.stripeClient.updateOrgRefund(status, refundId, orderID);
         	if (count > 0) {
@@ -105,10 +107,10 @@ public class PaymentController {
         	} else {
         		dbResult = "Something wrong...Database cannot update.";
         	}
-        }
+        }*/
         return new ResponseEntity<>("{\"message\": \"Congratulations, your charge has been refunded\", \n" 
-				+ "\"refund_id\": " + refundId + "\n"
-					+ "\"amount in USD\": " + amount/100.0 + "\n"
+				+ "\"refund_id\": \"" + refundId + "\",\n"
+					+ "\"amount in USD\": " + amount/100.0 + ",\n"
 						+ "\"database result\": " + dbResult + "\n}", HttpStatus.OK);
     }
     

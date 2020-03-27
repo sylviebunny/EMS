@@ -7,5 +7,5 @@ public class RefundRequest {
 	
 	private String charge_id;
     private int order_id;
-    private String user_type;
+//    private String user_type;
 }

@@ -515,7 +515,7 @@ public class EventRepositoryImpl implements EventRepository {
 		param.put("derived_days_duration", eventTable.getDerived_days_duration() == null || eventTable.getDerived_days_duration().isEmpty() ? 
 				null : eventTable.getDerived_days_duration());	
 		
-		param.put("event_cost", eventTable.getEvent_cost() == null ? 
+		param.put("event_cost", eventTable.getEvent_cost() == null || eventTable.getEvent_cost().length() == 0 ? 
 				null : eventTable.getEvent_cost());
 		
 		param.put("discount", eventTable.getDiscount() == null ? 

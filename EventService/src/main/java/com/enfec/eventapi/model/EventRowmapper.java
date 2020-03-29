@@ -49,7 +49,7 @@ public class EventRowmapper implements RowMapper<EventTable> {
 		et.setDerived_days_duration(
 				hasColumn(rs, "Derived_Days_Duration") ? rs.getString("Derived_Days_Duration") : null);
 
-		et.setEvent_cost(hasColumn(rs, "Event_Cost") ? rs.getDouble("Event_Cost") : null);
+		et.setEvent_cost(hasColumn(rs, "Event_Cost") ? rs.getString("Event_Cost") : null);
 
 		et.setDiscount(hasColumn(rs, "Discount") ? rs.getDouble("Discount") : null);
 

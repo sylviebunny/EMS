@@ -74,9 +74,9 @@ public class EventTable {
 	private String derived_days_duration;
 	
 	/**
-	 * Event cost
+	 * General event cost
 	 */
-	private Double event_cost;
+	private String event_cost;
 	
 	/**
 	 * Discount rate

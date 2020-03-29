@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
@@ -150,9 +151,13 @@ public class RefundController {
                         HttpStatus.OK);
             } else {
                 logger.info("Organizer refund successfully created");
-                return new ResponseEntity<>(String.format("{\"Organizer refund ID\" : \"%s\"}", newORefundID),
+                return new ResponseEntity<>(String.format("{\"message\" : \"Organizer order refund successfully created, refund ID: %s\"}", newORefundID),
                         HttpStatus.OK);
             }
+        } catch (DuplicateKeyException d) {
+            logger.error("Organizer order refund duplicate created");
+            return new ResponseEntity<>("{\"message\" : \"Organizer order refund already created, cannot create again\"}",
+                    HttpStatus.BAD_REQUEST);
         } catch (DataIntegrityViolationException di) {
             logger.error("Invalid input: {}", organizerRefundTable.getOorder_id());
             return new ResponseEntity<>("{\"message\" : \"Invalid input, lack of data\"}",
@@ -358,13 +363,17 @@ public class RefundController {
                         HttpStatus.OK);
             } else {
                 logger.info("Customer refund successfully created for customer order id: " + customerRefund.getCorder_id());
-                return new ResponseEntity<>(String.format("{\"Customer refund ID\" : \"%s\"}", newCRefund_ID),
+                return new ResponseEntity<>(String.format("{\"message\" : \"Customer order refund successfully created\"}"),
                         HttpStatus.OK);
             }
         } catch (CannotGetJdbcConnectionException ce) {
             logger.error("Fail to connect database: {}", ce.getMessage());
             return new ResponseEntity<>("{\"message\" : \"Fail to connect database\"}",
                     HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (DuplicateKeyException d) {
+            logger.error("Customer order refund duplicate created");
+            return new ResponseEntity<>("{\"message\" : \"Customer order refund already created, cannot create again\"}",
+                    HttpStatus.BAD_REQUEST);
         } catch (DataIntegrityViolationException di) {
             logger.error("Invalid input");
             logger.error("Customer order id: {}", customerRefund.getCorder_id());

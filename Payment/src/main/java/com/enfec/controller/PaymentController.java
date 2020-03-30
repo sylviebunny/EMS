@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.enfec.model.ChargeRequest;
 import com.enfec.model.RefundRequest;
 import com.enfec.service.StripeClient;
+import com.stripe.exception.InvalidRequestException;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Charge;
 import com.stripe.model.Customer;
@@ -45,35 +46,43 @@ public class PaymentController {
 	 */
     @RequestMapping(value = "/charge", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
     public ResponseEntity<String> chargeCard(@RequestBody ChargeRequest chargeRequest) throws StripeException {
-        Charge charge = this.stripeClient.chargeCreditCard(chargeRequest);
-        String chargeId = charge.getId();
-        Long amount = charge.getAmount();
-        String status = charge.getStatus();
-        
-//        String type = chargeRequest.getUser_type();
-        int orderID = chargeRequest.getOrder_id();
-        
-        String dbResult = null;
-        int count = this.stripeClient.updateCusOrder(status, chargeId, orderID);
-        if (count > 0) {
-        	dbResult = "\"Updated\"";
-        } else {
-        	dbResult = "\"Something wrong...Database cannot update\"";
-        }
-        /*
-        else if (type.equals("organizer")) {
-        	int count = this.stripeClient.updateOrgOrder(status, chargeId, orderID);
-        	if (count > 0) {
-        		dbResult = "Updated.";
-        	} else {
-        		dbResult = "Something wrong...Database cannot update.";
-        	}
-        }
-        */
-        return new ResponseEntity<>("{\"message\": \"Your card has been charged successfully\", \n" 
-				+ "\"charge_id\": \"" + chargeId + "\",\n"
-					+ "\"amount in USD\": " + amount/100.0 + ",\n"
-						+ "\"database result\": " + dbResult + "\n}", HttpStatus.OK);
+    	try {
+	        Charge charge = this.stripeClient.chargeCreditCard(chargeRequest);
+	        String chargeId = charge.getId();
+	        Long amount = charge.getAmount();
+	        String status = charge.getStatus();
+	        
+	//        String type = chargeRequest.getUser_type();
+	        int orderID = chargeRequest.getOrder_id();
+	        
+	        String dbResult = null;
+	        int count = this.stripeClient.updateCusOrder(status, chargeId, orderID);
+	        if (count > 0) {
+	        	dbResult = "\"Updated\"";
+	        } else {
+	        	dbResult = "\"Something wrong...Database cannot update\"";
+	        }
+	        /*
+	        else if (type.equals("organizer")) {
+	        	int count = this.stripeClient.updateOrgOrder(status, chargeId, orderID);
+	        	if (count > 0) {
+	        		dbResult = "Updated.";
+	        	} else {
+	        		dbResult = "Something wrong...Database cannot update.";
+	        	}
+	        }
+	        */
+	        return new ResponseEntity<>("{\"message\": \"Your card has been charged successfully\", \n" 
+					+ "\"charge_id\": \"" + chargeId + "\",\n"
+						+ "\"amount in USD\": " + amount/100.0 + ",\n"
+							+ "\"database result\": " + dbResult + "\n}", HttpStatus.OK);
+    	} catch (InvalidRequestException exception) {
+			return new ResponseEntity<>("{\"message\" : \"You cannot use a Stripe token more than once\"}",
+					HttpStatus.INTERNAL_SERVER_ERROR);
+		} catch (Exception exception) {
+			return new ResponseEntity<>("{\"message\" : \"Exception in charging a card, please contact admin\"}",
+					HttpStatus.INTERNAL_SERVER_ERROR);
+		}
     }
     
 	/**
@@ -84,34 +93,40 @@ public class PaymentController {
 	 */
     @RequestMapping(value = "/refund", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
     public ResponseEntity<String> getRefund(@RequestBody RefundRequest refundRequest) throws StripeException {
-        Refund refund = this.stripeClient.createRefund(refundRequest);
-        String refundId = refund.getId();
-        Long amount = refund.getAmount();
-        String status = refund.getStatus();
-        
-//        String type = refundRequest.getUser_type();
-        int orderID = refundRequest.getOrder_id();
-        
-        String dbResult = null;
-        int count = this.stripeClient.updateCusRefund(status, refundId, orderID);
-        if (count > 0) {
-        	dbResult = "\"Updated\"";
-        } else {
-        	dbResult = "\"Something wrong...Database cannot update\"";
-        }
-        /*
-        } else if (type.equals("organizer")) {
-        	int count = this.stripeClient.updateOrgRefund(status, refundId, orderID);
-        	if (count > 0) {
-        		dbResult = "Updated.";
-        	} else {
-        		dbResult = "Something wrong...Database cannot update.";
-        	}
-        }*/
-        return new ResponseEntity<>("{\"message\": \"Congratulations, your charge has been refunded\", \n" 
-				+ "\"refund_id\": \"" + refundId + "\",\n"
-					+ "\"amount in USD\": " + amount/100.0 + ",\n"
-						+ "\"database result\": " + dbResult + "\n}", HttpStatus.OK);
+    	String chargeID = refundRequest.getCharge_id();
+    	try {
+	        Refund refund = this.stripeClient.createRefund(refundRequest);
+	        String refundId = refund.getId();
+	        Long amount = refund.getAmount();
+	        String status = refund.getStatus();
+	        
+	//        String type = refundRequest.getUser_type();
+	        int orderID = refundRequest.getOrder_id();
+	        
+	        String dbResult = null;
+	        int count = this.stripeClient.updateCusRefund(status, refundId, orderID);
+	        if (count > 0) {
+	        	dbResult = "\"Updated\"";
+	        } else {
+	        	dbResult = "\"Something wrong...Database cannot update\"";
+	        }
+	        /*
+	        } else if (type.equals("organizer")) {
+	        	int count = this.stripeClient.updateOrgRefund(status, refundId, orderID);
+	        	if (count > 0) {
+	        		dbResult = "Updated.";
+	        	} else {
+	        		dbResult = "Something wrong...Database cannot update.";
+	        	}
+	        }*/
+	        return new ResponseEntity<>("{\"message\": \"Congratulations, your charge has been refunded\", \n" 
+					+ "\"refund_id\": \"" + refundId + "\",\n"
+						+ "\"amount in USD\": " + amount/100.0 + ",\n"
+							+ "\"database result\": " + dbResult + "\n}", HttpStatus.OK);
+	    } catch (Exception exception) {
+			return new ResponseEntity<>("{\"message\" : \"This charge has already been refunded\", \n"
+					+ "\"charge_id\": \"" + chargeID + "\"\n}", HttpStatus.INTERNAL_SERVER_ERROR);
+		}	
     }
     
     /*

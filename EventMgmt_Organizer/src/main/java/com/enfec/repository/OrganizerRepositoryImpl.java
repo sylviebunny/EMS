@@ -64,8 +64,8 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 	 */
 	@Override
 	public int createOrganizer(OrganizerTable organizerTable) {
-		String REGISTER_ORGANIZER = "INSERT INTO Organizers(Organizer_Name, Email_Address, Password, Other_Details) VALUES "
-		+ "(:organizer_name, :email_address, :password, :other_details)";
+		String REGISTER_ORGANIZER = "INSERT INTO Organizers(Organizer_Name, Email_Address, Password, Phone) VALUES "
+		+ "(:organizer_name, :email_address, :password, :phone)";
 		String CREATE_DEFAULT_ADDRESS = "INSERT INTO `Address` (`Organizer_ID`) VALUES(?)";
 		String CREATE_DEFAULT_CONTACT = "INSERT INTO `Contacts` (`Organizer_ID`, `Address_ID`) VALUES(?,?)";
 
@@ -252,8 +252,8 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 	@Override
 	public int createOrganizerContact(OrganizerContactTable organizerContactTable) {
 		// Insert contact information of organizer into Contact table
-		String CREATE_REGISTER_CONTACT_INFO = "INSERT INTO Contacts(Organizer_ID, Address_ID, Contact_Name, Telephone, Web_Site_Address) VALUES"
-				+ "(:organizer_id, :address_id, :contact_name, :telephone, :web_site_address)";
+		String CREATE_REGISTER_CONTACT_INFO = "INSERT INTO Contacts(Organizer_ID, Address_ID, Contact_Name, Contact_Telephone, Web_Site_Address) VALUES"
+				+ "(:organizer_id, :address_id, :contact_name, :contact_telephone, :web_site_address)";
 
 		try {
 			Map<String, Object> param = getOrganizerContactMap(organizerContactTable);
@@ -277,7 +277,7 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 	@Override
 	public List<OrganizerContactTable> getOrganizerContactInfo(int organizer_id) {
 		String SELECT_ORGANIZER_CONTACT = "SELECT Contact_ID, Organizer_ID, Address_ID, "
-				+ "Contact_Name, Telephone, Web_Site_Address from Contacts where Contacts.Organizer_ID = ?;";
+				+ "Contact_Name, Contact_Telephone, Web_Site_Address from Contacts where Contacts.Organizer_ID = ?;";
 		return jdbcTemplate.query(SELECT_ORGANIZER_CONTACT, new Object[] { organizer_id },
 				new OrganizerContactRowmapper());
 	}
@@ -293,7 +293,7 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 	public int updateOrganizerContact(OrganizerContactTable organizerContactTable) {
 		// Update contact information of organizer into contact table
 		String UPDATE_ORGANIZER_CONTACT_INFO = "UPDATE Contacts SET Contact_Name=:contact_name, "
-				+ "Telephone=:telephone, Web_Site_Address=:web_site_address WHERE "
+				+ "Contact_Telephone=:contact_telephone, Web_Site_Address=:web_site_address WHERE "
 				+ "Organizer_ID=:organizer_id AND Contact_ID =:contact_id";
 
 		try {
@@ -332,9 +332,9 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 		param.put("password", organizerTable.getPassword() == null || organizerTable.getPassword().isEmpty() ? null
 				: Base64.getEncoder().encode((organizerTable.getPassword().getBytes())));
 
-		param.put("other_details",
-				organizerTable.getOther_details() == null || organizerTable.getOther_details().isEmpty() ? null
-						: organizerTable.getOther_details());
+		param.put("phone",
+				organizerTable.getPhone() == null || organizerTable.getPhone().isEmpty() ? null
+						: organizerTable.getPhone());
 		param.put("actived", organizerTable.getActived());
 		return param;
 	}
@@ -372,8 +372,8 @@ public class OrganizerRepositoryImpl implements OrganizerRepository {
 		contactMap.put("address_id", organizerContactTable.getAddress_id());
 		contactMap.put("contact_name",
 				organizerContactTable.getContact_name().isEmpty() ? null : organizerContactTable.getContact_name());
-		contactMap.put("telephone",
-				organizerContactTable.getTelephone().isEmpty() ? null : organizerContactTable.getTelephone());
+		contactMap.put("contact_telephone",
+				organizerContactTable.getContact_telephone().isEmpty() ? null : organizerContactTable.getContact_telephone());
 		contactMap.put("web_site_address", organizerContactTable.getWeb_site_address().isEmpty() ? null
 				: organizerContactTable.getWeb_site_address());
 		return contactMap;

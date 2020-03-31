@@ -24,7 +24,7 @@ public class OrganizerContactTable {
 	private int organizer_id;
 	private int contact_id;
 	private String contact_name;
-	private String telephone;
+	private String contact_telephone;
 	private String web_site_address;
 	private int address_id;
 }

@@ -24,7 +24,7 @@ public class OrganizerTable {
 	private String email_address;
 	private String password;
 	private String phone;
-	private int actived;
+	private String actived;
 	private int contact_id; 
 	private int address_id; 
 	private String contact_name; 

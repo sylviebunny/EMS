@@ -60,4 +60,12 @@ public interface SeatRepository {
      * @return affected rows
      */
 	public int updateAvailability(Seat seat);
+	
+	/**
+     * Update seat availability to available 
+     * 
+     * @param seat Seat information
+     * @return affected rows
+     */
+	public int updateToAvailabile(Seat seat);
 }

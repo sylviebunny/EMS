@@ -52,4 +52,12 @@ public interface SeatRepository {
 	 * @return Object
 	 */
 	public Object getAllSeatInfo(int Room_ID);
+	
+	/**
+     * Update seat availability to unavailable 
+     * 
+     * @param seat Seat information
+     * @return affected rows
+     */
+	public int updateAvailability(Seat seat);
 }

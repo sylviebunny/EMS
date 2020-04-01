@@ -128,6 +128,19 @@ public class SeatRepositoryImpl implements SeatRepository{
 	}	
 	
 	/**
+     * Update seat availability to unavailable 
+     * 
+     * @param seat: The information that needs to be updated. 
+     * @return number of affected rows
+     */
+	@Override
+	public int updateAvailability(Seat seat) {
+		String sql = "UPDATE Seats SET Availability=? where Seat_ID=?";
+		int count = jdbcTemplate.update(sql,"0",seat.getSeat_id());
+		return count;
+	}
+	
+	/**
      * Delete seat information from database by seat id
      * @param Seat_ID
      * @return number of affected rows

@@ -125,6 +125,37 @@ public class SeatController {
 	}
 
 	/**
+	 * Update seat availability to unavailable 
+	 * 
+	 * @param seat. Seat_id cannot be null and must exist in database
+	 * @return ResponseEntity with message
+	 */
+	@RequestMapping(value = "/seat/setseat", method = RequestMethod.PUT, produces = "application/json;charset=UTF-8")
+	public ResponseEntity<String> updateAvailability(@RequestBody(required = true) Seat seat) {
+		try {	
+			int affectedRow = SeatRepositoryImpl.updateAvailability(seat);
+			if (affectedRow == 0) {
+				logger.info("No seat found for: {}", seat.getSeat_id());
+				return new ResponseEntity<>(
+						"{\"message\" : \"Input seat_id not found\"}", HttpStatus.OK);
+			} else {
+				logger.info("Seat updated for seat_id: {} ", seat.getSeat_id());
+				return new ResponseEntity<>(
+						"{\"message\" : \"Seat updated\"}", HttpStatus.OK);
+			}
+		} catch (DataIntegrityViolationException dataIntegrityViolationException) {
+			logger.error("Room_id or category_id not found or Invalid input");
+			return new ResponseEntity<>("{\"message\" : \"Invalid input\"}",
+					HttpStatus.BAD_REQUEST);
+		} catch (Exception exception) {
+			logger.error("Exception in updating seat info: {}", exception.getMessage());
+			return new ResponseEntity<>(
+					"{\"message\" : \"Exception in updating seat availability, please contact admin\"}",
+					HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	/**
 	 * Delete a seat from database by seat id
 	 * 
 	 * @param Seat_ID

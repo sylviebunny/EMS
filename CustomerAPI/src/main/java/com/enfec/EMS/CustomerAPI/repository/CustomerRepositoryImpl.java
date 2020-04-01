@@ -94,8 +94,7 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 		cstmMap.put("psw", customerTable.getPsw() == null || customerTable.getPsw().isEmpty() ? null
 				: Base64.getEncoder().encode((customerTable.getPsw().getBytes())));
 		cstmMap.put("phone", customerTable.getPhone() == null || customerTable.getPhone().isEmpty() ? null : customerTable.getPhone());
-		cstmMap.put("hasActived", customerTable.getHasActived());
-
+		cstmMap.put("hasActived", customerTable.getHasActived() == 0 ? 0 : customerTable.getHasActived());
 		return cstmMap;
 	}
 

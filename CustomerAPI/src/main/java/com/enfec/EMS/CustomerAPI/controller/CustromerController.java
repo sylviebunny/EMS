@@ -140,10 +140,10 @@ public class CustromerController {
 			customerRepositoryImpl.updateActiveStatus(cEmail);
 			logger.info("Customer Active Status changed");
 			
-			return new ResponseEntity<String>("{\"message\": \"Customer account actived\"}", HttpStatus.OK);
+			return new ResponseEntity<String>("{\"message\": \"Customer account activited\"}", HttpStatus.OK);
 		} else if (customerRepositoryImpl.validToken(cToken) && customerRepositoryImpl.hasChecked(cToken)){
 			logger.info(" has checked already ");
-			return new ResponseEntity<String>("{\"message\": \"Customer account actived already, please login\"}", HttpStatus.OK);
+			return new ResponseEntity<String>("{\"message\": \"Customer account has activited already, please login\"}", HttpStatus.OK);
 		} else {
 			logger.info("invalid token: {} ", cToken);
 			return new ResponseEntity<String>("{\"message\": \"Customer account active failed\"}", HttpStatus.OK);
@@ -379,17 +379,23 @@ public class CustromerController {
 			logger.info("customer ID: {} ", cID);
 
 			String newEmail = jEmail.get("newEmail").textValue();
-			customerRepositoryImpl.updateEmail(cID, newEmail);
-			logger.info("Email reset successfully.");
-			
-			customerRepositoryImpl.sendGreetMail(newEmail, "Welcome to EMS", 
-					"<p>You have successfully changed your account to this Email Address</p>"
-					+"<p>Thank you for using our Event Management System\r\n</p>", 
-					cToken);
-			logger.info("Greeting send to the eamil address: {}", newEmail);
-			
-			
-			return new ResponseEntity<>("{\"message\" : \"Email reset successfully!\"}", HttpStatus.OK);
+			if (customerRepositoryImpl.hasRegistered(newEmail)){
+				logger.info("New Email has registered before, Please try another email or log in.");
+				return new ResponseEntity<String>("{\"message\" : \"New Email has registered before, Please try another email or log in.\"}",
+						HttpStatus.OK);
+				}else{
+					customerRepositoryImpl.updateEmail(cID, newEmail);
+					logger.info("Email reset successfully.");
+					
+					customerRepositoryImpl.sendGreetMail(newEmail, "Welcome to EMS", 
+							"<p>You have successfully changed your account to this Email Address</p>"
+							+"<p>Thank you for using our Event Management System\r\n</p>", 
+							cToken);
+					logger.info("Greeting send to the eamil address: {}", newEmail);
+					
+					
+					return new ResponseEntity<>("{\"message\" : \"Email reset successfully!\"}", HttpStatus.OK);
+				}
 
 		}
 		logger.info("Not valid token: {}", cToken);

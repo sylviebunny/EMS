@@ -131,7 +131,7 @@ public class SeatController {
 	 * @return ResponseEntity with message
 	 */
 	@RequestMapping(value = "/seat/setseat", method = RequestMethod.PUT, produces = "application/json;charset=UTF-8")
-	public ResponseEntity<String> updateAvailability(@RequestBody(required = true) Seat seat) {
+	public ResponseEntity<String> updateToUnavailable(@RequestBody(required = true) Seat seat) {
 		try {	
 			int affectedRow = SeatRepositoryImpl.updateAvailability(seat);
 			if (affectedRow == 0) {
@@ -162,7 +162,7 @@ public class SeatController {
 	 * @return ResponseEntity with message
 	 */
 	@RequestMapping(value = "/seat/unsetseat", method = RequestMethod.PUT, produces = "application/json;charset=UTF-8")
-	public ResponseEntity<String> updateToAvailabile(@RequestBody(required = true) Seat seat) {
+	public ResponseEntity<String> updateToAvailable(@RequestBody(required = true) Seat seat) {
 		try {	
 			int affectedRow = SeatRepositoryImpl.updateToAvailabile(seat);
 			if (affectedRow == 0) {

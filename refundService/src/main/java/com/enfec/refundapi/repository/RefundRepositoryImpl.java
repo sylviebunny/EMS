@@ -5,13 +5,20 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.internet.MimeMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import com.enfec.refundapi.model.COrderRefundRowmapper;
@@ -123,6 +130,9 @@ public class RefundRepositoryImpl implements RefundRepository {
 
     @Autowired
     JdbcTemplate jdbcTemplate;
+    
+    @Autowired
+    private JavaMailSender mailSender;
     
     /**
      * {@inheritDoc}
@@ -335,4 +345,37 @@ public class RefundRepositoryImpl implements RefundRepository {
         return affectedRow;
     }
 
+    /**
+     * @param asText
+     * @param customerRefund
+     */
+    public void sendRefundInfoEmail(String recipient_email, List<COrderRefundTable> customerRefund, double refund_amount) {
+        MimeMessage message = mailSender.createMimeMessage(); 
+        MimeMessageHelper helper; 
+        
+        COrderRefundTable currentRefund = customerRefund.get(0); 
+        
+        try {
+            String email_body = "<p><b>Refund successfully created! \n</b></p>" + "<p>\n</p>" + 
+                                "<p>Refund ID: " + currentRefund.getCrefund_id() + "\n</p>" +
+                                "<p>Customer order ID: " + currentRefund.getCorder_id() + "\n</p>" + 
+                                "<p>Refund amount: " + refund_amount + "\n</p>" + 
+                                "<p>Refund status: " + currentRefund.getCrefund_status() + "\n</p>" + 
+                                "<p>Payment ID: " + currentRefund.getStripe_refund_id() + "\n</p>" + 
+                                "<p>Payment status: " + currentRefund.getStripe_status() + "\n</p>" + "<p>\n</p>" +
+                                "<p>This is a system generated mail. Please do not reply to this email ID. If you have a query or need any clarification you may:</p>" + 
+                                "<p>(1) Call our 24-hour Customer Care or\r\n</p>" + 
+                                "<p>(2) Email Us support@enfec.com\r\n</p>"; 
+            
+            helper = new MimeMessageHelper(message, true);
+            helper.setSubject("Refund created for customer order: " + currentRefund.getCorder_id());
+            helper.setTo(recipient_email); 
+            helper.setText(email_body, true);;
+            mailSender.send(message);
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        } 
+    }
+
+    
 }

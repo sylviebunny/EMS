@@ -5,11 +5,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,7 +55,7 @@ public class CustomerOrderRepositoryImpl implements CustomerOrderRepository {
 	final String DELETE_TICKET = "DELETE FROM Tickets WHERE Ticket_ID =?";
 	final String SELECT_TICKET_BY_ORDER = "SELECT Ticket_ID, COrder_ID, Event_ID, Room_ID, Seat_ID, RealPrice FROM Tickets WHERE COrder_ID=?";
 	final String SELECT_PRICE = "SELECT Price FROM Seat_Category WHERE Category_ID=(SELECT category_id FROM Seats WHERE Seat_ID = ?)";
-	final String SELECT_PERCENTAGE_OFF = "SELECT Percentage_Off FROM Discounts, Tickets WHERE Discount_ID = ?";
+	final String SELECT_PERCENTAGE_OFF = "SELECT Percentage_Off FROM Discounts WHERE Discount_ID = ?";
 	
 	//Discount SQL
 	final String SELECT_DISCOUNT = "SELECT * FROM Discounts WHERE Discount_ID=?";
@@ -342,6 +347,35 @@ public class CustomerOrderRepositoryImpl implements CustomerOrderRepository {
 	public int deleteDiscount(String discountID) {
 		int affectedRow = jdbcTemplate.update(DELETE_DISCOUNT,discountID);
 		return affectedRow;
+
+	}
+	
+	
+	
+	@Autowired
+	private JavaMailSender mailSender;
+	
+	/**
+     * Customer order receipt: send order info to customer
+     * @param to: the email address of the customer
+     * @param subject: the subject of the reset password email
+     * @param body: the detail of reset password email
+     * @return null
+     */
+	@Override
+	public void sendOrderEmail(String to, String subject, String body) {
+		MimeMessage message = mailSender.createMimeMessage();
+		MimeMessageHelper helper;
+
+		try {
+			helper = new MimeMessageHelper(message, true);
+			helper.setSubject(subject);
+			helper.setTo(to);
+			helper.setText(body, true);// true indicate html
+			mailSender.send(message);
+		} catch (MessagingException e) {
+			e.printStackTrace();
+		}
 
 	}
 

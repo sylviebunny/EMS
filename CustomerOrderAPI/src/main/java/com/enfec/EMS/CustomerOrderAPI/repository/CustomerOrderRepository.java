@@ -129,4 +129,13 @@ public interface CustomerOrderRepository {
 	 */
 	public int deleteDiscount(String discountID);
 	
+	/**
+     * Customer order receipt: send order info to customer
+     * @param to: the email address of the customer
+     * @param subject: the subject of the reset password email
+     * @param body: the detail of reset password email
+     * @return null
+     */
+	public void sendOrderEmail(String to, String subject, String body);
+	
 }

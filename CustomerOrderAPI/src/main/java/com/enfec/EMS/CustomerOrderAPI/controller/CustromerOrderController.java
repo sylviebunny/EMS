@@ -1,6 +1,7 @@
 package com.enfec.EMS.CustomerOrderAPI.controller;
 
 
+import java.sql.Timestamp;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -19,6 +20,7 @@ import com.enfec.EMS.CustomerOrderAPI.model.CustomerOrderTable;
 import com.enfec.EMS.CustomerOrderAPI.model.DiscountTable;
 import com.enfec.EMS.CustomerOrderAPI.model.TicketTable;
 import com.enfec.EMS.CustomerOrderAPI.repository.CustomerOrderRepositoryImpl;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.Gson;
 
 /************************************************
@@ -367,5 +369,54 @@ public class CustromerOrderController {
 	
 	}
 	
+	
+	
+	/**
+	 * Send customer order email
+	 * @param cEmail: Customer email address
+	 * @param cOrderID: Customer order ID
+	 * @return ResponseEntity with message
+	 */
+	@RequestMapping(value = "/Customer/OrderEmail", method = RequestMethod.POST, produces = "applications/json; charset=UTF-8")
+	public ResponseEntity<String> customerOrderEmail(@RequestBody(required = true) ObjectNode json ) {
+		String cEmail = json.get("cEmail").textValue();
+		String cOrderID = json.get("cOrderID").textValue();
+		double amount = json.get("amount").doubleValue();
+		try {
+			if (customerOrderRepositoryImpl.getCustomerOrder(cOrderID).isEmpty()) {
+				return new ResponseEntity<String>("{\"message\" : \"Customer Order doesn't exist, Please check\"}",
+						HttpStatus.OK);
+			} else {
+				List<CustomerOrderTable>orderDetail = customerOrderRepositoryImpl.getCustomerOrder(cOrderID);
+				int cOID = orderDetail.get(0).getCustomerOrderID();
+				Timestamp time = orderDetail.get(0).getOrderTime();
+				String orderStatus = orderDetail.get(0).getStripeStatus();
+				
+				customerOrderRepositoryImpl.sendOrderEmail(cEmail, "Payment Receipt", 
+						"<p>Thanks for your payment to EMS!</p>"
+						+"<p><b>Your Order Number is: "
+						+ cOID + "</b></p>"
+						+ "<p>Your Order Time is : "
+						+ time + "</p>"
+						+ "<p>Your Order Status is: "
+						+ orderStatus + "</p>" 
+						+ "<p>Your Order amount is: "
+						+ amount + "</p>" +
+						"<p>This is a system generated mail. Please do not reply to this email ID. If you have a query or need any clarification you may:</p>"
+						+ "<p>(1) Call our 24-hour Customer Care or\r\n</p>"
+						+ "<p>(2) Email Us support@enfec.com\r\n</p>" +
+	
+						"<p>For any problem please contact us at 24*7 Hrs. Customer Support at 18001231234 (TBD) or mail us at support@enfec.com\r\n"
+						+ "Thank you for using our Event Management System\r\n</p>");
+				
+				logger.info("Order detail send to the eamil address: {}", cEmail);
+				return new ResponseEntity<String>(
+						"{\"message\": \"Customer order receipt send to the email\"}", HttpStatus.OK);
+			}
+		} catch (DataIntegrityViolationException dataIntegrityViolationException) {
+			logger.error("Invalid Customer Order id:{}", cOrderID);
+			return new ResponseEntity<String>("{\"message\": \"Invalid Customer Order id\"}", HttpStatus.BAD_REQUEST);
+		}
+	}
 	
 }

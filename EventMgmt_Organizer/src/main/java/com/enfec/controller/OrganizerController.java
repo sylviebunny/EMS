@@ -421,10 +421,10 @@ public class OrganizerController {
 			OrganizerRepositoryImpl.updateActiveStatus(oEmail);
 			logger.info("Customer Active Status changed");
 			
-			return new ResponseEntity<String>("{\"message\": \"Organizer account actived\"}", HttpStatus.OK);
+			return new ResponseEntity<String>("{\"message\": \"Organizer account activated\"}", HttpStatus.OK);
 		} else if (OrganizerRepositoryImpl.validToken(oToken) && OrganizerRepositoryImpl.hasChecked(oToken)){
 			logger.info(" has checked already ");
-			return new ResponseEntity<String>("{\"message\": \"Organizer account actived already, please login\"}", HttpStatus.OK);
+			return new ResponseEntity<String>("{\"message\": \"Organizer account has activated already, please login\"}", HttpStatus.OK);
 		} else {
 			logger.info("invalid token: {} ", oToken);
 			return new ResponseEntity<String>("{\"message\": \"Organizer account active failed\"}", HttpStatus.OK);
@@ -580,18 +580,24 @@ public class OrganizerController {
 			logger.info("Organizer ID: {} ", oID);
 
 			String newEmail = jEmail.get("newEmail").textValue();
-			OrganizerRepositoryImpl.updateEmail(oID, newEmail);
-			logger.info("Email reset successfully.");
-			
-			OrganizerRepositoryImpl.sendGreetMail(newEmail, "Welcome to EMS", 
-					"<p>You have successfully changed your account to this Email Address</p>"
-					+"<p>Thank you for using our Event Management System\r\n</p>", 
-					oToken);
-			logger.info("Greeting send to the email address: {}", newEmail);
-			
-			
-			return new ResponseEntity<>("{\"message\" : \"Email reset successfully!\"}", HttpStatus.OK);
 
+			if (OrganizerRepositoryImpl.hasRegistered(newEmail)) {
+				logger.info("New Email has registered before, Please try another email or log in.");
+				return new ResponseEntity<String>("{\"message\" : \"New Email has registered before, Please try another email or log in.\"}",
+						HttpStatus.OK);
+				} else {
+					OrganizerRepositoryImpl.updateEmail(oID, newEmail);
+					logger.info("Email reset successfully.");
+					
+					OrganizerRepositoryImpl.sendGreetMail(newEmail, "Welcome to EMS", 
+							"<p>You have successfully changed your account to this Email Address</p>"
+							+"<p>Thank you for using our Event Management System\r\n</p>", 
+							oToken);
+					logger.info("Greeting send to the email address: {}", newEmail);
+					
+					
+					return new ResponseEntity<>("{\"message\" : \"Email reset successfully!\"}", HttpStatus.OK);
+				}
 		}
 		logger.info("Not valid token: {}", oToken);
 		return new ResponseEntity<>("{\"message\" : \"Invalid Token. Please re-reset Email.\"}", HttpStatus.OK);

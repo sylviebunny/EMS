@@ -3,6 +3,7 @@ package com.enfec.refundapi.controller;
 import com.enfec.refundapi.model.COrderRefundTable;
 import com.enfec.refundapi.model.OOrderRefundTable;
 import com.enfec.refundapi.repository.RefundRepositoryImpl;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.Gson;
 import java.util.List;
 import org.slf4j.Logger;
@@ -316,8 +317,7 @@ public class RefundController {
      * @param customer_order_id. Cannot be null and must be positive
      * @return ResponseEntity with message and data
      */
-    @RequestMapping(value = "/customer_refund/search/customer_order_id/{corder_id}",
-            method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
+    @RequestMapping(value = "/customer_refund/search/customer_order_id/{corder_id}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
     public ResponseEntity<String> getCustomerRefundByCorderID(@PathVariable int corder_id) {
 
         try {
@@ -433,8 +433,7 @@ public class RefundController {
      * @param customer_refund_id. Cannot be null and must be positive 
      * @return ResponseEntity with message
      */
-    @RequestMapping(value = "/customer_refund/delete/{customer_refund_id}",
-            method = RequestMethod.DELETE, produces = "application/json;charset=UTF-8")
+    @RequestMapping(value = "/customer_refund/delete/{customer_refund_id}", method = RequestMethod.DELETE, produces = "application/json;charset=UTF-8")
     public ResponseEntity<String> deleteCustomerRefund(@PathVariable int customer_refund_id) {
         try {
             int affectedRow = refundRepositoryImpl.deleteCustomerRefund(customer_refund_id);
@@ -459,4 +458,17 @@ public class RefundController {
         }
     }
 
+    
+    @RequestMapping(value = "/customer_refund/send_email", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+    public ResponseEntity<String> sendCustomerRefundEmail(@RequestBody(required = true) ObjectNode customerInfo) {
+        int corder_id = customerInfo.get("corder_id").asInt(); 
+        List<COrderRefundTable> customerRefund = refundRepositoryImpl.getCustomerRefundByCorderID(corder_id);
+        
+        if (customerRefund == null || customerRefund.size() == 0) {
+            return new ResponseEntity<>(String.format("{\"message\" : \"No customer refund found for given customer order id: %s\"}", corder_id), HttpStatus.OK); 
+        } else {
+            refundRepositoryImpl.sendRefundInfoEmail(customerInfo.get("recipient_email").asText(), customerRefund, customerInfo.get("refund_amount").asDouble()); 
+            return new ResponseEntity<>(String.format("{\"message\" : \"Customer Refund info sent to email: %s\"}", customerInfo.get("recipient_email").asText()), HttpStatus.OK); 
+        }
+    }
 }

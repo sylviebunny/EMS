@@ -376,7 +376,7 @@ public class EventRepositoryImpl implements EventRepository {
 	 * @param str
 	 * @return zipcode in int type or null if input is not a valid 5-digit zipcode
 	 */
-	private Integer getZipcode(String str) {
+	public Integer getZipcode(String str) {
 		if (str != null && str.length() != 5) {
 			return null; 
 		}

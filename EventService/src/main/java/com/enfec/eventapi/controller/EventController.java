@@ -2,6 +2,8 @@ package com.enfec.eventapi.controller;
 
 import java.rmi.NotBoundException;
 import java.sql.Timestamp;
+import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +25,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import com.enfec.eventapi.model.EventComparatorByDistance;
+import com.enfec.eventapi.model.EventComparatorByStartTime;
 import com.enfec.eventapi.model.EventTable;
 import com.enfec.eventapi.repository.AmazonClient;
 import com.enfec.eventapi.repository.EventRepositoryImpl;
@@ -95,6 +99,14 @@ public class EventController {
 			List<Map> afterFilterEvents = eventRepositoryImpl.getFilteredEventsByWordFilter(getAllEvent, word);
 			List<Map> resultEvents = eventRepositoryImpl.getEventsAfterToday(afterFilterEvents); 
 			
+			Integer zipcode = eventRepositoryImpl.getZipcode(word); 
+			
+			if (zipcode == null) {
+			    Collections.sort(resultEvents, new EventComparatorByStartTime()); 
+			} else {
+			    Collections.sort(resultEvents, new EventComparatorByDistance()); 
+			}
+			
 			if (resultEvents.isEmpty()) {
 			    logger.info("No event found, word: {}", word);
 				return new ResponseEntity<>("{\"message\" : \"No event found\"}", HttpStatus.OK);
@@ -155,6 +167,12 @@ public class EventController {
 
 			List<Map> result_events = eventRepositoryImpl.getEventsAfterToday(afterFilterEvents); 
 			
+            if (zipcode == null) {
+                Collections.sort(result_events, new EventComparatorByStartTime()); 
+            } else {
+                Collections.sort(result_events, new EventComparatorByDistance()); 
+            }
+			
 			if (result_events == null || result_events.size() == 0) {
 			    logger.info("Based on given criteria, no event found");
 				return new ResponseEntity<>("{\"message\" : \"No event found\"}", HttpStatus.OK);
@@ -182,6 +200,37 @@ public class EventController {
 		}
 	}
 
+    @RequestMapping(value = "event/search_period", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
+    public ResponseEntity<String> getEventsWithinPeriod( @RequestParam(required = true) int days) {
+        try {
+            
+            List<EventTable> allEvent = eventRepositoryImpl.getAllEvents();
+            
+            Timestamp currentTime = new Timestamp(System.currentTimeMillis()); 
+            
+            Calendar c = Calendar.getInstance();
+            c.add(Calendar.DATE, days);  
+            Timestamp afterTime =  new Timestamp(c.getTimeInMillis()); 
+            
+            List<Map> result_events = eventRepositoryImpl.getFilteredEventsWithDateRange(allEvent, currentTime, afterTime);
+            
+            if (result_events == null || result_events.size() == 0) {
+                logger.info("Based on given criteria, no event found");
+                return new ResponseEntity<>("{\"message\" : \"No event found\"}", HttpStatus.OK);
+            } else {
+                logger.info("Events found");
+                return new ResponseEntity<>(new Gson().toJson(result_events), HttpStatus.OK);
+            }
+        } catch (CannotGetJdbcConnectionException ce) {
+            logger.error("Fail to connect database: {}",ce.getMessage());
+            return new ResponseEntity<>("{\"message\" : \"Fail to connect database\"}",
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            logger.error("Exception in searching events: {}", e.getMessage());
+            return new ResponseEntity<>("{\"message\" : \"Unknown error, please contact developer\"}",
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 	/**
 	 * Post API to create an event
 	 * @param eventTable parameter table of the event to be created
